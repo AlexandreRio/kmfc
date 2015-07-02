@@ -76,7 +76,7 @@ public class Generator {
                 factoryGenerator.generateFactory((EClass) eo);
 
                 classes.append(HelperGenerator.genIncludeLocal(((EClass) eo).getName()));
-
+                break;
             }  else if(eo instanceof EPackage)
             {
                 String name =   ((EPackage) eo).getNsPrefix();

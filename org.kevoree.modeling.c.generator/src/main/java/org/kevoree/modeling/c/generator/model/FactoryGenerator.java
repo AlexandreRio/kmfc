@@ -49,24 +49,24 @@ public class FactoryGenerator extends AGenerator
 
     }
     public void generateClass(EClass e){
-        add_CPP(e.getName() + "* create" + e.getName() + "(){return new " + e.getName() + "();\n};");
+        add_C(e.getName() + "* create" + e.getName() + "(){return new " + e.getName() + "();\n};");
     }
 
     public void generateVersion()
     {
         add_H("string getVersion();");
-        add_CPP("string getVersion(){ return "+ctx.getVersion()+";\n}");
+        add_C("string getVersion(){ return " + ctx.getVersion() + ";\n}");
     }
 
     public void generateCreate(){
-        add_CPP("KMFContainer* create(std::string metaClassName){");
+        add_C("KMFContainer* create(std::string metaClassName){");
             for (String name : classes){
-                add_CPP("if(metaClassName.compare(\"org."+ctx.getName_package()+"."+name+"\")==0){");
-                add_CPP("return create"+name+"();");
-                add_CPP("}");
+                add_C("if(metaClassName.compare(\"org." + ctx.getName_package() + "." + name + "\")==0){");
+                add_C("return create" + name + "();");
+                add_C("}");
             }
-        add_CPP("return NULL;");
-        add_CPP("}");
+        add_C("return NULL;");
+        add_C("}");
     }
     public void write(){
         link_generation();

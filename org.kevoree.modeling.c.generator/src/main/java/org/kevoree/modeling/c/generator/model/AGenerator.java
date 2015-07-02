@@ -33,7 +33,7 @@ public abstract  class AGenerator {
         destructor.append(source+"\n");
     }
 
-    protected void add_CPP(String source){
+    protected void add_C(String source){
         class_result.append(source+"\n");
     }
 
@@ -46,7 +46,7 @@ public abstract  class AGenerator {
     }
     protected void ADD_DEBUG(EClass cls,String msg){
         if(ctx.isDebug_model()){
-            add_CPP(msg_DEBUG(cls,msg));
+            add_C(msg_DEBUG(cls, msg));
         }
     }
     protected void add_H(String s){
@@ -81,19 +81,16 @@ public abstract  class AGenerator {
 
     protected void generateDestructorMethod(EClass cls) {
         add_H("~"+cls.getName()+"();\n");
-        add_CPP(cls.getName()+"::~"+cls.getName()+"(){\n");
-        add_CPP(destructor.toString());
-        add_CPP("}\n");
+        add_C(cls.getName() + "::~" + cls.getName() + "(){\n");
+        add_C(destructor.toString());
+        add_C("}\n");
     }
 
     protected void generateConstructorMethod(EClass cls) {
-
-        add_H(cls.getName()+"();\n");
-        add_CPP(cls.getName()+"::"+cls.getName()+"(){\n");
-        add_CPP(constructor.toString());
-        add_CPP("}\n");
-
-
+        add_H(cls.getName()+"* new_" + cls.getName() + "(void);\n");
+        add_C(cls.getName() + "* new_" + cls.getName() + "(){\n");
+        add_C(constructor.toString());
+        add_C("}\n");
     }
 
     public void link_generation(){
