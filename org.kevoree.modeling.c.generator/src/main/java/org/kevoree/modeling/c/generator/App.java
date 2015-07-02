@@ -1,4 +1,4 @@
-package org.kevoree.modeling.cpp.generator;
+package org.kevoree.modeling.c.generator;
 
 import org.apache.commons.cli.*;
 

@@ -1,4 +1,4 @@
-package org.kevoree.modeling.cpp.generator.model;
+package org.kevoree.modeling.c.generator.model;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -6,10 +6,10 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
-import org.kevoree.modeling.cpp.generator.utils.ConverterDataTypes;
-import org.kevoree.modeling.cpp.generator.GenerationContext;
-import org.kevoree.modeling.cpp.generator.utils.HelperGenerator;
-import org.kevoree.modeling.cpp.generator.utils.FileManager;
+import org.kevoree.modeling.c.generator.utils.HelperGenerator;
+import org.kevoree.modeling.c.generator.utils.ConverterDataTypes;
+import org.kevoree.modeling.c.generator.GenerationContext;
+import org.kevoree.modeling.c.generator.utils.FileManager;
 
 import java.io.IOException;
 import java.io.StringWriter;

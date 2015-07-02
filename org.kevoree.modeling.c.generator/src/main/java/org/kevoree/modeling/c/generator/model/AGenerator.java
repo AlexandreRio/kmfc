@@ -1,9 +1,8 @@
-package org.kevoree.modeling.cpp.generator.model;
+package org.kevoree.modeling.c.generator.model;
 
-import org.apache.velocity.Template;
 import org.apache.velocity.app.VelocityEngine;
 import org.eclipse.emf.ecore.EClass;
-import org.kevoree.modeling.cpp.generator.GenerationContext;
+import org.kevoree.modeling.c.generator.GenerationContext;
 
 /**
  * Created with IntelliJ IDEA.

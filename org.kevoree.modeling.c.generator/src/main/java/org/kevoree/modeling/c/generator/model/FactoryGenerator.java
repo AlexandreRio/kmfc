@@ -1,11 +1,10 @@
-package org.kevoree.modeling.cpp.generator.model;
+package org.kevoree.modeling.c.generator.model;
 
 import org.eclipse.emf.ecore.EClass;
-import org.kevoree.modeling.cpp.generator.GenerationContext;
-import org.kevoree.modeling.cpp.generator.utils.FileManager;
-import org.kevoree.modeling.cpp.generator.utils.HelperGenerator;
+import org.kevoree.modeling.c.generator.utils.HelperGenerator;
+import org.kevoree.modeling.c.generator.GenerationContext;
+import org.kevoree.modeling.c.generator.utils.FileManager;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

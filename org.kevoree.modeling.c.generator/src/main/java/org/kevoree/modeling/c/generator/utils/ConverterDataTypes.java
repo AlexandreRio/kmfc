@@ -1,4 +1,4 @@
-package org.kevoree.modeling.cpp.generator.utils;
+package org.kevoree.modeling.c.generator.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

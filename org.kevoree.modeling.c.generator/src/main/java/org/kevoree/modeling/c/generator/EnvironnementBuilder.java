@@ -1,10 +1,10 @@
-package org.kevoree.modeling.cpp.generator;
+package org.kevoree.modeling.c.generator;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
-import org.kevoree.modeling.cpp.generator.utils.FileManager;
+import org.kevoree.modeling.c.generator.utils.FileManager;
 import org.kevoree.resolver.MavenResolver;
 //import org.kevoree.resolver.MavenResolver;
 
@@ -12,9 +12,7 @@ import org.kevoree.resolver.MavenResolver;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 
 /**

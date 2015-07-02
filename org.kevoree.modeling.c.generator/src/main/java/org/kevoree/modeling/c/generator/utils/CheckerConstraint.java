@@ -1,9 +1,9 @@
-package org.kevoree.modeling.cpp.generator.utils;
+package org.kevoree.modeling.c.generator.utils;
 
 import org.eclipse.emf.ecore.*;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.XMIResource;
-import org.kevoree.modeling.cpp.generator.GenerationContext;
+import org.kevoree.modeling.c.generator.GenerationContext;
 
 import java.util.Iterator;
 

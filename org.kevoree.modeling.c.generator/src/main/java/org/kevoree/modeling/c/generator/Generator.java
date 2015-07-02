@@ -1,4 +1,4 @@
-package org.kevoree.modeling.cpp.generator;
+package org.kevoree.modeling.c.generator;
 
 
 
@@ -10,11 +10,11 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
-import org.kevoree.modeling.cpp.generator.model.ClassGenerator;
-import org.kevoree.modeling.cpp.generator.model.FactoryGenerator;
-import org.kevoree.modeling.cpp.generator.utils.CheckerConstraint;
-import org.kevoree.modeling.cpp.generator.utils.FileManager;
-import org.kevoree.modeling.cpp.generator.utils.HelperGenerator;
+import org.kevoree.modeling.c.generator.model.ClassGenerator;
+import org.kevoree.modeling.c.generator.model.FactoryGenerator;
+import org.kevoree.modeling.c.generator.utils.CheckerConstraint;
+import org.kevoree.modeling.c.generator.utils.FileManager;
+import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,7 +89,7 @@ public class Generator {
 
                 }
 
-                FileManager.writeFile(context.getPackageGenerationDirectory()+"classes.cpp", HelperGenerator.genIncludeLocal(context.getName_package()),false);
+                FileManager.writeFile(context.getPackageGenerationDirectory() + "classes.cpp", HelperGenerator.genIncludeLocal(context.getName_package()), false);
                 factoryGenerator= new FactoryGenerator(context);
             }
 
