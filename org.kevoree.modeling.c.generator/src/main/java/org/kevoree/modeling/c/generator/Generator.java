@@ -2,6 +2,7 @@ package org.kevoree.modeling.c.generator;
 
 
 
+import com.sun.nio.sctp.SctpSocketOption;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.*;
 import org.eclipse.emf.ecore.impl.EClassImpl;
@@ -68,9 +69,9 @@ public class Generator {
         for (Iterator i = resource.getAllContents(); i.hasNext();) {
             EObject eo = (EObject)i.next();
 
+
             if(eo instanceof EClass)
             {
-
                 classGenerator.generateClass((EClass) eo);
                 factoryGenerator.generateFactory((EClass) eo);
 
@@ -78,8 +79,7 @@ public class Generator {
 
             }  else if(eo instanceof EPackage)
             {
-                               String name =   ((EPackage) eo).getNsPrefix();
-
+                String name =   ((EPackage) eo).getNsPrefix();
                 context.setName_package( name.replace(".",""));
 
                 try {
