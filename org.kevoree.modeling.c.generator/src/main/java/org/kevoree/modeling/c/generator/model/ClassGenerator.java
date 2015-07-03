@@ -52,8 +52,9 @@ public class ClassGenerator extends AGenerator {
     public void generateClass(EClass cls) throws IOException {
         initGeneration();
         generateBeginHeader(cls);
+        generateFunctionHeader(cls);
         generateInit(cls);
-        //generateAttributes(cls);
+        generateAttributes(cls);
         //generateMethodAdd(cls);
         //generateMethodRemove(cls);
         generateGettermetaClassName(cls);
@@ -312,7 +313,7 @@ public class ClassGenerator extends AGenerator {
         StringWriter result_visitor = new StringWriter();
         context_visitor.put("classname",cls.getName());
         context_visitor.put("visitor_refs_contained",result_visitor_ref_contained);
-        context_visitor.put("visitor_refs_non_contained",result_visitor_ref_non_contained);
+        context_visitor.put("visitor_refs_non_contained", result_visitor_ref_non_contained);
 
         if(ctx.isDebug_model()){
             context_visitor.put("debug",msg_DEBUG(cls,"Visiting class "+cls.getName()));
@@ -454,11 +455,30 @@ public class ClassGenerator extends AGenerator {
         }
     }
 
+    public void generateFunctionHeader(EClass cls) {
+        for (EReference ref : cls.getEReferences()) {
+            String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
+            add_H("typedef void (*fptr" + cls.getName() + "Add" + HelperGenerator.genToUpperCaseFirstChar(ref.getName()) + ")(" + cls.getName() + "*, " + type + "*);");
+            add_H("typedef void (*fptr" + cls.getName() + "Remove" + HelperGenerator.genToUpperCaseFirstChar(ref.getName()) + ")(" + cls.getName() + "*, " + type + "*);");
+        }
+    }
+
     public void generateVirtualTable(EClass cls) {
         //TODO .c file
+        // C part
 
-        String firstCharLowerCaseName = Character.toLowerCase(cls.getName().charAt(0)) + cls.getName().substring(1);
-        add_H("extern const " + cls.getName() + "_VT " + firstCharLowerCaseName + "_VT;");
+
+        // Header part
+        add_H("typedef struct _" + cls.getName() + "_VT {");
+        if (cls.getESuperTypes().size() == 1)
+            add_H("\t" + cls.getESuperTypes().get(0).getName() + "_VT *super;");
+        else if (cls.getESuperTypes().size() == 0)
+            add_H("\tKMFContainer_VT *super;");
+        else
+            System.err.println("Invalid number of parent in " + cls.getName());
+        add_H("} " + cls.getName() + "_VT;");
+
+        add_H("extern const " + cls.getName() + "_VT " + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT;");
     }
 
     //TODO
@@ -552,17 +572,13 @@ public class ClassGenerator extends AGenerator {
 
 
     private void generateAttributes(EClass cls){
-
-
-        add_PUBLIC_ATTRIBUTE("public:\n");
-
-        for( EAttribute eAttribute : cls.getEAttributes() )
-        {
-            add_PUBLIC_ATTRIBUTE(ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()));
-            add_PUBLIC_ATTRIBUTE(" "+eAttribute.getName()+";\n");
-
-
+        add_H("typedef struct _" + cls.getName() + "NodeType {");
+        //TODO parents attributes
+        for( EAttribute eAttribute : cls.getEAttributes() ) {
+            System.out.println(cls.getName() + " attr " + eAttribute.getName() + " type " + ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()));
+            add_H(ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()) + " " + eAttribute.getName());
         }
+        add_H("} " + cls.getName() + ";");
 
         generateinternalGetKey(cls);
 
@@ -587,11 +603,6 @@ public class ClassGenerator extends AGenerator {
 
                 //
             }
-
-
-
-
-
             gen_type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
 
 
@@ -599,23 +610,23 @@ public class ClassGenerator extends AGenerator {
             {
                 if(ref.getEReferenceType().getEIDAttribute() != null)
                 {
+                    //TODO add attr in a map for inheritance
 
-                    add_PUBLIC_ATTRIBUTE("std::map<string,"+gen_type+"*> "+ref.getName()+"; \n") ;
+                    // map_t ref.getName();
+                    add_ATTRIBUTE("map_t "+ref.getName()+"; \n") ;
                     //  add_CONSTRUCTOR(ref.getName() + ".set_empty_key(\"\");");
                     generateFindbyIdAttribute(cls, ref);
                 }  else
                 {
-
                     System.err.println("NO ID "+ref.getName());
                 }
 
             }else
             {
                 // TODO implements shared_ptr to fix delete from other class
-                add_PUBLIC_ATTRIBUTE(gen_type+" *"+ref.getName()+"; \n");
+                add_ATTRIBUTE(gen_type+" *"+ref.getName()+"; \n");
                 add_CONSTRUCTOR(ref.getName()+"=NULL;");
             }
-
         }
 
 
@@ -632,19 +643,19 @@ public class ClassGenerator extends AGenerator {
         add_HEADER(HelperGenerator.genInclude("string.h"));
         add_HEADER(HelperGenerator.genInclude("stdio.h"));
 
-        for(EClass super_eclass : cls.getESuperTypes() )
-            add_HEADER(HelperGenerator.genIncludeLocal(super_eclass.getName()));
-
+        // only greater than 0 value should be 1
+        if (cls.getESuperTypes().size() > 0) {
+            for (EClass super_eclass : cls.getESuperTypes())
+                add_HEADER(HelperGenerator.genIncludeLocal(super_eclass.getName()));
+        } else {
+            add_HEADER(HelperGenerator.genIncludeLocal("KMFContainer.h"));
+        }
     }
 
 
     public void generateEndHeader(){
         api_result.append(HelperGenerator.genENDIF());
     }
-
-
-
-
 
     public void writeHeader(EClass cls) throws IOException {
         // WRITE

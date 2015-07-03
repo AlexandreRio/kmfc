@@ -1,6 +1,7 @@
 package org.kevoree.modeling.c.generator.utils;
 
 
+import org.eclipse.emf.ecore.EClass;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,6 +22,13 @@ public class HelperGenerator {
         return   "#include \""+name+".h\"\n";
     }
 
+    public static String genToLowerCaseFirstChar(String name) {
+        return Character.toLowerCase(name.charAt(0)) + name.substring(1);
+    }
+
+    public static String genToUpperCaseFirstChar(String name) {
+        return Character.toUpperCase(name.charAt(0)) + name.substring(1);
+    }
 
     public static String genIFDEF(String name){
         return   "#ifndef __"+name+"_H\n" +

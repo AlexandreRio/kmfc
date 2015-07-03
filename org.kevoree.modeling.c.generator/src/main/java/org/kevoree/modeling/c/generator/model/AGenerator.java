@@ -11,7 +11,7 @@ import org.kevoree.modeling.c.generator.GenerationContext;
  * Time: 10:23
  * To change this templates use File | Settings | File Templates.
  */
-public abstract  class AGenerator {
+public abstract class AGenerator {
     protected GenerationContext ctx;
     protected StringBuilder header;
     protected StringBuilder gen_class;
@@ -25,80 +25,77 @@ public abstract  class AGenerator {
 
     protected VelocityEngine ve = new VelocityEngine();
 
-    protected void add_CONSTRUCTOR(String source){
-       constructor.append(source+"\n");
-   }
-
-    protected void add_DESTRUCTOR(String source){
-        destructor.append(source+"\n");
+    protected void add_CONSTRUCTOR(String source) {
+        constructor.append(source + "\n");
     }
 
-    protected void add_C(String source){
-        class_result.append(source+"\n");
+    protected void add_DESTRUCTOR(String source) {
+        destructor.append(source + "\n");
     }
 
-    protected String msg_DEBUG(EClass cls,String msg){
-        return "LOGGER_WRITE(Logger::DEBUG_MODEL,\""+cls.getName()+" --> "+msg+"\");";
+    protected void add_C(String source) {
+        class_result.append(source + "\n");
     }
 
-    protected String msg_ERROR(EClass cls,String msg){
-        return "LOGGER_WRITE(Logger::DEBUG_MODEL,\""+cls.getName()+" --> "+msg+"\");";
+    protected String msg_DEBUG(EClass cls, String msg) {
+        return "LOGGER_WRITE(Logger::DEBUG_MODEL,\"" + cls.getName() + " --> " + msg + "\");";
     }
-    protected void ADD_DEBUG(EClass cls,String msg){
-        if(ctx.isDebug_model()){
+
+    protected String msg_ERROR(EClass cls, String msg) {
+        return "LOGGER_WRITE(Logger::DEBUG_MODEL,\"" + cls.getName() + " --> " + msg + "\");";
+    }
+
+    protected void ADD_DEBUG(EClass cls, String msg) {
+        if (ctx.isDebug_model()) {
             add_C(msg_DEBUG(cls, msg));
         }
     }
-    protected void add_H(String s){
-        body.append(s+"\n");
+
+    protected void add_H(String s) {
+        body.append(s + "\n");
     }
 
-    protected void add_HEADER(String source){
+    protected void add_HEADER(String source) {
         header.append(source);
     }
 
-    protected void add_PUBLIC_ATTRIBUTE(String source){
+    protected void add_ATTRIBUTE(String source) {
         public_attributes.append(source);
     }
 
-    protected void add_PRIVATE_ATTRIBUTE(String source){
-        private_attributes.append(source);
-    }
-
-    protected void initGeneration(){
+    protected void initGeneration() {
         header = new StringBuilder();
         gen_class = new StringBuilder();
         private_attributes = new StringBuilder();
         public_attributes = new StringBuilder();
         body = new StringBuilder();
         api_result = new StringBuilder();
-        class_result = new StringBuilder() ;
+        class_result = new StringBuilder();
         constructor = new StringBuilder();
         destructor = new StringBuilder();
 
     }
 
 
-
     protected void generateDestructorMethod(EClass cls) {
-        add_H("~"+cls.getName()+"();\n");
+        add_H("~" + cls.getName() + "();\n");
         add_C(cls.getName() + "::~" + cls.getName() + "(){\n");
         add_C(destructor.toString());
         add_C("}\n");
     }
 
     protected void generateConstructorMethod(EClass cls) {
-        add_H(cls.getName()+"* new_" + cls.getName() + "(void);\n");
+        add_H(cls.getName() + "* new_" + cls.getName() + "(void);\n");
         add_C(cls.getName() + "* new_" + cls.getName() + "(){\n");
         add_C(constructor.toString());
         add_C("}\n");
     }
 
-    public void link_generation(){
+    public void link_generation() {
         api_result.append(header);
         api_result.append(gen_class);
-        api_result.append(private_attributes);
-        api_result.append(public_attributes);
+        //api_result.append(private_attributes);
+        //api_result.append(public_attributes);
         api_result.append(body);
     }
 
