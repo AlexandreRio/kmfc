@@ -64,6 +64,7 @@ public abstract  class AGenerator {
     protected void add_PRIVATE_ATTRIBUTE(String source){
         private_attributes.append(source);
     }
+
     protected void initGeneration(){
         header = new StringBuilder();
         gen_class = new StringBuilder();

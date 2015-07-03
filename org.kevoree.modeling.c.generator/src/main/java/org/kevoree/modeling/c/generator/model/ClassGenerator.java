@@ -50,24 +50,20 @@ public class ClassGenerator extends AGenerator {
 
      */
     public void generateClass(EClass cls) throws IOException {
-
         initGeneration();
-        generateBeginClassHeader(cls);
-        generateAttributes(cls);
-        generateMethodAdd(cls);
-        generateMethodRemove(cls);
+        generateBeginHeader(cls);
+        generateInit(cls);
+        //generateAttributes(cls);
+        //generateMethodAdd(cls);
+        //generateMethodRemove(cls);
         generateGettermetaClassName(cls);
-        //generateFlatReflexiveSetters(cls);
-        //generateFindById(cls);
-        //generateVisitor(cls);
-        //generateVisitorAttribute(cls);
         generateDeleteMethod(cls);
         generateConstructorMethod(cls);
-        //generateDestructorMethod(cls);
+        generateVirtualTable(cls);
         link_generation();
-        generateEndClass(cls);
-        writeHeader(cls);
+        generateEndHeader();
 
+        writeHeader(cls);
         FileManager.writeFile(ctx.getPackageGenerationDirectory() + cls.getName() + ".c", class_result.toString(), true);
     }
 
@@ -106,6 +102,10 @@ public class ClassGenerator extends AGenerator {
 
         }
         add_DESTRUCTOR(result.toString());
+    }
+
+    private void generateInit(EClass cls) {
+        add_H("void init" + cls.getName() + "(" + cls.getName() + " * const this);");
     }
 
     private void generateGettermetaClassName(EClass cls) {
@@ -317,7 +317,7 @@ public class ClassGenerator extends AGenerator {
         if(ctx.isDebug_model()){
             context_visitor.put("debug",msg_DEBUG(cls,"Visiting class "+cls.getName()));
         }else {
-            context_visitor.put("debug","");
+            context_visitor.put("debug", "");
         }
         gen_visitor.merge(context_visitor, result_visitor);
 
@@ -345,7 +345,7 @@ public class ClassGenerator extends AGenerator {
         for(EReference ref : cls.getEReferences()  ){
 
             String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
-            add_H("void remove"+ref.getName()+"("+type+" *ptr);");
+            add_H("void remove" + ref.getName() + "(" + type + " *ptr);");
 
 
             if(ref.getUpperBound() == -1)
@@ -454,6 +454,14 @@ public class ClassGenerator extends AGenerator {
         }
     }
 
+    public void generateVirtualTable(EClass cls) {
+        //TODO .c file
+
+        String firstCharLowerCaseName = Character.toLowerCase(cls.getName().charAt(0)) + cls.getName().substring(1);
+        add_H("extern const " + cls.getName() + "_VT " + firstCharLowerCaseName + "_VT;");
+    }
+
+    //TODO
     public void generateinternalGetKey(EClass cls)
     {
         List<String> idsgen  = new ArrayList<String>();
@@ -614,56 +622,23 @@ public class ClassGenerator extends AGenerator {
     }
 
 
-    public void generateBeginClassHeader(EClass cls)
+    public void generateBeginHeader(EClass cls)
     {
 
 
         String name =   cls.getName();
         add_HEADER(HelperGenerator.genIFDEF(name));
-        //  add_CPP(HelperGenerator.genIncludeLocal(name));
 
-        add_HEADER(HelperGenerator.genInclude("string"));
-        add_HEADER(HelperGenerator.genInclude("stdio"));
-
-        if(cls.getESuperTypes().size() >0)
-        {
-            gen_class.append("class "+name+" : ");  // FIX
-        } else {
-            add_HEADER(HelperGenerator.genInclude("microframework/api/container/KMFContainerImpl.h"));
-            gen_class.append("class "+name+" : public KMFContainerImpl");
-        }
-
-        boolean first = true;
-        int i=0;
-
+        add_HEADER(HelperGenerator.genInclude("string.h"));
+        add_HEADER(HelperGenerator.genInclude("stdio.h"));
 
         for(EClass super_eclass : cls.getESuperTypes() )
-        {
-            /*
-            TODO FIX ME CHECK DIAMANT ISSUE  ADD VIRTUAL ON ONE C++ CLASS
-             */
-
             add_HEADER(HelperGenerator.genIncludeLocal(super_eclass.getName()));
-            //    add_HEADER("class "+super_eclass.getName()+"\n");
 
-            // implements
-            gen_class.append("public " + super_eclass.getName());
-
-
-            if(first && i <cls.getESuperTypes().size()-1 ) {
-                gen_class.append(",");
-            }
-
-
-            i++;
-        }
-
-        gen_class.append("{ \n");
     }
 
 
-    public void generateEndClass(EClass cls){
-        api_result.append("}; // END CLASS \n");
+    public void generateEndHeader(){
         api_result.append(HelperGenerator.genENDIF());
     }
 
