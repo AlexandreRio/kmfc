@@ -474,7 +474,8 @@ public class ClassGenerator extends AGenerator {
         else
             System.err.println("Invalid number of parent in " + cls.getName());
 
-        add_self_attribute_H("extern const " + cls.getName() + "_VT " + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT;");
+        add_self_attribute_H("extern const " + cls.getName() + "_VT " +
+                HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT;");
     }
 
     //TODO
@@ -549,7 +550,8 @@ public class ClassGenerator extends AGenerator {
         String name = ref.getName();
 
 
-        add_method_signature_H(type + " *find" + name + "ByID(std::string id);");
+        add_method_signature_H("typedef " + type + " * (*fptr" + eClass.getName() + "Find" +
+                name + "ByID)(" + eClass.getName() + "*, char*);");
 
         add_C(type + "* " + eClass.getName() + "::find" + name + "ByID(std::string id){");
         if(ctx.isDebug_model()){
@@ -562,10 +564,7 @@ public class ClassGenerator extends AGenerator {
         add_C("}else { return NULL; }");
 
         add_C("}");
-
     }
-
-
 
     private void generateAttributes(EClass cls){
         //TODO parents attributes
@@ -573,7 +572,7 @@ public class ClassGenerator extends AGenerator {
             add_ATTRIBUTE("parent: " + c.getName());
 
         for( EAttribute eAttribute : cls.getEAttributes() ) {
-            System.out.println(cls.getName() + " attr " + eAttribute.getName() + " type " + ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()));
+            //System.out.println(cls.getName() + " attr " + eAttribute.getName() + " type " + ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()));
             add_ATTRIBUTE(ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()) + " " + eAttribute.getName());
         }
 
@@ -631,8 +630,6 @@ public class ClassGenerator extends AGenerator {
 
     public void generateBeginHeader(EClass cls)
     {
-
-
         String name =   cls.getName();
         add_begin_header(HelperGenerator.genIFDEF(name));
 
@@ -653,8 +650,5 @@ public class ClassGenerator extends AGenerator {
         // WRITE
         FileManager.writeFile(ctx.getPackageGenerationDirectory()+cls.getName()+".h", header_result.toString(),false);
     }
-
-
-
 
 }

@@ -59,10 +59,6 @@ public abstract class AGenerator {
         }
     }
 
-//    protected void add_H(String s) {
-//        body.append(s + "\n");
-//    }
-
     protected void add_begin_header(String source) {
         begin_header.append(source);
     }
@@ -124,7 +120,6 @@ public abstract class AGenerator {
 
         // header file
         header_result.append(begin_header + "\n");
-        header_result.append(attributes);
         header_result.append(method_signature);
 
         header_result.append("typedef struct _" + this.className +
@@ -132,7 +127,7 @@ public abstract class AGenerator {
         header_result.append(virtual_table);
         header_result.append("} " + this.className + "_VT;\n\n");
 
-        header_result.append("typedef struct _" + this.className + "NodeType {\n");
+        header_result.append("typedef struct _" + this.className + " {\n");
         header_result.append(attributes);
         header_result.append("} " + this.className + ";\n");
         header_result.append(HelperGenerator.genENDIF());
