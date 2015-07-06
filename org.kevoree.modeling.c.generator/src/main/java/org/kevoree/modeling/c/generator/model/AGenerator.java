@@ -72,9 +72,9 @@ public abstract class AGenerator {
     public static void add_class_attribute(String className, String attr) {
         // can be refactored to remove double access
         if (classAttributes.containsKey(className))
-            classAttributes.get(className).append(attr);
+            classAttributes.get(className).append(attr + "\n");
         else
-            classAttributes.put(className, new StringBuilder(attr));
+            classAttributes.put(className, new StringBuilder(attr + "\n"));
     }
 
     protected void add_method_signature_H(String source) {

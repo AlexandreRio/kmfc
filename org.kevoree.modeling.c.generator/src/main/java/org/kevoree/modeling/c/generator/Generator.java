@@ -91,6 +91,9 @@ public class Generator {
                 + File.separatorChar;
 
         for (ClassGenerator gen : this.generators) {
+            gen.generateInheritanceAttributes();
+
+            gen.link_generation();
             gen.writeHeader();
             gen.writeClass();
         }

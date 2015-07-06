@@ -1,8 +1,6 @@
 package org.kevoree.modeling.c.generator.model;
 
-import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
@@ -27,7 +25,7 @@ import java.util.List;
  */
 public class ClassGenerator extends AGenerator {
 
-
+    private EClass cls;
 
     public ClassGenerator(GenerationContext ctx){
         this.ctx = ctx;
@@ -37,6 +35,7 @@ public class ClassGenerator extends AGenerator {
      * GLOBAL GENERATION METHOD
      */
     public void generateClass(EClass cls) throws IOException {
+        this.cls = cls;
         initGeneration(cls.getName());
         generateBeginHeader(cls);
         generateFunctionHeader(cls);
@@ -47,7 +46,6 @@ public class ClassGenerator extends AGenerator {
         generateGetterMetaClassName(cls);
         generateDeleteMethod(cls);
         generateVirtualTable(cls);
-        link_generation();
     }
 
 
@@ -284,9 +282,6 @@ public class ClassGenerator extends AGenerator {
             }
 
         }
-
-
-
 
         VelocityContext context_visitor = new VelocityContext();
         StringWriter result_visitor = new StringWriter();
@@ -547,16 +542,11 @@ public class ClassGenerator extends AGenerator {
         //TODO parents attributes
 
         add_ATTRIBUTE(cls.getName() + "_VT *VT;");
-        for (EClass c : cls.getEAllSuperTypes()) {
-            add_ATTRIBUTE("parent: " + c.getName());
-            //System.out.println("contains " + classAttributes.containsKey(c.getName()));
 
-        }
-
-        add_ATTRIBUTE("/*\n* " + cls.getName() + "\n*/");
+        add_ATTRIBUTE("/*\n * " + cls.getName() + "\n */");
         for( EAttribute eAttribute : cls.getEAttributes() ) {
             String attr = ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName())
-                    + " " + eAttribute.getName();
+                    + " " + eAttribute.getName() + ";";
             add_class_attribute(cls.getName(), attr);
             add_ATTRIBUTE(attr);
         }
@@ -584,7 +574,7 @@ public class ClassGenerator extends AGenerator {
             {
                 if(ref.getEReferenceType().getEIDAttribute() != null)
                 {
-                    String attr = "map_t "+ref.getName()+"; ";
+                    String attr = "map_t " + ref.getName() + ";";
                     add_class_attribute(cls.getName(), attr);
                     add_ATTRIBUTE(attr); ;
                     generateFindbyIdAttribute(cls, ref);
@@ -602,6 +592,18 @@ public class ClassGenerator extends AGenerator {
         }
     }
 
+    /**
+     * Should be called after a whole model parsing
+     *
+     */
+    public void generateInheritanceAttributes() {
+        for (EClass c : this.cls.getEAllSuperTypes()) {
+            add_ATTRIBUTE("/*\n * " + c.getName() + "\n */");
+            add_ATTRIBUTE(classAttributes.get(c.getName()).toString());
+            //System.out.println("contains " + classAttributes.containsKey(c.getName()));
+
+        }
+    }
 
     public void generateBeginHeader(EClass cls)
     {
