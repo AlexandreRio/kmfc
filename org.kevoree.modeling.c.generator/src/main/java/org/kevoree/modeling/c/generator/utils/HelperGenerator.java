@@ -1,8 +1,5 @@
 package org.kevoree.modeling.c.generator.utils;
 
-
-import org.eclipse.emf.ecore.EClass;
-
 /**
  * Created with IntelliJ IDEA.
  * User: jed
@@ -13,13 +10,14 @@ import org.eclipse.emf.ecore.EClass;
 public class HelperGenerator {
 
     public static final String internal_id_name  = "generated_KMF_ID";
+
     public static String genInclude(String name){
-        return   "#include <"+name+">\n";
+        return   "#include <" + name + ">\n";
     }
 
 
     public static String genIncludeLocal(String name){
-        return   "#include \""+name+".h\"\n";
+        return   "#include \"" + name + ".h\"\n";
     }
 
     public static String genToLowerCaseFirstChar(String name) {

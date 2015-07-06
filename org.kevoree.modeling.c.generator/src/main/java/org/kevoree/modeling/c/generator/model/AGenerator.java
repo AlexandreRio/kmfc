@@ -34,7 +34,6 @@ public abstract class AGenerator {
 
     protected String className;
     protected static Map<String, StringBuilder> classAttributes = new HashMap<String, StringBuilder>();
-    protected VelocityEngine ve = new VelocityEngine();
 
     protected void add_CONSTRUCTOR(String source) {
         constructor.append(source + "\n");

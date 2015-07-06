@@ -6,6 +6,7 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
+import org.kevoree.modeling.c.generator.TemplateManager;
 import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 import org.kevoree.modeling.c.generator.utils.ConverterDataTypes;
 import org.kevoree.modeling.c.generator.GenerationContext;
@@ -27,23 +28,10 @@ import java.util.List;
 public class ClassGenerator extends AGenerator {
 
 
-    private Template gen_method_add;
-    private Template gen_method_remove;
-    private Template gen_visitor;
-    private Template gen_visitor_ref;
-    private Template gen_destructor_ref;
 
     public ClassGenerator(GenerationContext ctx){
         this.ctx = ctx;
-        ve.setProperty("file.resource.loader.class", ClasspathResourceLoader.class.getName()) ;
-        ve.init();
-        gen_method_add      = ve.getTemplate("templates/add_method.vm");
-        gen_method_remove   = ve.getTemplate("templates/remove_method.vm");
-        gen_visitor         = ve.getTemplate("templates/visitor.vm");
-        gen_visitor_ref     = ve.getTemplate("templates/visitor_ref.vm");
-        gen_destructor_ref  = ve.getTemplate("templates/destructor_ref.vm");
     }
-
 
     /**
      * GLOBAL GENERATION METHOD
@@ -60,10 +48,6 @@ public class ClassGenerator extends AGenerator {
         generateDeleteMethod(cls);
         generateVirtualTable(cls);
         link_generation();
-
-        writeHeader(cls);
-        FileManager.writeFile(ctx.getPackageGenerationDirectory() + cls.getName() + ".c",
-                class_result.toString(), false);
     }
 
 
@@ -73,7 +57,6 @@ public class ClassGenerator extends AGenerator {
         for(EReference ref :cls.getEAllReferences())
         {
 
-
             if(ref.getUpperBound() == -1 )
             {
                 if(ref.isContainment()){
@@ -82,7 +65,7 @@ public class ClassGenerator extends AGenerator {
                         context.put("refname",ref.getName());
                         context.put("type",ref.getEReferenceType().getName());
 
-                        gen_destructor_ref.merge(context,result);
+                        TemplateManager.getInstance().gen_destructor_ref.merge(context,result);
                     }
                 }else {
                     add_DESTRUCTOR(ref.getName()+".clear();");
@@ -275,9 +258,9 @@ public class ClassGenerator extends AGenerator {
 
 
                 if(ref.isContainment()){
-                    gen_visitor_ref.merge(context_visitor_ref,result_visitor_ref_contained);
+                    TemplateManager.getInstance().gen_visitor_ref.merge(context_visitor_ref,result_visitor_ref_contained);
                 }      else {
-                    gen_visitor_ref.merge(context_visitor_ref,result_visitor_ref_non_contained);
+                    TemplateManager.getInstance().gen_visitor_ref.merge(context_visitor_ref,result_visitor_ref_non_contained);
                 }
 
 
@@ -316,7 +299,7 @@ public class ClassGenerator extends AGenerator {
         }else {
             context_visitor.put("debug", "");
         }
-        gen_visitor.merge(context_visitor, result_visitor);
+        TemplateManager.getInstance().gen_visitor.merge(context_visitor, result_visitor);
 
         add_C(result_visitor.toString());
     }
@@ -365,7 +348,7 @@ public class ClassGenerator extends AGenerator {
                     }
 
                     StringWriter result = new StringWriter();
-                    gen_method_remove.merge(context, result);
+                    TemplateManager.getInstance().gen_method_remove.merge(context, result);
 
                     add_C(result.toString());
                 }
@@ -417,7 +400,7 @@ public class ClassGenerator extends AGenerator {
 
 
                     StringWriter result = new StringWriter();
-                    gen_method_add.merge(context, result);
+                    TemplateManager.getInstance().gen_method_add.merge(context, result);
                     add_C(result.toString());
                 }
 
@@ -525,7 +508,6 @@ public class ClassGenerator extends AGenerator {
 
             add_C("}");
         }else {
-
             System.err.println("KMF NEED ID "+cls.getName());
         }
 
@@ -534,8 +516,6 @@ public class ClassGenerator extends AGenerator {
                 // System.out.println("INTERNAL "+cls.getName());
                 add_begin_header(HelperGenerator.genInclude("microframework/api/utils/Uuid.h"));
                 add_CONSTRUCTOR(HelperGenerator.internal_id_name+"= Uuid::getSingleton().generateUUID();");
-
-
             }
 
         }
@@ -641,9 +621,14 @@ public class ClassGenerator extends AGenerator {
         }
     }
 
-    public void writeHeader(EClass cls) throws IOException {
-        // WRITE
-        FileManager.writeFile(ctx.getPackageGenerationDirectory()+cls.getName()+".h", header_result.toString(),false);
+    public void writeHeader() throws IOException {
+        FileManager.writeFile(ctx.getPackageGenerationDirectory() +
+                this.className + ".h", header_result.toString(), false);
+    }
+
+    public void writeClass() throws IOException {
+        FileManager.writeFile(ctx.getPackageGenerationDirectory() +
+                this.className + ".c", class_result.toString(), false);
     }
 
 }

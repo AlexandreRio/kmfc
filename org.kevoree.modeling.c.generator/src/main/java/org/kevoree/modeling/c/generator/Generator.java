@@ -16,7 +16,9 @@ import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,81 +33,73 @@ public class Generator {
     private File ecoreFile;
     private StringBuilder classes = new StringBuilder();
     private EnvironnementBuilder cmakeGenerator;
+    private List<ClassGenerator> generators;
 
-
-    public Generator(GenerationContext ctx)
-    {
-        this.context =ctx;
+    public Generator(GenerationContext ctx) {
+        this.context   = ctx;
         this.ecoreFile = ctx.getEcore();
-        cmakeGenerator = new EnvironnementBuilder(ctx);
+        this.generators     = new ArrayList<ClassGenerator>();
+        this.cmakeGenerator = new EnvironnementBuilder(ctx);
     }
 
     public void generateModel() throws Exception {
-
         URI fileUri =  URI.createFileURI(ecoreFile.getAbsolutePath());
         Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("ecore", new EcoreResourceFactoryImpl());
         ResourceSetImpl rs = new ResourceSetImpl();
         XMIResource resource = (XMIResource) rs.createResource(fileUri);
 
-        String package_name ="default";
-        StringBuilder   list_file_h = new StringBuilder();
+        String package_name = "default";
+        StringBuilder list_file_h = new StringBuilder();
 
         CheckerConstraint checkerConstraint = new CheckerConstraint(context);
         checkerConstraint.verify(resource);
 
+        ClassGenerator classGenerator;
 
-        ClassGenerator classGenerator =new ClassGenerator(context);
-
-
-
-        FactoryGenerator factoryGenerator=null;
+        FactoryGenerator factoryGenerator = null;
 
         resource.load(null) ;
         EcoreUtil.resolveAll(resource);
 
         for (Iterator i = resource.getAllContents(); i.hasNext();) {
+            classGenerator = new ClassGenerator(context);
             EObject eo = (EObject)i.next();
 
-
-            if(eo instanceof EClass)
-            {
+            if(eo instanceof EClass) {
                 classGenerator.generateClass((EClass) eo);
-                factoryGenerator.generateFactory((EClass) eo);
+                //factoryGenerator.generateFactory((EClass) eo);
 
                 classes.append(HelperGenerator.genIncludeLocal(((EClass) eo).getName()));
-                //break;
-            }  else if(eo instanceof EPackage)
-            {
-                String name =   ((EPackage) eo).getNsPrefix();
-                context.setName_package( name.replace(".",""));
+                this.generators.add(classGenerator);
+            } else if(eo instanceof EPackage) {
+                String name = ((EPackage) eo).getNsPrefix();
+                context.setName_package(name.replace(".", ""));
 
                 try {
                     context.setRoot(((EClassImpl)EcoreUtil.getRootContainer(eo).eContents().get(0)).getName());
+                }   catch (Exception e){}
 
-                }   catch (Exception e){
-
-                }
-
-                FileManager.writeFile(context.getPackageGenerationDirectory() + "classes.cpp", HelperGenerator.genIncludeLocal(context.getName_package()), false);
-                factoryGenerator= new FactoryGenerator(context);
+                FileManager.writeFile(context.getPackageGenerationDirectory() + "classes.cpp",
+                        HelperGenerator.genIncludeLocal(context.getName_package()), false);
+                factoryGenerator = new FactoryGenerator(context);
             }
 
-
-
         }
-        factoryGenerator.write();
-        String output =   context.getRootGenerationDirectory()+File.separatorChar+context.getName_package()+File.separatorChar;
 
-        FileManager.writeFile(output + context.getName_package() + ".h", classes.toString(), false);
+        //factoryGenerator.write();
+        String output = context.getRootGenerationDirectory() + File.separatorChar + context.getName_package()
+                + File.separatorChar;
+
+        for (ClassGenerator gen : this.generators) {
+            gen.writeHeader();
+            gen.writeClass();
+        }
+
+//        FileManager.writeFile(output + context.getName_package() + ".h", classes.toString(), false);
     }
-
 
     public void generateEnvironnement() throws IOException {
         cmakeGenerator.execute();
     }
-
-
-
-
 
 }
