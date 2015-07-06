@@ -568,9 +568,11 @@ public class ClassGenerator extends AGenerator {
 
     private void generateAttributes(EClass cls){
         //TODO parents attributes
+        add_ATTRIBUTE(cls.getName() + "_VT *VT;");
         for (EClass c : cls.getEAllSuperTypes())
             add_ATTRIBUTE("parent: " + c.getName());
 
+        add_ATTRIBUTE("/*\n* " + cls.getName() + "\n*/");
         for( EAttribute eAttribute : cls.getEAttributes() ) {
             //System.out.println(cls.getName() + " attr " + eAttribute.getName() + " type " + ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()));
             add_ATTRIBUTE(ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()) + " " + eAttribute.getName());
@@ -610,7 +612,7 @@ public class ClassGenerator extends AGenerator {
                     //TODO add attr in a map for inheritance
 
                     // map_t ref.getName();
-                    add_ATTRIBUTE("map_t "+ref.getName()+"; \n"); ;
+                    add_ATTRIBUTE("map_t "+ref.getName()+"; "); ;
                     //  add_CONSTRUCTOR(ref.getName() + ".set_empty_key(\"\");");
                     generateFindbyIdAttribute(cls, ref);
                 }  else
@@ -621,7 +623,7 @@ public class ClassGenerator extends AGenerator {
             }else
             {
                 // TODO implements shared_ptr to fix delete from other class
-                add_ATTRIBUTE(gen_type+" *"+ref.getName()+"; \n");
+                add_ATTRIBUTE(gen_type+" *"+ref.getName()+";");
                 //add_CONSTRUCTOR(ref.getName()+"=NULL;");
             }
         }

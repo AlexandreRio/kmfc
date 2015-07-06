@@ -120,7 +120,7 @@ public abstract class AGenerator {
 
         // header file
         header_result.append(begin_header + "\n");
-        header_result.append(method_signature);
+        header_result.append(method_signature + "\n");
 
         header_result.append("typedef struct _" + this.className +
                 "_VT {typedef struct _" + this.className + "_VT {\n");
@@ -129,7 +129,7 @@ public abstract class AGenerator {
 
         header_result.append("typedef struct _" + this.className + " {\n");
         header_result.append(attributes);
-        header_result.append("} " + this.className + ";\n");
+        header_result.append("} " + this.className + ";\n\n");
         header_result.append(HelperGenerator.genENDIF());
     }
 
