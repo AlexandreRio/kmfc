@@ -32,7 +32,8 @@ public abstract class AGenerator {
     protected StringBuilder header_result;
 
     protected String className;
-    protected static Map<String, StringBuilder> classAttributes = new HashMap<String, StringBuilder>();
+    protected static Map<String, StringBuilder> classAttributes   = new HashMap<String, StringBuilder>();
+    protected static Map<String, StringBuilder> classVirtualTable = new HashMap<String, StringBuilder>();
 
     protected void add_CONSTRUCTOR(String source) {
         constructor.append(source + "\n");
@@ -74,6 +75,14 @@ public abstract class AGenerator {
             classAttributes.get(className).append(attr + "\n");
         else
             classAttributes.put(className, new StringBuilder(attr + "\n"));
+    }
+
+    public static void add_class_virtual_table(String className, String vt) {
+        // can be refactored to remove double access
+        if (classVirtualTable.containsKey(className))
+            classVirtualTable.get(className).append(vt + "\n");
+        else
+            classVirtualTable.put(className, new StringBuilder(vt + "\n"));
     }
 
     protected void add_method_signature_H(String source) {
