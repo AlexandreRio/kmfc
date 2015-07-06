@@ -27,7 +27,7 @@ public class FactoryGenerator extends AGenerator
 
         this.ctx=context;
         factoryname ="Default"+ctx.getName_package()+"Factory";
-        initGeneration();
+        initGeneration(ctx.getName_package());
         generateClassHeader();
     }
 
@@ -40,12 +40,12 @@ public class FactoryGenerator extends AGenerator
 
 
     public void generateClassHeader(){
-        add_H(HelperGenerator.genIFDEF(factoryname));
-        add_H(HelperGenerator.genIncludeLocal(ctx.getName_package()));
-        add_H(HelperGenerator.genInclude("microframework/api/KMFFactory.h"));
+        //add_H(HelperGenerator.genIFDEF(factoryname));
+        //add_H(HelperGenerator.genIncludeLocal(ctx.getName_package()));
+        //add_H(HelperGenerator.genInclude("microframework/api/KMFFactory.h"));
 
-        add_H("class "+factoryname+" : public KMFFactory {");
-        add_H("public:");
+        //add_H("class "+factoryname+" : public KMFFactory {");
+        //add_H("public:");
 
     }
     public void generateClass(EClass e){
@@ -54,7 +54,7 @@ public class FactoryGenerator extends AGenerator
 
     public void generateVersion()
     {
-        add_H("string getVersion();");
+        //add_H("string getVersion();");
         add_C("string getVersion(){ return " + ctx.getVersion() + ";\n}");
     }
 
@@ -76,7 +76,7 @@ public class FactoryGenerator extends AGenerator
             class_result.append("};\n"); // end class
             class_result.append(HelperGenerator.genENDIF());
 
-            FileManager.writeFile(ctx.getPackageGenerationDirectory()+factoryname+".h", api_result.toString(),false);
+            FileManager.writeFile(ctx.getPackageGenerationDirectory()+factoryname+".h", header_result.toString(),false);
             FileManager.writeFile(ctx.getPackageGenerationDirectory()+factoryname+".h", class_result.toString(),true);
 
         } catch (IOException e) {

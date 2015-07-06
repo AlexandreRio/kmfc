@@ -50,7 +50,7 @@ public class ClassGenerator extends AGenerator {
 
      */
     public void generateClass(EClass cls) throws IOException {
-        initGeneration();
+        initGeneration(cls.getName());
         generateBeginHeader(cls);
         generateFunctionHeader(cls);
         generateInit(cls);
@@ -59,10 +59,8 @@ public class ClassGenerator extends AGenerator {
         //generateMethodRemove(cls);
         generateGettermetaClassName(cls);
         generateDeleteMethod(cls);
-        generateConstructorMethod(cls);
         generateVirtualTable(cls);
         link_generation();
-        generateEndHeader();
 
         writeHeader(cls);
         FileManager.writeFile(ctx.getPackageGenerationDirectory() + cls.getName() + ".c", class_result.toString(), true);
@@ -106,7 +104,7 @@ public class ClassGenerator extends AGenerator {
     }
 
     private void generateInit(EClass cls) {
-        add_H("void init" + cls.getName() + "(" + cls.getName() + " * const this);");
+        add_method_signature_H("void init" + cls.getName() + "(" + cls.getName() + " * const this);");
     }
 
     private void generateGettermetaClassName(EClass cls) {
@@ -128,7 +126,7 @@ public class ClassGenerator extends AGenerator {
 
             if(add)
             {
-                add_H("KMFContainer* findByID(string relationName,string idP);");
+                add_method_signature_H("KMFContainer* findByID(string relationName,string idP);");
                 add_C("KMFContainer* " + cls.getName() + "::findByID(string relationName,string idP){");
 
                 if(ctx.isDebug_model())
@@ -176,7 +174,7 @@ public class ClassGenerator extends AGenerator {
 
     private void generateFlatReflexiveSetters(EClass eClass) {
 
-        add_H("void reflexiveMutator(int ___mutatorType,string ___refName, any ___value, bool ___setOpposite,bool ___fireEvent );");
+        add_method_signature_H("void reflexiveMutator(int ___mutatorType,string ___refName, any ___value, bool ___setOpposite,bool ___fireEvent );");
 
 
         add_C("void " + eClass.getName() + "::reflexiveMutator(int ___mutatorType,string ___refName, any ___value, bool ___setOpposite,bool ___fireEvent){");
@@ -253,7 +251,7 @@ public class ClassGenerator extends AGenerator {
 
     private void generateVisitor(EClass cls){
 
-        add_H("void visit(ModelVisitor *visitor,bool recursive,bool containedReference ,bool nonContainedReference);");
+        add_method_signature_H("void visit(ModelVisitor *visitor,bool recursive,bool containedReference ,bool nonContainedReference);");
 
         StringWriter result_visitor_ref_contained = new StringWriter();
         StringWriter result_visitor_ref_non_contained= new StringWriter();
@@ -327,7 +325,7 @@ public class ClassGenerator extends AGenerator {
 
     private void generateVisitorAttribute(EClass cls)
     {
-        add_H("void visitAttributes(ModelAttributeVisitor *visitor);");
+        add_method_signature_H("void visitAttributes(ModelAttributeVisitor *visitor);");
 
         add_C("void " + cls.getName() + "::visitAttributes(ModelAttributeVisitor *visitor){");
 
@@ -346,7 +344,7 @@ public class ClassGenerator extends AGenerator {
         for(EReference ref : cls.getEReferences()  ){
 
             String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
-            add_H("void remove" + ref.getName() + "(" + type + " *ptr);");
+            add_method_signature_H("void remove" + ref.getName() + "(" + type + " *ptr);");
 
 
             if(ref.getUpperBound() == -1)
@@ -390,7 +388,7 @@ public class ClassGenerator extends AGenerator {
     {
         for(EReference ref : cls.getEReferences()  ){
             String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
-            add_H("void add"+ref.getName()+"("+type+" *ptr);");
+            add_method_signature_H("void add"+ref.getName()+"("+type+" *ptr);");
 
 
             if(ref.getUpperBound() == -1)
@@ -458,8 +456,8 @@ public class ClassGenerator extends AGenerator {
     public void generateFunctionHeader(EClass cls) {
         for (EReference ref : cls.getEReferences()) {
             String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
-            add_H("typedef void (*fptr" + cls.getName() + "Add" + HelperGenerator.genToUpperCaseFirstChar(ref.getName()) + ")(" + cls.getName() + "*, " + type + "*);");
-            add_H("typedef void (*fptr" + cls.getName() + "Remove" + HelperGenerator.genToUpperCaseFirstChar(ref.getName()) + ")(" + cls.getName() + "*, " + type + "*);");
+            add_method_signature_H("typedef void (*fptr" + cls.getName() + "Add" + HelperGenerator.genToUpperCaseFirstChar(ref.getName()) + ")(" + cls.getName() + "*, " + type + "*);");
+            add_method_signature_H("typedef void (*fptr" + cls.getName() + "Remove" + HelperGenerator.genToUpperCaseFirstChar(ref.getName()) + ")(" + cls.getName() + "*, " + type + "*);");
         }
     }
 
@@ -469,16 +467,14 @@ public class ClassGenerator extends AGenerator {
 
 
         // Header part
-        add_H("typedef struct _" + cls.getName() + "_VT {");
         if (cls.getESuperTypes().size() == 1)
-            add_H("\t" + cls.getESuperTypes().get(0).getName() + "_VT *super;");
+            add_virtual_table_H("\t" + cls.getESuperTypes().get(0).getName() + "_VT *super;");
         else if (cls.getESuperTypes().size() == 0)
-            add_H("\tKMFContainer_VT *super;");
+            add_virtual_table_H("\tKMFContainer_VT *super;");
         else
             System.err.println("Invalid number of parent in " + cls.getName());
-        add_H("} " + cls.getName() + "_VT;");
 
-        add_H("extern const " + cls.getName() + "_VT " + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT;");
+        add_self_attribute_H("extern const " + cls.getName() + "_VT " + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT;");
     }
 
     //TODO
@@ -516,7 +512,7 @@ public class ClassGenerator extends AGenerator {
         if(eAttribute.size() >0){
 
             // todo type
-            add_H("std::string internalGetKey();");
+            add_method_signature_H("std::string internalGetKey();");
             add_C("std::string " + cls.getName() + "::internalGetKey(){");
             class_result.append("return ");
 
@@ -538,7 +534,7 @@ public class ClassGenerator extends AGenerator {
         if(eAttribute.size() == 1  && idsgen.size() ==0){
             if (eAttribute.get(0).equals(HelperGenerator.internal_id_name)){
                 // System.out.println("INTERNAL "+cls.getName());
-                add_HEADER(HelperGenerator.genInclude("microframework/api/utils/Uuid.h"));
+                add_begin_header(HelperGenerator.genInclude("microframework/api/utils/Uuid.h"));
                 add_CONSTRUCTOR(HelperGenerator.internal_id_name+"= Uuid::getSingleton().generateUUID();");
 
 
@@ -572,14 +568,13 @@ public class ClassGenerator extends AGenerator {
 
 
     private void generateAttributes(EClass cls){
-        add_H("typedef struct _" + cls.getName() + "NodeType {");
         //TODO parents attributes
         for (EClass c : cls.getEAllSuperTypes())
-            add_H("parent: " + c.getName());
+            add_ATTRIBUTE("parent: " + c.getName());
 
         for( EAttribute eAttribute : cls.getEAttributes() ) {
             System.out.println(cls.getName() + " attr " + eAttribute.getName() + " type " + ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()));
-            add_H(ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()) + " " + eAttribute.getName());
+            add_ATTRIBUTE(ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()) + " " + eAttribute.getName());
         }
 
 
@@ -616,7 +611,7 @@ public class ClassGenerator extends AGenerator {
                     //TODO add attr in a map for inheritance
 
                     // map_t ref.getName();
-                    add_H("map_t "+ref.getName()+"; \n") ;
+                    add_ATTRIBUTE("map_t "+ref.getName()+"; \n"); ;
                     //  add_CONSTRUCTOR(ref.getName() + ".set_empty_key(\"\");");
                     generateFindbyIdAttribute(cls, ref);
                 }  else
@@ -627,11 +622,10 @@ public class ClassGenerator extends AGenerator {
             }else
             {
                 // TODO implements shared_ptr to fix delete from other class
-                add_H(gen_type+" *"+ref.getName()+"; \n");
+                add_ATTRIBUTE(gen_type+" *"+ref.getName()+"; \n");
                 //add_CONSTRUCTOR(ref.getName()+"=NULL;");
             }
         }
-        add_H("} " + cls.getName() + ";");
     }
 
 
@@ -640,28 +634,24 @@ public class ClassGenerator extends AGenerator {
 
 
         String name =   cls.getName();
-        add_HEADER(HelperGenerator.genIFDEF(name));
+        add_begin_header(HelperGenerator.genIFDEF(name));
 
-        add_HEADER(HelperGenerator.genInclude("string.h"));
-        add_HEADER(HelperGenerator.genInclude("stdio.h"));
+        add_begin_header("\n");
+        add_begin_header(HelperGenerator.genInclude("string.h"));
+        add_begin_header(HelperGenerator.genInclude("stdio.h"));
 
         // only greater than 0 value should be 1
         if (cls.getESuperTypes().size() > 0) {
             for (EClass super_eclass : cls.getESuperTypes())
-                add_HEADER(HelperGenerator.genIncludeLocal(super_eclass.getName()));
+                add_begin_header(HelperGenerator.genIncludeLocal(super_eclass.getName()));
         } else {
-            add_HEADER(HelperGenerator.genIncludeLocal("KMFContainer.h"));
+            add_begin_header(HelperGenerator.genIncludeLocal("KMFContainer.h"));
         }
-    }
-
-
-    public void generateEndHeader(){
-        api_result.append(HelperGenerator.genENDIF());
     }
 
     public void writeHeader(EClass cls) throws IOException {
         // WRITE
-        FileManager.writeFile(ctx.getPackageGenerationDirectory()+cls.getName()+".h", api_result.toString(),false);
+        FileManager.writeFile(ctx.getPackageGenerationDirectory()+cls.getName()+".h", header_result.toString(),false);
     }
 
 
