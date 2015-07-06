@@ -553,7 +553,7 @@ public class ClassGenerator extends AGenerator {
         String name = ref.getName();
 
 
-        add_H(type + " *find" + name + "ByID(std::string id);");
+        add_method_signature_H(type + " *find" + name + "ByID(std::string id);");
 
         add_C(type + "* " + eClass.getName() + "::find" + name + "ByID(std::string id){");
         if(ctx.isDebug_model()){
@@ -574,11 +574,14 @@ public class ClassGenerator extends AGenerator {
     private void generateAttributes(EClass cls){
         add_H("typedef struct _" + cls.getName() + "NodeType {");
         //TODO parents attributes
+        for (EClass c : cls.getEAllSuperTypes())
+            add_H("parent: " + c.getName());
+
         for( EAttribute eAttribute : cls.getEAttributes() ) {
             System.out.println(cls.getName() + " attr " + eAttribute.getName() + " type " + ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()));
             add_H(ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()) + " " + eAttribute.getName());
         }
-        add_H("} " + cls.getName() + ";");
+
 
         generateinternalGetKey(cls);
 
@@ -613,7 +616,7 @@ public class ClassGenerator extends AGenerator {
                     //TODO add attr in a map for inheritance
 
                     // map_t ref.getName();
-                    add_ATTRIBUTE("map_t "+ref.getName()+"; \n") ;
+                    add_H("map_t "+ref.getName()+"; \n") ;
                     //  add_CONSTRUCTOR(ref.getName() + ".set_empty_key(\"\");");
                     generateFindbyIdAttribute(cls, ref);
                 }  else
@@ -624,12 +627,11 @@ public class ClassGenerator extends AGenerator {
             }else
             {
                 // TODO implements shared_ptr to fix delete from other class
-                add_ATTRIBUTE(gen_type+" *"+ref.getName()+"; \n");
-                add_CONSTRUCTOR(ref.getName()+"=NULL;");
+                add_H(gen_type+" *"+ref.getName()+"; \n");
+                //add_CONSTRUCTOR(ref.getName()+"=NULL;");
             }
         }
-
-
+        add_H("} " + cls.getName() + ";");
     }
 
 

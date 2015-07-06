@@ -15,7 +15,7 @@ public abstract class AGenerator {
     protected GenerationContext ctx;
     protected StringBuilder header;
     protected StringBuilder gen_class;
-    protected StringBuilder private_attributes;
+    protected StringBuilder method_signature;
     protected StringBuilder public_attributes;
     protected StringBuilder body;
     protected StringBuilder api_result;
@@ -63,10 +63,14 @@ public abstract class AGenerator {
         public_attributes.append(source);
     }
 
+    protected void add_method_signature_H(String source) {
+        method_signature.append(source);
+    }
+
     protected void initGeneration() {
         header = new StringBuilder();
         gen_class = new StringBuilder();
-        private_attributes = new StringBuilder();
+        method_signature = new StringBuilder();
         public_attributes = new StringBuilder();
         body = new StringBuilder();
         api_result = new StringBuilder();
