@@ -1,8 +1,5 @@
 package org.kevoree.modeling.c.generator;
 
-
-
-import com.sun.nio.sctp.SctpSocketOption;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.*;
 import org.eclipse.emf.ecore.impl.EClassImpl;

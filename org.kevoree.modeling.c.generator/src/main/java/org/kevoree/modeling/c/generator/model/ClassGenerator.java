@@ -33,7 +33,7 @@ public class ClassGenerator extends AGenerator {
     private Template gen_visitor_ref;
     private Template gen_destructor_ref;
 
-    public ClassGenerator(GenerationContext   ctx){
+    public ClassGenerator(GenerationContext ctx){
         this.ctx = ctx;
         ve.setProperty("file.resource.loader.class", ClasspathResourceLoader.class.getName()) ;
         ve.init();
@@ -45,9 +45,8 @@ public class ClassGenerator extends AGenerator {
     }
 
 
-    /*
-        GLOBAL GENERATION METHOD
-
+    /**
+     * GLOBAL GENERATION METHOD
      */
     public void generateClass(EClass cls) throws IOException {
         initGeneration(cls.getName());
@@ -57,13 +56,14 @@ public class ClassGenerator extends AGenerator {
         generateAttributes(cls);
         //generateMethodAdd(cls);
         //generateMethodRemove(cls);
-        generateGettermetaClassName(cls);
+        generateGetterMetaClassName(cls);
         generateDeleteMethod(cls);
         generateVirtualTable(cls);
         link_generation();
 
         writeHeader(cls);
-        FileManager.writeFile(ctx.getPackageGenerationDirectory() + cls.getName() + ".c", class_result.toString(), true);
+        FileManager.writeFile(ctx.getPackageGenerationDirectory() + cls.getName() + ".c",
+                class_result.toString(), false);
     }
 
 
@@ -107,7 +107,7 @@ public class ClassGenerator extends AGenerator {
         add_method_signature_H("void init" + cls.getName() + "(" + cls.getName() + " * const this);");
     }
 
-    private void generateGettermetaClassName(EClass cls) {
+    private void generateGetterMetaClassName(EClass cls) {
         add_C("static char* " + cls.getName() + "_metaClassName(" + cls.getName() + "* const this) {");
         add_C("\treturn \"" + cls.getName() + "\";");
         add_C("}");
@@ -116,8 +116,6 @@ public class ClassGenerator extends AGenerator {
 
     private void generateFindById(EClass cls)
     {
-
-
         Boolean add = true;
         Boolean end = false;
         for(EReference ref :cls.getEAllReferences())
@@ -323,8 +321,7 @@ public class ClassGenerator extends AGenerator {
         add_C(result_visitor.toString());
     }
 
-    private void generateVisitorAttribute(EClass cls)
-    {
+    private void generateVisitorAttribute(EClass cls) {
         add_method_signature_H("void visitAttributes(ModelAttributeVisitor *visitor);");
 
         add_C("void " + cls.getName() + "::visitAttributes(ModelAttributeVisitor *visitor){");
@@ -544,7 +541,7 @@ public class ClassGenerator extends AGenerator {
         }
     }
 
-    public void generateFindbyIdAttribute(EClass eClass,EReference ref){
+    public void generateFindbyIdAttribute(EClass eClass, EReference ref){
 
         String type = ref.getEReferenceType().getName();
         String name = ref.getName();
@@ -568,52 +565,48 @@ public class ClassGenerator extends AGenerator {
 
     private void generateAttributes(EClass cls){
         //TODO parents attributes
+
         add_ATTRIBUTE(cls.getName() + "_VT *VT;");
-        for (EClass c : cls.getEAllSuperTypes())
+        for (EClass c : cls.getEAllSuperTypes()) {
             add_ATTRIBUTE("parent: " + c.getName());
+            //System.out.println("contains " + classAttributes.containsKey(c.getName()));
+
+        }
 
         add_ATTRIBUTE("/*\n* " + cls.getName() + "\n*/");
         for( EAttribute eAttribute : cls.getEAttributes() ) {
-            //System.out.println(cls.getName() + " attr " + eAttribute.getName() + " type " + ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()));
-            add_ATTRIBUTE(ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName()) + " " + eAttribute.getName());
+            String attr = ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName())
+                    + " " + eAttribute.getName();
+            add_class_attribute(cls.getName(), attr);
+            add_ATTRIBUTE(attr);
         }
-
 
         generateinternalGetKey(cls);
 
-
         for(EReference ref : cls.getEReferences()  ){
-
             String gen_type;
             String type_ref = ref.getEReferenceType().getName();
 
             if(ref.getEReferenceType().getEAllReferences().contains(cls)){
                 // cycle dependency
-                if(!type_ref.equals(cls.getName())){
+                if(!type_ref.equals(cls.getName()))
                     header.append("class "+type_ref+";\n\n");
-                }
-
             }else {
                 //  System.out.println(type_ref);
                 if(!type_ref.equals(cls.getName())){
                     //   header.append(  HelperGenerator.genIncludeLocal(type_ref));
                     header.append("class "+type_ref+";\n\n");
                 }
-
-                //
             }
             gen_type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
-
 
             if(ref.getUpperBound() == -1)
             {
                 if(ref.getEReferenceType().getEIDAttribute() != null)
                 {
-                    //TODO add attr in a map for inheritance
-
-                    // map_t ref.getName();
-                    add_ATTRIBUTE("map_t "+ref.getName()+"; "); ;
-                    //  add_CONSTRUCTOR(ref.getName() + ".set_empty_key(\"\");");
+                    String attr = "map_t "+ref.getName()+"; ";
+                    add_class_attribute(cls.getName(), attr);
+                    add_ATTRIBUTE(attr); ;
                     generateFindbyIdAttribute(cls, ref);
                 }  else
                 {

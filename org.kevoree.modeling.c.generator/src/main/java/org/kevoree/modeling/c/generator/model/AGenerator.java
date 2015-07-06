@@ -5,6 +5,9 @@ import org.apache.velocity.app.VelocityEngine;
 import org.eclipse.emf.ecore.EClass;
 import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jed
@@ -30,7 +33,7 @@ public abstract class AGenerator {
     protected StringBuilder header_result;
 
     protected String className;
-
+    protected static Map<String, StringBuilder> classAttributes = new HashMap<String, StringBuilder>();
     protected VelocityEngine ve = new VelocityEngine();
 
     protected void add_CONSTRUCTOR(String source) {
@@ -65,6 +68,14 @@ public abstract class AGenerator {
 
     protected void add_ATTRIBUTE(String source) {
         attributes.append(source + "\n");
+    }
+
+    public static void add_class_attribute(String className, String attr) {
+        // can be refactored to remove double access
+        if (classAttributes.containsKey(className))
+            classAttributes.get(className).append(attr);
+        else
+            classAttributes.put(className, new StringBuilder(attr));
     }
 
     protected void add_method_signature_H(String source) {
