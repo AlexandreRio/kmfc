@@ -1,7 +1,6 @@
 package org.kevoree.modeling.c.generator.model;
 
 import org.kevoree.modeling.c.generator.GenerationContext;
-import org.apache.velocity.app.VelocityEngine;
 import org.eclipse.emf.ecore.EClass;
 import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
@@ -100,6 +99,7 @@ public abstract class AGenerator {
 
         //H file
         begin_header = new StringBuilder();
+        //TODO duplicate of the HashMap
         attributes = new StringBuilder();
         method_signature = new StringBuilder();
         virtual_table = new StringBuilder();
@@ -132,14 +132,14 @@ public abstract class AGenerator {
         header_result.append(begin_header + "\n");
         header_result.append(method_signature + "\n");
 
-        header_result.append("typedef struct _" + this.className +
-                "_VT {typedef struct _" + this.className + "_VT {\n");
+        header_result.append("typedef struct _" + this.className + "_VT {\n");
         header_result.append(virtual_table);
         header_result.append("} " + this.className + "_VT;\n\n");
 
         header_result.append("typedef struct _" + this.className + " {\n");
         header_result.append(attributes);
         header_result.append("} " + this.className + ";\n\n");
+        header_result.append(self_attribute + "\n");
         header_result.append(HelperGenerator.genENDIF());
     }
 

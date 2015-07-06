@@ -85,7 +85,7 @@ public class ClassGenerator extends AGenerator {
     }
 
     private void generateInit(EClass cls) {
-        add_method_signature_H("void init" + cls.getName() + "(" + cls.getName() + " * const this);");
+        add_method_signature_H("void init" + cls.getName() + "(" + cls.getName() + "* const this);");
     }
 
     private void generateGetterMetaClassName(EClass cls) {
@@ -95,8 +95,7 @@ public class ClassGenerator extends AGenerator {
     }
 
 
-    private void generateFindById(EClass cls)
-    {
+    private void generateFindById(EClass cls) {
         Boolean add = true;
         Boolean end = false;
         for(EReference ref :cls.getEAllReferences())
@@ -228,7 +227,7 @@ public class ClassGenerator extends AGenerator {
     }
 
 
-    private void generateVisitor(EClass cls){
+    private void generateVisitor(EClass cls) {
 
         add_method_signature_H("void visit(ModelVisitor *visitor,bool recursive,bool containedReference ,bool nonContainedReference);");
 
@@ -316,21 +315,18 @@ public class ClassGenerator extends AGenerator {
 
     private void generateMethodRemove(EClass cls) {
 
-        for(EReference ref : cls.getEReferences()  ){
+        for(EReference ref : cls.getEReferences()) {
 
             String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
             add_method_signature_H("void remove" + ref.getName() + "(" + type + " *ptr);");
 
 
-            if(ref.getUpperBound() == -1)
-            {
-                if(ref.getEReferenceType().getEIDAttribute() == null)
-                {
+            if(ref.getUpperBound() == -1) {
+                if(ref.getEReferenceType().getEIDAttribute() == null) {
                     add_C("void " + cls.getName() + "::remove" + ref.getName() + "(" + type + " *ptr){");
                     add_C("delete ptr;");
                     add_C("}\n");
-                }else
-                {
+                }else {
                     VelocityContext context = new VelocityContext();
                     context.put("classname",cls.getName());
                     context.put("refname",ref.getName());
@@ -348,8 +344,7 @@ public class ClassGenerator extends AGenerator {
                     add_C(result.toString());
                 }
 
-            }  else
-            {
+            }  else {
                 add_C("void " + cls.getName() + "::remove" + ref.getName() + "(" + type + " *ptr){");
                 add_C("delete ptr;");
                 add_C("}\n");
@@ -361,15 +356,13 @@ public class ClassGenerator extends AGenerator {
 
     public void generateMethodAdd(EClass cls)
     {
-        for(EReference ref : cls.getEReferences()  ){
+        for(EReference ref : cls.getEReferences()) {
             String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
             add_method_signature_H("void add"+ref.getName()+"("+type+" *ptr);");
 
 
-            if(ref.getUpperBound() == -1)
-            {
-                if(ref.getEReferenceType().getEIDAttribute() == null)
-                {
+            if(ref.getUpperBound() == -1) {
+                if(ref.getEReferenceType().getEIDAttribute() == null) {
                     add_C("void " + cls.getName() + "::add" + ref.getName() + "(" + type + " *ptr){");
                     add_C(ref.getName() + ".push_back(ptr);");
                     add_C("}\n");
@@ -429,10 +422,18 @@ public class ClassGenerator extends AGenerator {
     }
 
     public void generateFunctionHeader(EClass cls) {
+        //TODO refactor
         for (EReference ref : cls.getEReferences()) {
             String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
-            add_method_signature_H("typedef void (*fptr" + cls.getName() + "Add" + HelperGenerator.genToUpperCaseFirstChar(ref.getName()) + ")(" + cls.getName() + "*, " + type + "*);");
-            add_method_signature_H("typedef void (*fptr" + cls.getName() + "Remove" + HelperGenerator.genToUpperCaseFirstChar(ref.getName()) + ")(" + cls.getName() + "*, " + type + "*);");
+            String addName = HelperGenerator.genToUpperCaseFirstChar(ref.getName());
+            String removeName = HelperGenerator.genToUpperCaseFirstChar(ref.getName());
+            String ptrAddName    = "fptr" + cls.getName() + "Add" + addName;
+            String ptrRemoveName = "fptr" + cls.getName() + "Remove" + removeName;
+
+            add_method_signature_H("typedef void (*"+ ptrAddName + ")(" + cls.getName() + "*, " + type + "*);");
+            add_method_signature_H("typedef void (*"+ ptrRemoveName + ")(" + cls.getName() + "*, " + type + "*);");
+            add_virtual_table_H("\t" + ptrAddName + " add" + addName + ";");
+            add_virtual_table_H("\t" + ptrRemoveName + " remove" + removeName + ";");
         }
     }
 
@@ -454,8 +455,7 @@ public class ClassGenerator extends AGenerator {
     }
 
     //TODO
-    public void generateinternalGetKey(EClass cls)
-    {
+    public void generateinternalGetKey(EClass cls) {
         List<String> idsgen  = new ArrayList<String>();
 
         for(EAttribute a : cls.getEAllAttributes()){
@@ -516,14 +516,15 @@ public class ClassGenerator extends AGenerator {
         }
     }
 
-    public void generateFindbyIdAttribute(EClass eClass, EReference ref){
-
+    public void generateFindbyIdAttribute(EClass eClass, EReference ref) {
         String type = ref.getEReferenceType().getName();
-        String name = ref.getName();
+        String name = HelperGenerator.genToUpperCaseFirstChar(ref.getName());
 
 
-        add_method_signature_H("typedef " + type + " * (*fptr" + eClass.getName() + "Find" +
-                name + "ByID)(" + eClass.getName() + "*, char*);");
+        String ptrName = "fptr" + eClass.getName() + "Find" + name + "ByID";
+        add_method_signature_H("typedef " + type + "* (*" + ptrName + ")(" +
+                eClass.getName() + "*, char*);");
+        add_virtual_table_H("\t" + ptrName + " find" + name + "ByID;");
 
         add_C(type + "* " + eClass.getName() + "::find" + name + "ByID(std::string id){");
         if(ctx.isDebug_model()){
@@ -538,9 +539,7 @@ public class ClassGenerator extends AGenerator {
         add_C("}");
     }
 
-    private void generateAttributes(EClass cls){
-        //TODO parents attributes
-
+    private void generateAttributes(EClass cls) {
         add_ATTRIBUTE(cls.getName() + "_VT *VT;");
 
         add_ATTRIBUTE("/*\n * " + cls.getName() + "\n */");
@@ -596,17 +595,21 @@ public class ClassGenerator extends AGenerator {
      * Should be called after a whole model parsing
      *
      */
-    public void generateInheritanceAttributes() {
+    public void generateInheritedAttributes() {
+        //Every class inherit from KMFContainer
+        add_ATTRIBUTE("/*\n * KMFContainer\n */");
+        add_ATTRIBUTE("KMFContainer *eContainer;");
         for (EClass c : this.cls.getEAllSuperTypes()) {
             add_ATTRIBUTE("/*\n * " + c.getName() + "\n */");
             add_ATTRIBUTE(classAttributes.get(c.getName()).toString());
-            //System.out.println("contains " + classAttributes.containsKey(c.getName()));
-
         }
     }
 
-    public void generateBeginHeader(EClass cls)
-    {
+    public void generateInheritedVirtualTable() {
+
+    }
+
+    public void generateBeginHeader(EClass cls) {
         String name =   cls.getName();
         add_begin_header(HelperGenerator.genIFDEF(name));
 
@@ -619,7 +622,7 @@ public class ClassGenerator extends AGenerator {
             for (EClass super_eclass : cls.getESuperTypes())
                 add_begin_header(HelperGenerator.genIncludeLocal(super_eclass.getName()));
         } else {
-            add_begin_header(HelperGenerator.genIncludeLocal("KMFContainer.h"));
+            add_begin_header(HelperGenerator.genIncludeLocal("KMFContainer"));
         }
     }
 

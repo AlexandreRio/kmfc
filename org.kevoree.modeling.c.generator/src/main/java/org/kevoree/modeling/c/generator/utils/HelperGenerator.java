@@ -29,7 +29,7 @@ public class HelperGenerator {
     }
 
     public static String genIFDEF(String name){
-        return   "#ifndef __"+name+"_H\n" +
+        return "#ifndef __"+name+"_H\n" +
                 "#define __"+name+"_H\n";
     }
 
