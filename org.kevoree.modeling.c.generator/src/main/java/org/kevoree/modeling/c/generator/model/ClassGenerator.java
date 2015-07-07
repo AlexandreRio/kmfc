@@ -107,60 +107,6 @@ public class ClassGenerator extends AGenerator {
         add_C("}");
     }
 
-    private void generateFindById(EClass cls) {
-        Boolean add = true;
-        Boolean end = false;
-        for(EReference ref :cls.getEAllReferences())
-        {
-
-
-            if(add)
-            {
-                add_method_signature_H("KMFContainer* findByID(string relationName,string idP);");
-                add_C("KMFContainer* " + cls.getName() + "::findByID(string relationName,string idP){");
-
-                if(ctx.isDebug_model())
-                {
-                    add_C("LOGGER_WRITE(Logger::DEBUG_MODEL,\"REQUEST findByID " + cls.getName() + " \" + relationName + \" \" + idP);");
-                }
-                add=false;
-                end = true;
-
-            }
-
-            if(ref.getUpperBound() == -1 )
-            {
-                if(ref.getEReferenceType().getEIDAttribute() != null)
-                {
-                    add_C("if(relationName.compare(\"" + ref.getName() + "\")== 0){");
-
-                    add_C("return (KMFContainer*)find" + ref.getName() + "ByID(idP);");
-                    add_C("}\n");
-                }
-            } else
-            {
-                add_C("if(relationName.compare(\"" + ref.getName() + "\")== 0){");
-                // TODO MAYBE CHECK match
-                add_C("return " + ref.getName() + ";");
-
-                add_C("}\n");
-            }
-
-
-        }
-
-
-
-        if(end){
-            if(ctx.isDebug_model()){
-                add_C("LOGGER_WRITE(Logger::DEBUG_MODEL,\"END -- findByID " + cls.getName() + "\");");
-            }
-            add_C("return NULL;\n");
-            add_C("}\n");
-
-        }
-    }
-
     private void generateMethodRemove(EClass cls) {
 
         for(EReference ref : cls.getEReferences()) {
@@ -200,7 +146,6 @@ public class ClassGenerator extends AGenerator {
 
         }
     }
-
 
     public void generateMethodAdd(EClass cls)
     {
@@ -401,40 +346,24 @@ public class ClassGenerator extends AGenerator {
 
         generateinternalGetKey(cls);
 
-        for(EReference ref : cls.getEReferences()  ){
+        for(EReference ref : cls.getEReferences()  ) {
             String gen_type;
             String type_ref = ref.getEReferenceType().getName();
 
-            if(ref.getEReferenceType().getEAllReferences().contains(cls)){
-                // cycle dependency
-                if(!type_ref.equals(cls.getName()))
-                    header.append("class "+type_ref+";\n\n");
-            }else {
-                //  System.out.println(type_ref);
-                if(!type_ref.equals(cls.getName())){
-                    //   header.append(  HelperGenerator.genIncludeLocal(type_ref));
-                    header.append("class "+type_ref+";\n\n");
-                }
-            }
             gen_type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
 
-            if(ref.getUpperBound() == -1)
-            {
-                if(ref.getEReferenceType().getEIDAttribute() != null)
-                {
+            if(ref.getUpperBound() == -1) {
+                if(ref.getEReferenceType().getEIDAttribute() != null) {
                     String attr = "map_t " + ref.getName() + ";";
                     add_class_attribute(cls.getName(), attr);
                     add_ATTRIBUTE(attr);
                     generateFindbyIdAttribute(cls, ref);
-                }  else
-                {
-                    System.err.println("NO ID "+ref.getName());
+                } else {
+                    System.err.println("NO ID " + ref.getName());
                 }
-
-            }else
-            {
+            } else {
                 // TODO implements shared_ptr to fix delete from other class
-                add_ATTRIBUTE(gen_type+" *"+ref.getName()+";");
+                add_ATTRIBUTE(gen_type + " *" + ref.getName() + ";");
                 //add_CONSTRUCTOR(ref.getName()+"=NULL;");
             }
         }
