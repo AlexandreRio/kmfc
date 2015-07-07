@@ -161,170 +161,6 @@ public class ClassGenerator extends AGenerator {
         }
     }
 
-
-    private void generateFlatReflexiveSetters(EClass eClass) {
-
-        add_method_signature_H("void reflexiveMutator(int ___mutatorType,string ___refName, any ___value, bool ___setOpposite,bool ___fireEvent );");
-
-
-        add_C("void " + eClass.getName() + "::reflexiveMutator(int ___mutatorType,string ___refName, any ___value, bool ___setOpposite,bool ___fireEvent){");
-        if(ctx.isDebug_model())
-        {
-            add_C("LOGGER_WRITE(Logger::DEBUG_MODEL,\"BEGIN -- reflexiveMutator " + eClass.getName() + " refName \" + ___refName); ");
-        }
-
-
-        int i=0;
-        for(EAttribute a :  eClass.getEAllAttributes()){
-
-            if(i==0){
-                add_C("if(___refName.compare(\"" + a.getName() + "\")==0){");
-            }else {
-                add_C("} else if(___refName.compare(\"" + a.getName() + "\")==0){");
-            }
-
-            String type = ConverterDataTypes.getInstance().check_type(a.getEAttributeType().getName());
-
-            if(type.contains("string")){
-                add_C(a.getName() + "= AnyCast<string>(___value);");
-            } else if(type.contains("short")){
-                add_C("short f;");
-                add_C("Utils::from_string<short>(f, AnyCast<string>(___value), std::dec);");
-                add_C(a.getName() + "= f;");
-            } else if(type.contains("int")){
-                add_C("int f;");
-                add_C("Utils::from_string<int>(f, AnyCast<string>(___value), std::dec);");
-                add_C(a.getName() + "= f;");
-            } else if(type.contains("bool")){
-                add_C("if(AnyCast<string>(___value).compare(\"true\") == 0){");
-                add_C(a.getName() + "= true;");
-
-                add_C("}else { ");
-                add_C(a.getName() + "= false;");
-                add_C("}");
-
-            }
-            i++;
-        }
-        if(i> 0){
-            add_C("}else {\n");
-        }
-        int j=0;
-        for(EReference a :  eClass.getEAllReferences())
-        {
-            if(j==0){
-                add_C("if(___refName.compare(\"" + a.getName() + "\")==0){");
-            }else {
-                add_C("} else if(___refName.compare(\"" + a.getName() + "\")==0){");
-            }
-
-            add_C("if(___mutatorType ==ADD){");
-            add_C("add" + a.getName() + "((" + a.getEType().getName() + "*)AnyCast<KMFContainer*>(___value));");
-            add_C("}else if(___mutatorType == REMOVE){");
-            add_C("remove" + a.getName() + "((" + a.getEType().getName() + "*)AnyCast<" + a.getEType().getName() + "*>(___value));");
-            add_C("}");
-            j++;
-        }
-        if(j> 0){
-            add_C("}\n");
-        }
-        if(i> 0){
-            add_C("}\n");
-        }
-        if(ctx.isDebug_model()){
-            add_C("LOGGER_WRITE(Logger::DEBUG_MODEL,\"END -- reflexiveMutator " + eClass.getName() + " refName \" + ___refName); ");
-        }
-
-        add_C("}\n");
-    }
-
-
-    private void generateVisitor(EClass cls) {
-
-        add_method_signature_H("void visit(ModelVisitor *visitor,bool recursive,bool containedReference ,bool nonContainedReference);");
-
-        StringWriter result_visitor_ref_contained = new StringWriter();
-        StringWriter result_visitor_ref_non_contained= new StringWriter();
-
-        for(EReference ref :cls.getEAllReferences())
-        {
-            String type = ref.getEReferenceType().getName();
-            String refname =   ref.getName();
-
-
-            if((ref.getUpperBound() == -1  | ref.getUpperBound() == 0 )&& ref.getEReferenceType().getEIDAttribute() != null)
-            {
-
-
-                VelocityContext context_visitor_ref = new VelocityContext();
-                context_visitor_ref.put("refname",refname);
-                context_visitor_ref.put("type",type);
-                if(ctx.isDebug_model()){
-                    context_visitor_ref.put("debug",msg_DEBUG(cls,"Visiting  \"+ current->path()+ \""));
-                }else {
-                    context_visitor_ref.put("debug","");
-                }
-
-
-                if(ref.isContainment()){
-                    TemplateManager.getInstance().gen_visitor_ref.merge(context_visitor_ref,result_visitor_ref_contained);
-                }      else {
-                    TemplateManager.getInstance().gen_visitor_ref.merge(context_visitor_ref,result_visitor_ref_non_contained);
-                }
-
-
-            } else if(ref.getUpperBound() == 1){
-                //
-                //System.out.println(cls.getName()+" "+ref.getName()+" "+ref.getUpperBound());
-                if(ref.isContainment()){
-                    result_visitor_ref_contained.append("visitor->beginVisitRef(\""+refname+"\",\"org.kevoree."+type+"\");\n");
-                    result_visitor_ref_contained.append("internal_visit(visitor,"+refname+",recursive,containedReference,nonContainedReference,\""+refname+"\");\n");
-                    result_visitor_ref_contained.append("visitor->endVisitRef(\""+refname+"\");\n");
-
-
-                }      else {
-                    //result_visitor_ref_non_contained
-                    result_visitor_ref_non_contained.append("visitor->beginVisitRef(\""+refname+"\",\"org.kevoree."+type+"\");\n");
-                    result_visitor_ref_non_contained.append("internal_visit(visitor,"+refname+",recursive,containedReference,nonContainedReference,\""+refname+"\");\n");
-                    result_visitor_ref_non_contained.append("visitor->endVisitRef(\""+refname+"\");\n");
-
-
-                }
-            }
-
-        }
-
-        VelocityContext context_visitor = new VelocityContext();
-        StringWriter result_visitor = new StringWriter();
-        context_visitor.put("classname",cls.getName());
-        context_visitor.put("visitor_refs_contained",result_visitor_ref_contained);
-        context_visitor.put("visitor_refs_non_contained", result_visitor_ref_non_contained);
-
-        if(ctx.isDebug_model()){
-            context_visitor.put("debug",msg_DEBUG(cls,"Visiting class "+cls.getName()));
-        }else {
-            context_visitor.put("debug", "");
-        }
-        TemplateManager.getInstance().gen_visitor.merge(context_visitor, result_visitor);
-
-        add_C(result_visitor.toString());
-    }
-
-    private void generateVisitorAttribute(EClass cls) {
-        add_method_signature_H("void visitAttributes(ModelAttributeVisitor *visitor);");
-
-        add_C("void " + cls.getName() + "::visitAttributes(ModelAttributeVisitor *visitor){");
-
-        for(EAttribute a: cls.getEAllAttributes())
-        {
-            ADD_DEBUG(cls,"Visiting attribute -> "+a.getName());
-            add_C("visitor->visit(any(" + a.getName() + "),\"" + a.getName() + "\",this);");
-
-        }
-
-        add_C("}");
-    }
-
     private void generateMethodRemove(EClass cls) {
 
         for(EReference ref : cls.getEReferences()) {
@@ -528,24 +364,28 @@ public class ClassGenerator extends AGenerator {
         String type = ref.getEReferenceType().getName();
         String name = HelperGenerator.genToUpperCaseFirstChar(ref.getName());
 
-
+        // header
         String ptrName = "fptr" + eClass.getName() + "Find" + name + "ByID";
         add_method_signature_H("typedef " + type + "* (*" + ptrName + ")(" +
                 eClass.getName() + "*, char*);");
         add_virtual_table_H(ptrName + " find" + name + "ByID;");
         add_class_virtual_table(cls.getName(), ptrName + " find" + name + "ByID;");
 
-        add_C(type + "* " + eClass.getName() + "::find" + name + "ByID(std::string id){");
-        if(ctx.isDebug_model()){
-            add_C("LOGGER_WRITE(Logger::DEBUG_MODEL,\"REQUEST -- findByID " + ref.getName() + " => \"+id);");
-        }
+        // implementation
+        add_C("static " + type + "\n* " + eClass.getName() + "Find" + name + "ByID(" + type + "* const this, char *id) {");
 
-        add_C("if(" + ref.getName() + ".find(id) != " + ref.getName() + ".end())");
-        add_C("{");
-        add_C("return " + ref.getName() + "[id];");
-        add_C("}else { return NULL; }");
-
+        add_C(type + " *value = NULL;");
+        add_C("if(this->" + ref.getName() + " != NULL) {");
+        add_C("\tif(hashmap_get(this->" + ref.getName() + ", id, (void**)(&value)) == MAP_OK) {");
+        add_C("\t\treturn value;");
+        add_C("\t} else {");
+        add_C("\t\treturn NULL;");
+        add_C("\t}");
+        add_C("} else {");
+        add_C("\treturn NULL;");
         add_C("}");
+
+        add_C("} // end of find");
     }
 
     private void generateAttributes(EClass cls) {
@@ -661,8 +501,8 @@ public class ClassGenerator extends AGenerator {
         generateInheritedAttributes();
         generateInheritedVirtualTable();
         generateSuperAndVTAttr();
-        header_result.append(begin_header + "\n");
-        header_result.append(method_signature + "\n");
+        header_result.append(begin_header.append("\n"));
+        header_result.append(method_signature.append("\n"));
 
         header_result.append("typedef struct _" + this.className + "_VT {\n");
         header_result.append(virtual_table);
