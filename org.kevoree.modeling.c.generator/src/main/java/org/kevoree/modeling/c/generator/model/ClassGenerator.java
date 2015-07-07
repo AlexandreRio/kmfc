@@ -107,7 +107,6 @@ public class ClassGenerator extends AGenerator {
         add_C("}");
     }
 
-
     private void generateFindById(EClass cls) {
         Boolean add = true;
         Boolean end = false;
@@ -498,7 +497,6 @@ public class ClassGenerator extends AGenerator {
         if(eAttribute.size() >0){
 
             // todo type
-            add_method_signature_H("std::string internalGetKey();");
             add_C("std::string " + cls.getName() + "::internalGetKey(){");
             class_result.append("return ");
 
