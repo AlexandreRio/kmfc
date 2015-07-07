@@ -432,10 +432,10 @@ public class ClassGenerator extends AGenerator {
 
             add_method_signature_H("typedef void (*"+ ptrAddName + ")(" + cls.getName() + "*, " + type + "*);");
             add_method_signature_H("typedef void (*"+ ptrRemoveName + ")(" + cls.getName() + "*, " + type + "*);");
-            add_virtual_table_H("\t" + ptrAddName + " add" + addName + ";");
-            add_class_virtual_table(cls.getName(), "\t" + ptrAddName + " add" + addName + ";");
-            add_virtual_table_H("\t" + ptrRemoveName + " remove" + removeName + ";");
-            add_class_virtual_table(cls.getName(), "\t" + ptrRemoveName + " remove" + removeName + ";");
+            add_virtual_table_H(ptrAddName + " add" + addName + ";");
+            add_class_virtual_table(cls.getName(), ptrAddName + " add" + addName + ";");
+            add_virtual_table_H(ptrRemoveName + " remove" + removeName + ";");
+            add_class_virtual_table(cls.getName(), ptrRemoveName + " remove" + removeName + ";");
         }
     }
 
@@ -446,9 +446,9 @@ public class ClassGenerator extends AGenerator {
 
         // Header part
         if (cls.getESuperTypes().size() == 1)
-            add_virtual_table_H("\t" + cls.getESuperTypes().get(0).getName() + "_VT *super;");
+            add_virtual_table_H(cls.getESuperTypes().get(0).getName() + "_VT *super;");
         else if (cls.getESuperTypes().size() == 0)
-            add_virtual_table_H("\tKMFContainer_VT *super;");
+            add_virtual_table_H("KMFContainer_VT *super;");
         else
             System.err.println("Invalid number of parent in " + cls.getName());
 
@@ -526,8 +526,8 @@ public class ClassGenerator extends AGenerator {
         String ptrName = "fptr" + eClass.getName() + "Find" + name + "ByID";
         add_method_signature_H("typedef " + type + "* (*" + ptrName + ")(" +
                 eClass.getName() + "*, char*);");
-        add_virtual_table_H("\t" + ptrName + " find" + name + "ByID;");
-        add_class_virtual_table(cls.getName(), "\t" + ptrName + " find" + name + "ByID;");
+        add_virtual_table_H(ptrName + " find" + name + "ByID;");
+        add_class_virtual_table(cls.getName(), ptrName + " find" + name + "ByID;");
 
         add_C(type + "* " + eClass.getName() + "::find" + name + "ByID(std::string id){");
         if(ctx.isDebug_model()){
@@ -545,7 +545,7 @@ public class ClassGenerator extends AGenerator {
     private void generateAttributes(EClass cls) {
         add_ATTRIBUTE(cls.getName() + "_VT *VT;");
 
-        add_ATTRIBUTE("/*\n * " + cls.getName() + "\n */");
+        add_ATTRIBUTE("/* " + cls.getName() + " */");
         for( EAttribute eAttribute : cls.getEAttributes() ) {
             String attr = ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName())
                     + " " + eAttribute.getName() + ";";
@@ -578,7 +578,7 @@ public class ClassGenerator extends AGenerator {
                 {
                     String attr = "map_t " + ref.getName() + ";";
                     add_class_attribute(cls.getName(), attr);
-                    add_ATTRIBUTE(attr); ;
+                    add_ATTRIBUTE(attr);
                     generateFindbyIdAttribute(cls, ref);
                 }  else
                 {
@@ -600,12 +600,12 @@ public class ClassGenerator extends AGenerator {
      */
     public void generateInheritedAttributes() {
         //Every class inherit from KMFContainer
-        add_ATTRIBUTE("/*\n * KMFContainer\n */");
+        add_ATTRIBUTE("/* KMFContainer */");
         add_ATTRIBUTE("KMFContainer *eContainer;");
         for (EClass c : this.cls.getEAllSuperTypes()) {
             if (classAttributes.containsKey(c.getName())) {
-                add_ATTRIBUTE("/*\n * " + c.getName() + "\n */");
-                add_ATTRIBUTE("" + classAttributes.get(c.getName()).toString());
+                add_ATTRIBUTE("/* " + c.getName() + " */");
+                add_ATTRIBUTE(classAttributes.get(c.getName()).toString());
             }
         }
     }
@@ -613,18 +613,18 @@ public class ClassGenerator extends AGenerator {
     //TODO remove \t char and add it to the helper
     public void generateInheritedVirtualTable() {
         //Every class inherit from KMFContainer
-        add_virtual_table_H("\t/*\n\t * KMFContainer\n\t */");
-        add_virtual_table_H("\tfptrKMFMetaClassName metaClassNameb");
-        add_virtual_table_H("\tfptrKMFInternalGetKey internalGetKey");
-        add_virtual_table_H("\tfptrKMFGetPath getPath");
-        add_virtual_table_H("\tfptrVisit visit");
-        add_virtual_table_H("\tfptrFindByPath findByPath");
-        add_virtual_table_H("\tfptrDelete delete");
+        add_virtual_table_H("/* KMFContainer */");
+        add_virtual_table_H("fptrKMFMetaClassName metaClassName;");
+        add_virtual_table_H("fptrKMFInternalGetKey internalGetKey;");
+        add_virtual_table_H("fptrKMFGetPath getPath;");
+        add_virtual_table_H("fptrVisit visit;");
+        add_virtual_table_H("fptrFindByPath findByPath;");
+        add_virtual_table_H("fptrDelete delete;");
         for (EClass c : this.cls.getEAllSuperTypes()) {
             // Some classes don't have method
             if (classVirtualTable.containsKey(c.getName())) {
-                add_virtual_table_H("\t/*\n\t * " + c.getName() + "\n\t */");
-                add_virtual_table_H("\t" + classVirtualTable.get(c.getName()).toString());
+                add_virtual_table_H("/* " + c.getName() + " */");
+                add_virtual_table_H(classVirtualTable.get(c.getName()).toString());
             }
         }
     }

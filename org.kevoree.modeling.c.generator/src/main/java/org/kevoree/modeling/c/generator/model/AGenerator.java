@@ -66,23 +66,23 @@ public abstract class AGenerator {
     }
 
     protected void add_ATTRIBUTE(String source) {
-        attributes.append(source + "\n");
+        attributes.append(source.startsWith("\t") ? source + "\n" : "\t" + source + "\n");
     }
 
     public static void add_class_attribute(String className, String attr) {
         // can be refactored to remove double access
         if (classAttributes.containsKey(className))
-            classAttributes.get(className).append(attr + "\n");
+            classAttributes.get(className).append(attr.startsWith("\t") ? attr + "\n" : "\t" + attr + "\n");
         else
-            classAttributes.put(className, new StringBuilder(attr + "\n"));
+            classAttributes.put(className, new StringBuilder(attr.startsWith("\t") ? attr + "\n" : "\t" + attr + "\n"));
     }
 
     public static void add_class_virtual_table(String className, String vt) {
         // can be refactored to remove double access
         if (classVirtualTable.containsKey(className))
-            classVirtualTable.get(className).append(vt + "\n");
+            classVirtualTable.get(className).append(vt.startsWith("\t") ? vt + "\n" : "\t" + vt + "\n");
         else
-            classVirtualTable.put(className, new StringBuilder(vt + "\n"));
+            classVirtualTable.put(className, new StringBuilder(vt.startsWith("\t") ? vt + "\n" : "\t" + vt + "\n"));
     }
 
     protected void add_method_signature_H(String source) {
@@ -90,7 +90,7 @@ public abstract class AGenerator {
     }
 
     protected void add_virtual_table_H(String source) {
-        virtual_table.append(source + "\n");
+        virtual_table.append(source.startsWith("\t") ? source + "\n" : "\t" + source + "\n");
     }
 
     protected void add_self_attribute_H(String source) {
