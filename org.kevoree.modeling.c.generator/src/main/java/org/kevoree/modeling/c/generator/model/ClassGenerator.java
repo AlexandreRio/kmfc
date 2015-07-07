@@ -38,6 +38,7 @@ public class ClassGenerator extends AGenerator {
         this.cls = cls;
         initGeneration(cls.getName());
         generateBeginHeader(cls);
+        generateVirtualTableComment();
         generateFunctionHeader(cls);
         generateInit(cls);
         generateAttributes(cls);
@@ -45,9 +46,11 @@ public class ClassGenerator extends AGenerator {
         //generateMethodRemove(cls);
         generateGetterMetaClassName(cls);
         generateDeleteMethod(cls);
-        generateVirtualTable(cls);
     }
 
+    private void generateVirtualTableComment() {
+        add_virtual_table_H("/* " + cls.getName() + " */");
+    }
 
     private void generateDeleteMethod(EClass cls) {
         StringWriter result = new StringWriter();
@@ -430,8 +433,8 @@ public class ClassGenerator extends AGenerator {
             String ptrAddName    = "fptr" + cls.getName() + "Add" + addName;
             String ptrRemoveName = "fptr" + cls.getName() + "Remove" + removeName;
 
-            add_method_signature_H("typedef void (*"+ ptrAddName + ")(" + cls.getName() + "*, " + type + "*);");
-            add_method_signature_H("typedef void (*"+ ptrRemoveName + ")(" + cls.getName() + "*, " + type + "*);");
+            add_method_signature_H("typedef void (*" + ptrAddName + ")(" + cls.getName() + "*, " + type + "*);");
+            add_method_signature_H("typedef void (*" + ptrRemoveName + ")(" + cls.getName() + "*, " + type + "*);");
             add_virtual_table_H(ptrAddName + " add" + addName + ";");
             add_class_virtual_table(cls.getName(), ptrAddName + " add" + addName + ";");
             add_virtual_table_H(ptrRemoveName + " remove" + removeName + ";");
@@ -439,16 +442,11 @@ public class ClassGenerator extends AGenerator {
         }
     }
 
-    public void generateVirtualTable(EClass cls) {
-        //TODO .c file
-        // C part
-
-
-        // Header part
+    public void generateSuperAndVTAttr() {
         if (cls.getESuperTypes().size() == 1)
-            add_virtual_table_H(cls.getESuperTypes().get(0).getName() + "_VT *super;");
+            add_begin_virtual_table_H(cls.getESuperTypes().get(0).getName() + "_VT *super;");
         else if (cls.getESuperTypes().size() == 0)
-            add_virtual_table_H("KMFContainer_VT *super;");
+            add_begin_virtual_table_H("KMFContainer_VT *super;");
         else
             System.err.println("Invalid number of parent in " + cls.getName());
 
@@ -610,23 +608,23 @@ public class ClassGenerator extends AGenerator {
         }
     }
 
-    //TODO remove \t char and add it to the helper
     public void generateInheritedVirtualTable() {
-        //Every class inherit from KMFContainer
-        add_virtual_table_H("/* KMFContainer */");
-        add_virtual_table_H("fptrKMFMetaClassName metaClassName;");
-        add_virtual_table_H("fptrKMFInternalGetKey internalGetKey;");
-        add_virtual_table_H("fptrKMFGetPath getPath;");
-        add_virtual_table_H("fptrVisit visit;");
-        add_virtual_table_H("fptrFindByPath findByPath;");
-        add_virtual_table_H("fptrDelete delete;");
         for (EClass c : this.cls.getEAllSuperTypes()) {
             // Some classes don't have method
             if (classVirtualTable.containsKey(c.getName())) {
-                add_virtual_table_H("/* " + c.getName() + " */");
-                add_virtual_table_H(classVirtualTable.get(c.getName()).toString());
+                add_begin_virtual_table_H(classVirtualTable.get(c.getName()).toString());
+                add_begin_virtual_table_H("/* " + c.getName() + " */");
             }
         }
+        //Every class inherit from KMFContainer
+        add_begin_virtual_table_H("fptrKMFMetaClassName metaClassName;");
+        add_begin_virtual_table_H("fptrKMFInternalGetKey internalGetKey;");
+        add_begin_virtual_table_H("fptrKMFGetPath getPath;");
+        add_begin_virtual_table_H("fptrVisit visit;");
+        add_begin_virtual_table_H("fptrFindByPath findByPath;");
+        add_begin_virtual_table_H("fptrDelete delete;");
+        // reverse order for the insertion, so comment at the end
+        add_begin_virtual_table_H("/* KMFContainer */");
     }
 
     public void generateBeginHeader(EClass cls) {

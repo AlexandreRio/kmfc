@@ -93,6 +93,7 @@ public class Generator {
         for (ClassGenerator gen : this.generators) {
             gen.generateInheritedAttributes();
             gen.generateInheritedVirtualTable();
+            gen.generateSuperAndVTAttr();
 
             gen.link_generation();
             gen.writeHeader();

@@ -17,6 +17,11 @@ import java.util.Map;
 public abstract class AGenerator {
     protected GenerationContext ctx;
 
+    /**
+     * TODO
+     * StringBuilder can be safely replaced by String and + operator since the
+     * compiler will use them.
+     */
     protected StringBuilder header;
     protected StringBuilder body;
     protected StringBuilder constructor;
@@ -83,6 +88,10 @@ public abstract class AGenerator {
             classVirtualTable.get(className).append(vt.startsWith("\t") ? vt + "\n" : "\t" + vt + "\n");
         else
             classVirtualTable.put(className, new StringBuilder(vt.startsWith("\t") ? vt + "\n" : "\t" + vt + "\n"));
+    }
+
+    public void add_begin_virtual_table_H(String vt) {
+        virtual_table.insert(0, vt.startsWith("\t") ? vt + "\n" : "\t" + vt + "\n");
     }
 
     protected void add_method_signature_H(String source) {
