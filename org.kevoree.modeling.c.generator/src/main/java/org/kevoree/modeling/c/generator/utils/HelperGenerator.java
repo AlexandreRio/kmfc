@@ -28,6 +28,21 @@ public class HelperGenerator {
         return Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 
+    public static String genDefaultValue(String type) {
+        System.out.println("helper def");
+        String defVal = "NULL";
+        if (type.equals("EString")) {
+            defVal = "NULL";
+        }
+        else if (type.equals("EBoolean")) {
+            defVal = "false";
+        }
+        else if (type.equals("EInt")) {
+            defVal = "-1";
+        }
+        return defVal;
+    }
+
     public static String genIFDEF(String name){
         return "#ifndef __"+name+"_H\n" +
                 "#define __"+name+"_H\n";

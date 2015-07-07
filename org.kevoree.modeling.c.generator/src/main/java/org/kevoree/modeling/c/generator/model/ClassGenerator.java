@@ -98,7 +98,22 @@ public class ClassGenerator extends AGenerator {
     }
 
     private void generateInit(EClass cls) {
+        // header
         add_method_signature_H("void init" + cls.getName() + "(" + cls.getName() + "* const this);");
+
+        // implementation
+        String parentType = "";
+        //TODO not the good method, only one direct parent here…
+        if (cls.getEAllSuperTypes().size() == 1)
+            parentType = cls.getEAllSuperTypes().get(0).getName();
+        else if (cls.getEAllSuperTypes().size() == 0)
+            parentType = "KMFContainer";
+        else
+            System.err.println("Invalid number of parent for " + cls.getName());
+
+        //TODO …and here we loop over EAllSuperType for all the attributes
+
+        add_init("init" + parentType + "((" + parentType + "*)this);");
     }
 
     private void generateGetterMetaClassName(EClass cls) {
@@ -341,6 +356,8 @@ public class ClassGenerator extends AGenerator {
             String attr = ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName())
                     + " " + eAttribute.getName() + ";";
             add_class_attribute(cls.getName(), attr);
+            add_init("this->" + eAttribute.getName() + " = " + HelperGenerator.
+                    genDefaultValue(eAttribute.getEAttributeType().getName()) + ";");
             add_ATTRIBUTE(attr);
         }
 
@@ -357,6 +374,7 @@ public class ClassGenerator extends AGenerator {
                     String attr = "map_t " + ref.getName() + ";";
                     add_class_attribute(cls.getName(), attr);
                     add_ATTRIBUTE(attr);
+                    add_CONSTRUCTOR(ref.getName() + " = NULL;");
                     generateFindbyIdAttribute(cls, ref);
                 } else {
                     System.err.println("NO ID " + ref.getName());
@@ -364,7 +382,7 @@ public class ClassGenerator extends AGenerator {
             } else {
                 // TODO implements shared_ptr to fix delete from other class
                 add_ATTRIBUTE(gen_type + " *" + ref.getName() + ";");
-                //add_CONSTRUCTOR(ref.getName()+"=NULL;");
+                add_CONSTRUCTOR(ref.getName() + " = NULL;");
             }
         }
     }
@@ -424,6 +442,9 @@ public class ClassGenerator extends AGenerator {
     public void link_generation() {
         // c file
         class_result.append(header);
+        class_result.append("void init" + cls.getName() + "(" + cls.getName() + "* const this) {\n");
+        class_result.append(init);
+        class_result.append("}\n");
         class_result.append(body);
 
         // header file

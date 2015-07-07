@@ -24,6 +24,7 @@ public abstract class AGenerator {
      */
     protected StringBuilder header;
     protected StringBuilder body;
+    protected StringBuilder init;
     protected StringBuilder constructor;
     protected StringBuilder destructor;
 
@@ -74,6 +75,10 @@ public abstract class AGenerator {
         attributes.append(source.startsWith("\t") ? source + "\n" : "\t" + source + "\n");
     }
 
+    protected void add_init(String source) {
+        init.append(source + "\n");
+    }
+
     public static void add_class_attribute(String className, String attr) {
         // can be refactored to remove double access
         if (classAttributes.containsKey(className))
@@ -112,6 +117,7 @@ public abstract class AGenerator {
         //C file
         header = new StringBuilder();
         body = new StringBuilder();
+        init = new StringBuilder();
         constructor = new StringBuilder();
         destructor = new StringBuilder();
 
