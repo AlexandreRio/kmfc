@@ -4,6 +4,7 @@ import org.apache.velocity.VelocityContext;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
+import org.kevoree.modeling.c.generator.Generator;
 import org.kevoree.modeling.c.generator.TemplateManager;
 import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 import org.kevoree.modeling.c.generator.utils.ConverterDataTypes;
@@ -17,6 +18,15 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Generator for a class of the meta-model
+ * Call order are important
+ * Some code is generated while parsing, some after the full parsing since
+ * parents can be reached after child class.
+ *
+ * @see #link_generation() For final concatenation
+ * @see Generator#generateModel()
+ *
+ * Initial code comment:
  * Created with IntelliJ IDEA.
  * User: jed
  * Date: 28/10/13
@@ -642,6 +652,29 @@ public class ClassGenerator extends AGenerator {
         } else {
             add_begin_header(HelperGenerator.genIncludeLocal("KMFContainer"));
         }
+    }
+
+    public void link_generation() {
+        // c file
+        class_result.append(header);
+        class_result.append(body);
+
+        // header file
+        generateInheritedAttributes();
+        generateInheritedVirtualTable();
+        generateSuperAndVTAttr();
+        header_result.append(begin_header + "\n");
+        header_result.append(method_signature + "\n");
+
+        header_result.append("typedef struct _" + this.className + "_VT {\n");
+        header_result.append(virtual_table);
+        header_result.append("} " + this.className + "_VT;\n\n");
+
+        header_result.append("typedef struct _" + this.className + " {\n");
+        header_result.append(attributes);
+        header_result.append("} " + this.className + ";\n\n");
+        header_result.append(self_attribute + "\n");
+        header_result.append(HelperGenerator.genENDIF());
     }
 
     public void writeHeader() throws IOException {

@@ -141,24 +141,5 @@ public abstract class AGenerator {
 //        add_C("}\n");
 //    }
 
-    public void link_generation() {
-        // c file
-        class_result.append(header);
-        class_result.append(body);
-
-        // header file
-        header_result.append(begin_header + "\n");
-        header_result.append(method_signature + "\n");
-
-        header_result.append("typedef struct _" + this.className + "_VT {\n");
-        header_result.append(virtual_table);
-        header_result.append("} " + this.className + "_VT;\n\n");
-
-        header_result.append("typedef struct _" + this.className + " {\n");
-        header_result.append(attributes);
-        header_result.append("} " + this.className + ";\n\n");
-        header_result.append(self_attribute + "\n");
-        header_result.append(HelperGenerator.genENDIF());
-    }
-
+    public void link_generation() {}
 }
