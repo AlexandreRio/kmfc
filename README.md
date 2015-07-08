@@ -1,11 +1,12 @@
-# KMF
+# KMFC
 
 Rewrite of a cpp code generator from kevoree metal-model.
+Original write is by [Jean-Emile](https://github.com/Jean-Emile) and is located [here](https://github.com/kevoree/kmfcpp).
 
 ## Class generator
 
 See `org.kevoree.modeling.c.generator` for class generation and its [Readme](/org.kevoree.modeling.c.generator/README.md)
- for further reading.
+for further reading.
 
 ### Progress
 
