@@ -103,17 +103,18 @@ public class ClassGenerator extends AGenerator {
 
         // implementation
         String parentType = "";
-        //TODO not the good method, only one direct parent here…
-        if (cls.getEAllSuperTypes().size() == 1)
+        if (cls.getESuperTypes().size() == 1)
             parentType = cls.getEAllSuperTypes().get(0).getName();
         else if (cls.getEAllSuperTypes().size() == 0)
             parentType = "KMFContainer";
         else
             System.err.println("Invalid number of parent for " + cls.getName());
 
-        //TODO …and here we loop over EAllSuperType for all the attributes
-
         add_init("init" + parentType + "((" + parentType + "*)this);");
+
+//        for (EAttribute attr : cls.getEAllAttributes())
+//            add_init("this->" + attr.getName() + " = " + HelperGenerator.genDefaultValue(attr.getEType().getName()) + ";");
+
     }
 
     private void generateGetterMetaClassName(EClass cls) {
@@ -259,65 +260,63 @@ public class ClassGenerator extends AGenerator {
                 HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT;");
     }
 
-    //TODO
+    /**
+     * TODO
+     * DeployUnit et TypeDefinition, implé différente,
+     * si parent KMFContainer -> generated_KMF
+     * sinon, NamedElement -> name
+     * @param cls
+     */
     public void generateinternalGetKey(EClass cls) {
-        List<String> idsgen  = new ArrayList<String>();
-
-        for(EAttribute a : cls.getEAllAttributes()){
-            if(a.isID() && !a.getName().equals(HelperGenerator.internal_id_name)){
-                idsgen.add(a.getName());
-            }
+        // Header signature is defined in the non-generated class KMFContainer
+        String fun;
+        add_C("static char\n*" + cls.getName() + "_internalGetKey(" + cls.getName() + "* const this) {");
+        if (cls.getName().equals("DeployUnit")) {
+            fun = "\tif (this->internalKey == NULL) {\n" +
+                    "\t\tchar* internalKey;\n" +
+                    "\n" +
+                    "\t\tinternalKey = malloc(sizeof(char) * (strlen(this->groupName) + strlen(\"/\") +\n" +
+                    "\t\t\t\tstrlen(this->hashcode) + strlen(\"/\") +\n" +
+                    "\t\t\t\tstrlen(this->name) + strlen(\"/\") +\n" +
+                    "\t\t\t\tstrlen(this->version)) + 1);\n" +
+                    "\n" +
+                    "\t\tif (internalKey == NULL) {\n" +
+                    "\t\t\tPRINTF(\"ERROR: not enough memory for internalKey\\n\");\n" +
+                    "\t\t\treturn NULL;\n" +
+                    "\t\t}\n" +
+                    "\n" +
+                    "\t\tsprintf(internalKey, \"%s/%s/%s/%s\", this->groupName, this->hashcode, this->name, this->version);\n" +
+                    "\t\tthis->internalKey = internalKey;\n" +
+                    "\n" +
+                    "\t\treturn internalKey;\n" +
+                    "\t} else {\n" +
+                    "\t\treturn this->internalKey;\n" +
+                    "\t}";
+        } else if (cls.getName().equals("TypeDefinition")) {
+            fun = "\tchar* internalKey = NULL;\n" +
+                    "\n" +
+                    "\tif (this->internalKey == NULL) {\n" +
+                    "\t\tinternalKey = malloc(sizeof(char) * (strlen(this->name) + strlen(\"/\") + strlen(this->version)) + 1);\n" +
+                    "\n" +
+                    "\t\tif (internalKey == NULL)\n" +
+                    "\t\t\treturn NULL;\n" +
+                    "\n" +
+                    "\t\tsprintf(internalKey, \"%s/%s\", this->name, this->version);\n" +
+                    "\n" +
+                    "\t\tthis->internalKey = internalKey;\n" +
+                    "\t\treturn internalKey;\n" +
+                    "\t} else {\n" +
+                    "\t\treturn this->internalKey;\n" +
+                    "\t}";
+        } else if (cls.getName().equals("NamedElement")) {
+            fun = "\treturn this->name;";
+        } else if (cls.getESuperTypes().size() == 0) {
+            fun = "\treturn this->generated_KMF_ID;";
+        } else { // in all other cases we inherit from NamedElement
+            fun = "\treturn instance_VT.internalGetKey((NamedElement*)this);";
         }
-
-        List<String> eAttribute  = new ArrayList<String>();
-
-        for(EAttribute a : cls.getEAllAttributes()){
-            if(a.isID()  ){
-                if(a.getName().equals(HelperGenerator.internal_id_name) && idsgen.size() ==0)
-                {
-                    eAttribute.add(a.getName());
-                }
-                else  if(!a.getName().equals(HelperGenerator.internal_id_name))
-                {
-                    eAttribute.add(a.getName());
-
-                }
-            }
-
-        }
-
-        // sort
-        Collections.sort(eAttribute);
-
-
-        if(eAttribute.size() >0){
-
-            // todo type
-            add_C("std::string " + cls.getName() + "::internalGetKey(){");
-            class_result.append("return ");
-
-            for(int i=0;i<eAttribute.size();i++){
-                class_result.append(eAttribute.get(i));
-                if(i < eAttribute.size()-1){
-                    class_result.append("+\"/\"+");
-                }
-            }
-
-            add_C(";");
-
-            add_C("}");
-        }else {
-            System.err.println("KMF NEED ID "+cls.getName());
-        }
-
-        if(eAttribute.size() == 1  && idsgen.size() ==0){
-            if (eAttribute.get(0).equals(HelperGenerator.internal_id_name)){
-                // System.out.println("INTERNAL "+cls.getName());
-                add_begin_header(HelperGenerator.genInclude("microframework/api/utils/Uuid.h"));
-                add_CONSTRUCTOR(HelperGenerator.internal_id_name+"= Uuid::getSingleton().generateUUID();");
-            }
-
-        }
+        add_C(fun);
+        add_C("}\n");
     }
 
     public void generateFindbyIdAttribute(EClass eClass, EReference ref) {

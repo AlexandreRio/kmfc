@@ -29,7 +29,6 @@ public class HelperGenerator {
     }
 
     public static String genDefaultValue(String type) {
-        System.out.println("helper def");
         String defVal = "NULL";
         if (type.equals("EString")) {
             defVal = "NULL";
@@ -37,7 +36,7 @@ public class HelperGenerator {
         else if (type.equals("EBoolean")) {
             defVal = "false";
         }
-        else if (type.equals("EInt")) {
+        else if (type.equals("EIntegerObject:")) {
             defVal = "-1";
         }
         return defVal;
