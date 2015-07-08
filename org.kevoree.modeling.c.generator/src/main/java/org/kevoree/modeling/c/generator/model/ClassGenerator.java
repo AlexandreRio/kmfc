@@ -1,5 +1,6 @@
 package org.kevoree.modeling.c.generator.model;
 
+import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
@@ -16,20 +17,13 @@ import java.io.StringWriter;
 import java.util.Arrays;
 
 /**
- * Generator for a class of the meta-model
- * Call order are important
+ * Generator for a class of the meta-model.
+ * Call order are important.
  * Some code is generated while parsing, some after the full parsing since
  * parents can be reached after child class.
  *
  * @see #link_generation() For final concatenation
  * @see Generator#generateModel()
- *
- * Initial code comment:
- * Created with IntelliJ IDEA.
- * User: jed
- * Date: 28/10/13
- * Time: 11:26
- * To change this templates use File | Settings | File Templates.
  */
 public class ClassGenerator extends AGenerator {
 
@@ -45,23 +39,23 @@ public class ClassGenerator extends AGenerator {
     public void generateClass(EClass cls) throws IOException {
         this.cls = cls;
         initGeneration(cls.getName());
-        generateBeginHeader(cls);
+        generateBeginHeader();
         generateVirtualTableComment();
         generateInternalGetKey();
-        generateFunctionHeader(cls);
-        generateInit(cls);
-        generateAttributes(cls);
+        generateFunctionHeader();
+        generateInit();
+        generateAttributes();
         //generateMethodAdd(cls);
         //generateMethodRemove(cls);
-        generateGetterMetaClassName(cls);
-        generateDeleteMethod(cls);
+        generateGetterMetaClassName();
+        generateDeleteMethod();
     }
 
     private void generateVirtualTableComment() {
         add_virtual_table_H("/* " + cls.getName() + " */");
     }
 
-    private void generateDeleteMethod(EClass cls) {
+    private void generateDeleteMethod() {
         StringWriter result = new StringWriter();
 
         for(EReference ref :cls.getEAllReferences())
@@ -75,7 +69,7 @@ public class ClassGenerator extends AGenerator {
                         context.put("refname",ref.getName());
                         context.put("type",ref.getEReferenceType().getName());
 
-                        TemplateManager.getInstance().gen_destructor_ref.merge(context,result);
+                        TemplateManager.getInstance().getGen_destructor_ref().merge(context, result);
                     }
                 }else {
                     add_DESTRUCTOR(ref.getName()+".clear();");
@@ -96,7 +90,7 @@ public class ClassGenerator extends AGenerator {
         add_DESTRUCTOR(result.toString());
     }
 
-    private void generateInit(EClass cls) {
+    private void generateInit() {
         // header
         add_method_signature_H("void init" + cls.getName() + "(" + cls.getName() + "* const this);");
 
@@ -116,7 +110,7 @@ public class ClassGenerator extends AGenerator {
 
     }
 
-    private void generateGetterMetaClassName(EClass cls) {
+    private void generateGetterMetaClassName() {
         add_C("static char* " + cls.getName() + "_metaClassName(" + cls.getName() + "* const this) {");
         add_C("\treturn \"" + cls.getName() + "\";");
         add_C("}");
@@ -148,7 +142,7 @@ public class ClassGenerator extends AGenerator {
                     }
 
                     StringWriter result = new StringWriter();
-                    TemplateManager.getInstance().gen_method_remove.merge(context, result);
+                    TemplateManager.getInstance().getGen_method_remove().merge(context, result);
 
                     add_C(result.toString());
                 }
@@ -196,7 +190,7 @@ public class ClassGenerator extends AGenerator {
 
 
                     StringWriter result = new StringWriter();
-                    TemplateManager.getInstance().gen_method_add.merge(context, result);
+                    TemplateManager.getInstance().getGen_method_add().merge(context, result);
                     add_C(result.toString());
                 }
 
@@ -229,9 +223,9 @@ public class ClassGenerator extends AGenerator {
         }
     }
 
-    public void generateFunctionHeader(EClass cls) {
+    public void generateFunctionHeader() {
         for (EReference ref : cls.getEReferences()) {
-            for (String methodName : Arrays.asList("Add", "Remove")) {
+            for (String methodName : new String[]{"Add", "Remove"}) {
                 String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
                 String name = HelperGenerator.genToUpperCaseFirstChar(ref.getName());
                 String ptrName    = "fptr" + cls.getName() + methodName + name;
@@ -261,49 +255,23 @@ public class ClassGenerator extends AGenerator {
      * If the only parent is KMFContainer then the key is generated_KMF_ID,
      * in all other cases the class inherit from NamedElement so we return
      * its name. Of course NamedElement have a specific implementation too.
+     *
+     * @see TemplateManager
      */
     public void generateInternalGetKey() {
         // Header signature is defined in the non-generated class KMFContainer
         String fun;
+        VelocityContext context = new VelocityContext();
+        StringWriter writer = new StringWriter();
         add_C("static char\n*" + cls.getName() + "_internalGetKey(" + cls.getName() + "* const this) {");
         if (cls.getName().equals("DeployUnit")) {
-            //TODO use a f*ckin template
-            fun = "\tif (this->internalKey == NULL) {\n" +
-                    "\t\tchar* internalKey;\n" +
-                    "\n" +
-                    "\t\tinternalKey = malloc(sizeof(char) * (strlen(this->groupName) + strlen(\"/\") +\n" +
-                    "\t\t\t\tstrlen(this->hashcode) + strlen(\"/\") +\n" +
-                    "\t\t\t\tstrlen(this->name) + strlen(\"/\") +\n" +
-                    "\t\t\t\tstrlen(this->version)) + 1);\n" +
-                    "\n" +
-                    "\t\tif (internalKey == NULL) {\n" +
-                    "\t\t\tPRINTF(\"ERROR: not enough memory for internalKey\\n\");\n" +
-                    "\t\t\treturn NULL;\n" +
-                    "\t\t}\n" +
-                    "\n" +
-                    "\t\tsprintf(internalKey, \"%s/%s/%s/%s\", this->groupName, this->hashcode, this->name, this->version);\n" +
-                    "\t\tthis->internalKey = internalKey;\n" +
-                    "\n" +
-                    "\t\treturn internalKey;\n" +
-                    "\t} else {\n" +
-                    "\t\treturn this->internalKey;\n" +
-                    "\t}";
+            Template method = TemplateManager.getInstance().getTp_getKey_DeployUnit();
+            method.merge(context, writer);
+            fun = writer.toString();
         } else if (cls.getName().equals("TypeDefinition")) {
-            fun = "\tchar* internalKey = NULL;\n" +
-                    "\n" +
-                    "\tif (this->internalKey == NULL) {\n" +
-                    "\t\tinternalKey = malloc(sizeof(char) * (strlen(this->name) + strlen(\"/\") + strlen(this->version)) + 1);\n" +
-                    "\n" +
-                    "\t\tif (internalKey == NULL)\n" +
-                    "\t\t\treturn NULL;\n" +
-                    "\n" +
-                    "\t\tsprintf(internalKey, \"%s/%s\", this->name, this->version);\n" +
-                    "\n" +
-                    "\t\tthis->internalKey = internalKey;\n" +
-                    "\t\treturn internalKey;\n" +
-                    "\t} else {\n" +
-                    "\t\treturn this->internalKey;\n" +
-                    "\t}";
+            Template method = TemplateManager.getInstance().getTp_getKey_TypeDefinition();
+            method.merge(context, writer);
+            fun = writer.toString();
         } else if (cls.getName().equals("NamedElement")) {
             fun = "\treturn this->name;";
         } else if (cls.getESuperTypes().size() == 0) {
@@ -327,24 +295,16 @@ public class ClassGenerator extends AGenerator {
         add_class_virtual_table(cls.getName(), ptrName + " find" + name + "ByID;");
 
         // implementation
-        add_C("static " + type + "\n* " + eClass.getName() + "Find" + name + "ByID(" + type + "* const this, char *id) {");
-
-        //TODO use template
-        add_C(type + " *value = NULL;");
-        add_C("if(this->" + ref.getName() + " != NULL) {");
-        add_C("\tif(hashmap_get(this->" + ref.getName() + ", id, (void**)(&value)) == MAP_OK) {");
-        add_C("\t\treturn value;");
-        add_C("\t} else {");
-        add_C("\t\treturn NULL;");
-        add_C("\t}");
-        add_C("} else {");
-        add_C("\treturn NULL;");
-        add_C("}");
-
-        add_C("} // end of find");
+        VelocityContext context = new VelocityContext();
+        StringWriter result = new StringWriter();
+        context.put("type", type);
+        context.put("refname",ref.getName());
+        context.put("name", eClass.getName());
+        TemplateManager.getInstance().getGen_find_by_id().merge(context, result);
+        add_C(result.toString());
     }
 
-    private void generateAttributes(EClass cls) {
+    private void generateAttributes() {
         add_ATTRIBUTE(cls.getName() + "_VT *VT;");
 
         add_ATTRIBUTE("/* " + cls.getName() + " */");
@@ -417,7 +377,7 @@ public class ClassGenerator extends AGenerator {
         add_begin_virtual_table_H("/* KMFContainer */");
     }
 
-    public void generateBeginHeader(EClass cls) {
+    public void generateBeginHeader() {
         String name =   cls.getName();
         add_begin_header(HelperGenerator.genIFDEF(name));
 

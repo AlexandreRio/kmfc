@@ -1,0 +1,20 @@
+	if (this->internalKey == NULL) {
+		char* internalKey;
+
+		internalKey = malloc(sizeof(char) * (strlen(this->groupName) + strlen("/") +
+				strlen(this->hashcode) + strlen("/") +
+				strlen(this->name) + strlen("/") +
+				strlen(this->version)) + 1);
+
+		if (internalKey == NULL) {
+			PRINTF("ERROR: not enough memory for internalKey\n");
+			return NULL;
+		}
+
+		sprintf(internalKey, "%s/%s/%s/%s", this->groupName, this->hashcode, this->name, this->version);
+		this->internalKey = internalKey;
+
+		return internalKey;
+	} else {
+		return this->internalKey;
+	}
