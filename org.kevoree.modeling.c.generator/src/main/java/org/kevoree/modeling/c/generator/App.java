@@ -78,8 +78,6 @@ public class App {
 
             Generator gen = new Generator(context);
             gen.generateModel();
-            gen.generateEnvironnement();
-
 
         }
         catch(MissingOptionException e){

@@ -32,14 +32,12 @@ public class Generator {
     private GenerationContext context;
     private File ecoreFile;
     private StringBuilder classes = new StringBuilder();
-    private EnvironnementBuilder cmakeGenerator;
     private List<ClassGenerator> generators;
 
     public Generator(GenerationContext ctx) {
         this.context   = ctx;
         this.ecoreFile = ctx.getEcore();
         this.generators     = new ArrayList<ClassGenerator>();
-        this.cmakeGenerator = new EnvironnementBuilder(ctx);
     }
 
     public void generateModel() throws Exception {
@@ -97,10 +95,6 @@ public class Generator {
         }
 
 //        FileManager.writeFile(output + context.getName_package() + ".h", classes.toString(), false);
-    }
-
-    public void generateEnvironnement() throws IOException {
-        cmakeGenerator.execute();
     }
 
 }

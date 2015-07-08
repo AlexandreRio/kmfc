@@ -1,0 +1,7 @@
+	/* KMFContainer */
+	/fptrKMFMetaClassName metaClassName;
+	/fptrKMFInternalGetKey internalGetKey;
+	/ptrKMFGetPath getPath;
+	/fptrVisit visit;
+	/fptrFindByPath findByPath;
+	/fptrDelete delete;

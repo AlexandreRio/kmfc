@@ -8,14 +8,17 @@ public class TemplateManager {
 
     private static String BASE_DIR = "templates/";
 
+    /** Templates with variables. */
     private Template gen_method_add;
     private Template gen_method_remove;
     private Template gen_visitor;
     private Template gen_visitor_ref;
     private Template gen_destructor_ref;
     private Template gen_find_by_id;
+    /** Templates with no variables. */
     private Template tp_getKey_DeployUnit;
     private Template tp_getKey_TypeDefinition;
+    private Template tp_KMFContainer_fptr;
 
     protected VelocityEngine ve = new VelocityEngine();
 
@@ -32,6 +35,7 @@ public class TemplateManager {
         gen_find_by_id      = ve.getTemplate(BASE_DIR + "findById_method.vm");
         tp_getKey_DeployUnit = ve.getTemplate(BASE_DIR + "internalGetKey_DeployUnit.vm");
         tp_getKey_TypeDefinition = ve.getTemplate(BASE_DIR + "internalGetKey_TypeDefinition.vm");
+        tp_KMFContainer_fptr = ve.getTemplate(BASE_DIR + "kmfcontainer_fptr.vm");
     }
 
     public static TemplateManager getInstance() {
@@ -70,5 +74,9 @@ public class TemplateManager {
 
     public Template getGen_find_by_id() {
         return gen_find_by_id;
+    }
+
+    public Template getTp_KMFContainer_fptr() {
+        return tp_KMFContainer_fptr;
     }
 }

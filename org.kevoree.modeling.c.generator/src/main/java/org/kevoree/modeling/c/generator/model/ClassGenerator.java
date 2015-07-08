@@ -33,7 +33,7 @@ public class ClassGenerator extends AGenerator {
     }
 
     /**
-     * GLOBAL GENERATION METHOD
+     * global generation method
      */
     public void generateClass(EClass cls) throws IOException {
         this.cls = cls;
@@ -102,10 +102,6 @@ public class ClassGenerator extends AGenerator {
             System.err.println("Invalid number of parent for " + cls.getName());
 
         add_init("init" + parentType + "((" + parentType + "*)this);");
-
-//        for (EAttribute attr : cls.getEAllAttributes())
-//            add_init("this->" + attr.getName() + " = " + HelperGenerator.genDefaultValue(attr.getEType().getName()) + ";");
-
     }
 
     private void generateGetterMetaClassName() {
@@ -356,15 +352,10 @@ public class ClassGenerator extends AGenerator {
             }
         }
         //Every class inherit from KMFContainer
-        //TODO use a template
-        add_begin_virtual_table_H("fptrKMFMetaClassName metaClassName;");
-        add_begin_virtual_table_H("fptrKMFInternalGetKey internalGetKey;");
-        add_begin_virtual_table_H("fptrKMFGetPath getPath;");
-        add_begin_virtual_table_H("fptrVisit visit;");
-        add_begin_virtual_table_H("fptrFindByPath findByPath;");
-        add_begin_virtual_table_H("fptrDelete delete;");
-        // reverse order for the insertion, so comment at the end
-        add_begin_virtual_table_H("/* KMFContainer */");
+        VelocityContext context = new VelocityContext();
+        StringWriter result = new StringWriter();
+        TemplateManager.getInstance().getTp_KMFContainer_fptr().merge(context, result);
+        add_begin_virtual_table_H(result.toString());
     }
 
     public void generateBeginHeader() {
