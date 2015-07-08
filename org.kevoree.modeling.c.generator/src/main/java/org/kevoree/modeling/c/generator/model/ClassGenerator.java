@@ -13,6 +13,7 @@ import org.kevoree.modeling.c.generator.utils.FileManager;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Arrays;
 
 /**
  * Generator for a class of the meta-model
@@ -229,20 +230,16 @@ public class ClassGenerator extends AGenerator {
     }
 
     public void generateFunctionHeader(EClass cls) {
-        //TODO refactor
         for (EReference ref : cls.getEReferences()) {
-            String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
-            String addName = HelperGenerator.genToUpperCaseFirstChar(ref.getName());
-            String removeName = HelperGenerator.genToUpperCaseFirstChar(ref.getName());
-            String ptrAddName    = "fptr" + cls.getName() + "Add" + addName;
-            String ptrRemoveName = "fptr" + cls.getName() + "Remove" + removeName;
+            for (String methodName : Arrays.asList("Add", "Remove")) {
+                String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
+                String name = HelperGenerator.genToUpperCaseFirstChar(ref.getName());
+                String ptrName    = "fptr" + cls.getName() + methodName + name;
 
-            add_method_signature_H("typedef void (*" + ptrAddName + ")(" + cls.getName() + "*, " + type + "*);");
-            add_method_signature_H("typedef void (*" + ptrRemoveName + ")(" + cls.getName() + "*, " + type + "*);");
-            add_virtual_table_H(ptrAddName + " add" + addName + ";");
-            add_class_virtual_table(cls.getName(), ptrAddName + " add" + addName + ";");
-            add_virtual_table_H(ptrRemoveName + " remove" + removeName + ";");
-            add_class_virtual_table(cls.getName(), ptrRemoveName + " remove" + removeName + ";");
+                add_method_signature_H("typedef void (*" + ptrName + ")(" + cls.getName() + "*, " + type + "*);");
+                add_virtual_table_H(ptrName + " add" + name + ";");
+                add_class_virtual_table(cls.getName(), ptrName + " add" + name + ";");
+            }
         }
     }
 
@@ -270,6 +267,7 @@ public class ClassGenerator extends AGenerator {
         String fun;
         add_C("static char\n*" + cls.getName() + "_internalGetKey(" + cls.getName() + "* const this) {");
         if (cls.getName().equals("DeployUnit")) {
+            //TODO use a f*ckin template
             fun = "\tif (this->internalKey == NULL) {\n" +
                     "\t\tchar* internalKey;\n" +
                     "\n" +
@@ -331,6 +329,7 @@ public class ClassGenerator extends AGenerator {
         // implementation
         add_C("static " + type + "\n* " + eClass.getName() + "Find" + name + "ByID(" + type + "* const this, char *id) {");
 
+        //TODO use template
         add_C(type + " *value = NULL;");
         add_C("if(this->" + ref.getName() + " != NULL) {");
         add_C("\tif(hashmap_get(this->" + ref.getName() + ", id, (void**)(&value)) == MAP_OK) {");
@@ -407,6 +406,7 @@ public class ClassGenerator extends AGenerator {
             }
         }
         //Every class inherit from KMFContainer
+        //TODO use a template
         add_begin_virtual_table_H("fptrKMFMetaClassName metaClassName;");
         add_begin_virtual_table_H("fptrKMFInternalGetKey internalGetKey;");
         add_begin_virtual_table_H("fptrKMFGetPath getPath;");

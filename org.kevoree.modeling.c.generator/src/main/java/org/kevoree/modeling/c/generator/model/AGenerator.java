@@ -84,7 +84,7 @@ public abstract class AGenerator {
     }
 
     public static void add_class_attribute(String className, String attr) {
-        // can be refactored to remove double access
+        //TODO can be refactored to remove double access
         if (classAttributes.containsKey(className))
             classAttributes.get(className).append(attr.startsWith("\t") ? attr + "\n" : "\t" + attr + "\n");
         else
@@ -92,7 +92,7 @@ public abstract class AGenerator {
     }
 
     public static void add_class_virtual_table(String className, String vt) {
-        // can be refactored to remove double access
+        //TODO can be refactored to remove double access
         if (classVirtualTable.containsKey(className))
             classVirtualTable.get(className).append(vt.startsWith("\t") ? vt + "\n" : "\t" + vt + "\n");
         else
