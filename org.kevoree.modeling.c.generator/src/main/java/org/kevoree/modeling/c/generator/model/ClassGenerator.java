@@ -5,16 +5,15 @@ import org.apache.velocity.VelocityContext;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
+import org.kevoree.modeling.c.generator.GenerationContext;
 import org.kevoree.modeling.c.generator.Generator;
 import org.kevoree.modeling.c.generator.TemplateManager;
-import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 import org.kevoree.modeling.c.generator.utils.ConverterDataTypes;
-import org.kevoree.modeling.c.generator.GenerationContext;
 import org.kevoree.modeling.c.generator.utils.FileManager;
+import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Arrays;
 
 /**
  * Generator for a class of the meta-model.
@@ -29,7 +28,7 @@ public class ClassGenerator extends AGenerator {
 
     private EClass cls;
 
-    public ClassGenerator(GenerationContext ctx){
+    public ClassGenerator(GenerationContext ctx) {
         this.ctx = ctx;
     }
 
@@ -39,6 +38,7 @@ public class ClassGenerator extends AGenerator {
     public void generateClass(EClass cls) throws IOException {
         this.cls = cls;
         initGeneration(cls.getName());
+
         generateBeginHeader();
         generateVirtualTableComment();
         generateInternalGetKey();
@@ -58,28 +58,26 @@ public class ClassGenerator extends AGenerator {
     private void generateDeleteMethod() {
         StringWriter result = new StringWriter();
 
-        for(EReference ref :cls.getEAllReferences())
-        {
+        for (EReference ref : cls.getEAllReferences()) {
 
-            if(ref.getUpperBound() == -1 )
-            {
-                if(ref.isContainment()){
-                    if(ref.getEReferenceType().getEIDAttribute() != null){
+            if (ref.getUpperBound() == -1) {
+                if (ref.isContainment()) {
+                    if (ref.getEReferenceType().getEIDAttribute() != null) {
                         VelocityContext context = new VelocityContext();
-                        context.put("refname",ref.getName());
-                        context.put("type",ref.getEReferenceType().getName());
+                        context.put("refname", ref.getName());
+                        context.put("type", ref.getEReferenceType().getName());
 
                         TemplateManager.getInstance().getGen_destructor_ref().merge(context, result);
                     }
-                }else {
-                    add_DESTRUCTOR(ref.getName()+".clear();");
+                } else {
+                    add_DESTRUCTOR(ref.getName() + ".clear();");
                 }
 
             } else {
-                if(ref.isContainment()){
-                    result.append("if("+ref.getName()+" != NULL){\n")  ;
-                    result.append("delete "+ref.getName()+";\n");
-                    result.append(ref.getName()+"= NULL;");
+                if (ref.isContainment()) {
+                    result.append("if(" + ref.getName() + " != NULL){\n");
+                    result.append("delete " + ref.getName() + ";\n");
+                    result.append(ref.getName() + "= NULL;");
                     result.append("}\n");
                 }
 
@@ -118,27 +116,26 @@ public class ClassGenerator extends AGenerator {
 
     private void generateMethodRemove(EClass cls) {
 
-        for(EReference ref : cls.getEReferences()) {
+        for (EReference ref : cls.getEReferences()) {
 
             String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
             add_method_signature_H("void remove" + ref.getName() + "(" + type + " *ptr);");
 
 
-            if(ref.getUpperBound() == -1) {
-                if(ref.getEReferenceType().getEIDAttribute() == null) {
+            if (ref.getUpperBound() == -1) {
+                if (ref.getEReferenceType().getEIDAttribute() == null) {
                     add_C("void " + cls.getName() + "::remove" + ref.getName() + "(" + type + " *ptr){");
                     add_C("delete ptr;");
                     add_C("}\n");
-                }else {
+                } else {
                     VelocityContext context = new VelocityContext();
-                    context.put("classname",cls.getName());
-                    context.put("refname",ref.getName());
-                    context.put("typeadd",type);
-                    if(ref.isContainment())
-                    {
-                        context.put("isContainment","delete container;");  // TODO shared ptr
+                    context.put("classname", cls.getName());
+                    context.put("refname", ref.getName());
+                    context.put("typeadd", type);
+                    if (ref.isContainment()) {
+                        context.put("isContainment", "delete container;");  // TODO shared ptr
                     } else {
-                        context.put("isContainment","");
+                        context.put("isContainment", "");
                     }
 
                     StringWriter result = new StringWriter();
@@ -147,7 +144,7 @@ public class ClassGenerator extends AGenerator {
                     add_C(result.toString());
                 }
 
-            }  else {
+            } else {
                 add_C("void " + cls.getName() + "::remove" + ref.getName() + "(" + type + " *ptr){");
                 add_C("delete ptr;");
                 add_C("}\n");
@@ -156,29 +153,27 @@ public class ClassGenerator extends AGenerator {
         }
     }
 
-    public void generateMethodAdd(EClass cls)
-    {
-        for(EReference ref : cls.getEReferences()) {
+    public void generateMethodAdd(EClass cls) {
+        for (EReference ref : cls.getEReferences()) {
             String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
             add_method_signature_H("void add" + ref.getName() + "(" + type + " *ptr);");
 
 
-            if(ref.getUpperBound() == -1) {
-                if(ref.getEReferenceType().getEIDAttribute() == null) {
+            if (ref.getUpperBound() == -1) {
+                if (ref.getEReferenceType().getEIDAttribute() == null) {
                     add_C("void " + cls.getName() + "::add" + ref.getName() + "(" + type + " *ptr){");
                     add_C(ref.getName() + ".push_back(ptr);");
                     add_C("}\n");
-                }else
-                {
+                } else {
                     VelocityContext context = new VelocityContext();
-                    context.put("classname",cls.getName());
-                    context.put("refname",ref.getName());
-                    context.put("typeadd",type);
+                    context.put("classname", cls.getName());
+                    context.put("refname", ref.getName());
+                    context.put("typeadd", type);
 
 
-                    if(!ref.isContainment()){
-                        context.put("iscontained","");
-                    } else    {
+                    if (!ref.isContainment()) {
+                        context.put("iscontained", "");
+                    } else {
                         StringBuilder iscontainer = new StringBuilder();
                         iscontainer.append("\tany ptr_any = container;\n");
                         iscontainer.append("\tRemoveFromContainerCommand  *cmd = new  RemoveFromContainerCommand(this,REMOVE,\"" + ref.getName() + "\",ptr_any);\n");
@@ -187,34 +182,30 @@ public class ClassGenerator extends AGenerator {
                     }
 
 
-
-
                     StringWriter result = new StringWriter();
                     TemplateManager.getInstance().getGen_method_add().merge(context, result);
                     add_C(result.toString());
                 }
 
-            }  else
-            {
+            } else {
                 add_C("void " + cls.getName() + "::add" + ref.getName() + "(" + type + " *ptr){");
 
-                if(ref.isContainment()){
+                if (ref.isContainment()) {
 
                     StringBuilder iscontainer = new StringBuilder();
-                    iscontainer.append("if("+ref.getName()+" != ptr ){\n");
-                    iscontainer.append("if("+ref.getName()+" != NULL ){\n");
-                    iscontainer.append(ref.getName()+"->setEContainer(NULL,NULL,\"\");\n");
+                    iscontainer.append("if(" + ref.getName() + " != ptr ){\n");
+                    iscontainer.append("if(" + ref.getName() + " != NULL ){\n");
+                    iscontainer.append(ref.getName() + "->setEContainer(NULL,NULL,\"\");\n");
                     iscontainer.append("}\n");
                     iscontainer.append("if(ptr != NULL ){\n");
                     iscontainer.append("ptr->setEContainer(this,NULL,\"" + ref.getName() + "\");\n");
                     iscontainer.append("}\n");
 
 
-                    iscontainer.append(ref.getName()+" =ptr;\n");
+                    iscontainer.append(ref.getName() + " =ptr;\n");
                     iscontainer.append("}\n");
                     add_C(iscontainer.toString());
-                }   else
-                {
+                } else {
                     add_C(ref.getName() + " =ptr;\n");
                 }
                 add_C("}\n");
@@ -228,7 +219,7 @@ public class ClassGenerator extends AGenerator {
             for (String methodName : new String[]{"Add", "Remove"}) {
                 String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
                 String name = HelperGenerator.genToUpperCaseFirstChar(ref.getName());
-                String ptrName    = "fptr" + cls.getName() + methodName + name;
+                String ptrName = "fptr" + cls.getName() + methodName + name;
 
                 add_method_signature_H("typedef void (*" + ptrName + ")(" + cls.getName() + "*, " + type + "*);");
                 add_virtual_table_H(ptrName + " add" + name + ";");
@@ -298,7 +289,7 @@ public class ClassGenerator extends AGenerator {
         VelocityContext context = new VelocityContext();
         StringWriter result = new StringWriter();
         context.put("type", type);
-        context.put("refname",ref.getName());
+        context.put("refname", ref.getName());
         context.put("name", eClass.getName());
         TemplateManager.getInstance().getGen_find_by_id().merge(context, result);
         add_C(result.toString());
@@ -308,7 +299,7 @@ public class ClassGenerator extends AGenerator {
         add_ATTRIBUTE(cls.getName() + "_VT *VT;");
 
         add_ATTRIBUTE("/* " + cls.getName() + " */");
-        for( EAttribute eAttribute : cls.getEAttributes() ) {
+        for (EAttribute eAttribute : cls.getEAttributes()) {
             String attr = ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName())
                     + " " + eAttribute.getName() + ";";
             add_class_attribute(cls.getName(), attr);
@@ -318,13 +309,13 @@ public class ClassGenerator extends AGenerator {
         }
 
 
-        for(EReference ref : cls.getEReferences()  ) {
+        for (EReference ref : cls.getEReferences()) {
             String gen_type;
 
             gen_type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
 
-            if(ref.getUpperBound() == -1) {
-                if(ref.getEReferenceType().getEIDAttribute() != null) {
+            if (ref.getUpperBound() == -1) {
+                if (ref.getEReferenceType().getEIDAttribute() != null) {
                     String attr = "map_t " + ref.getName() + ";";
                     add_class_attribute(cls.getName(), attr);
                     add_ATTRIBUTE(attr);
@@ -343,7 +334,6 @@ public class ClassGenerator extends AGenerator {
 
     /**
      * Should be called after a whole model parsing
-     *
      */
     public void generateInheritedAttributes() {
         for (EClass c : this.cls.getEAllSuperTypes()) {
@@ -378,7 +368,7 @@ public class ClassGenerator extends AGenerator {
     }
 
     public void generateBeginHeader() {
-        String name =   cls.getName();
+        String name = cls.getName();
         add_begin_header(HelperGenerator.genIFDEF(name));
 
         add_begin_header("\n");
