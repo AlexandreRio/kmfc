@@ -13,9 +13,6 @@ import org.kevoree.modeling.c.generator.utils.FileManager;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Generator for a class of the meta-model
@@ -49,6 +46,7 @@ public class ClassGenerator extends AGenerator {
         initGeneration(cls.getName());
         generateBeginHeader(cls);
         generateVirtualTableComment();
+        generateInternalGetKey();
         generateFunctionHeader(cls);
         generateInit(cls);
         generateAttributes(cls);
@@ -261,13 +259,13 @@ public class ClassGenerator extends AGenerator {
     }
 
     /**
-     * TODO
-     * DeployUnit et TypeDefinition, implé différente,
-     * si parent KMFContainer -> generated_KMF
-     * sinon, NamedElement -> name
-     * @param cls
+     * This method is a bit tricky to generate.
+     * DeployUnit and TypeDefinition have their own implementation
+     * If the only parent is KMFContainer then the key is generated_KMF_ID,
+     * in all other cases the class inherit from NamedElement so we return
+     * its name. Of course NamedElement have a specific implementation too.
      */
-    public void generateinternalGetKey(EClass cls) {
+    public void generateInternalGetKey() {
         // Header signature is defined in the non-generated class KMFContainer
         String fun;
         add_C("static char\n*" + cls.getName() + "_internalGetKey(" + cls.getName() + "* const this) {");
@@ -319,7 +317,7 @@ public class ClassGenerator extends AGenerator {
         add_C("}\n");
     }
 
-    public void generateFindbyIdAttribute(EClass eClass, EReference ref) {
+    public void generateFindByIdAttribute(EClass eClass, EReference ref) {
         String type = ref.getEReferenceType().getName();
         String name = HelperGenerator.genToUpperCaseFirstChar(ref.getName());
 
@@ -360,11 +358,9 @@ public class ClassGenerator extends AGenerator {
             add_ATTRIBUTE(attr);
         }
 
-        generateinternalGetKey(cls);
 
         for(EReference ref : cls.getEReferences()  ) {
             String gen_type;
-            String type_ref = ref.getEReferenceType().getName();
 
             gen_type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
 
@@ -374,7 +370,7 @@ public class ClassGenerator extends AGenerator {
                     add_class_attribute(cls.getName(), attr);
                     add_ATTRIBUTE(attr);
                     add_CONSTRUCTOR(ref.getName() + " = NULL;");
-                    generateFindbyIdAttribute(cls, ref);
+                    generateFindByIdAttribute(cls, ref);
                 } else {
                     System.err.println("NO ID " + ref.getName());
                 }
@@ -391,15 +387,15 @@ public class ClassGenerator extends AGenerator {
      *
      */
     public void generateInheritedAttributes() {
-        //Every class inherit from KMFContainer
-        add_ATTRIBUTE("/* KMFContainer */");
-        add_ATTRIBUTE("KMFContainer *eContainer;");
         for (EClass c : this.cls.getEAllSuperTypes()) {
             if (classAttributes.containsKey(c.getName())) {
-                add_ATTRIBUTE("/* " + c.getName() + " */");
-                add_ATTRIBUTE(classAttributes.get(c.getName()).toString());
+                add_begin_ATTRIBUTE(classAttributes.get(c.getName()).toString());
+                add_begin_ATTRIBUTE("/* " + c.getName() + " */");
             }
         }
+        //Every class inherit from KMFContainer
+        add_begin_ATTRIBUTE("KMFContainer *eContainer;");
+        add_begin_ATTRIBUTE("/* KMFContainer */");
     }
 
     public void generateInheritedVirtualTable() {

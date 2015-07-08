@@ -75,6 +75,10 @@ public abstract class AGenerator {
         attributes.append(source.startsWith("\t") ? source + "\n" : "\t" + source + "\n");
     }
 
+    protected void add_begin_ATTRIBUTE(String source) {
+        attributes.insert(0, source.startsWith("\t") ? source + "\n" : "\t" + source + "\n");
+    }
+
     protected void add_init(String source) {
         init.append(source + "\n");
     }
