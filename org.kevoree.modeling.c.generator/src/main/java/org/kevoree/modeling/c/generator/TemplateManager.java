@@ -17,6 +17,9 @@ public class TemplateManager {
     private Template gen_visitor;
     private Template gen_visitor_ref;
     private Template gen_destructor_ref;
+
+
+    private Template gen_method_new;
     private Template gen_find_by_id;
     /** Templates with no variables. */
     private Template tp_getKey_DeployUnit;
@@ -36,6 +39,7 @@ public class TemplateManager {
         gen_visitor         = ve.getTemplate(BASE_DIR + "visitor.vm");
         gen_visitor_ref     = ve.getTemplate(BASE_DIR + "visitor_ref.vm");
         gen_destructor_ref  = ve.getTemplate(BASE_DIR + "destructor_ref.vm");
+        gen_method_new      = ve.getTemplate(BASE_DIR + "new_method.vm");
         gen_find_by_id      = ve.getTemplate(BASE_DIR + "findById_method.vm");
         tp_getKey_DeployUnit = ve.getTemplate(BASE_DIR + "internalGetKey_DeployUnit.vm");
         tp_getKey_TypeDefinition = ve.getTemplate(BASE_DIR + "internalGetKey_TypeDefinition.vm");
@@ -86,5 +90,9 @@ public class TemplateManager {
 
     public Template getGen_method_add_unary_containment() {
         return gen_method_add_unary_containment;
+    }
+
+    public Template getGen_method_new() {
+        return gen_method_new;
     }
 }

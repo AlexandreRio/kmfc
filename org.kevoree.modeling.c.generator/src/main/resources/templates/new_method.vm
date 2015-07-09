@@ -1,0 +1,23 @@
+${classname}* new_${classname}(void)
+{
+	${classname}* pObj = NULL;
+	/* Allocating memory */
+	pObj = malloc(sizeof(${classname}));
+
+	if (pObj == NULL)
+	{
+		return NULL;
+	}
+
+	/*
+	 * Virtual Table
+	 */
+	pObj->VT = &mBinding_VT;
+
+	/*
+	 * ${classname}
+	 */
+	init${classname}(pObj);
+
+	return pObj;
+}

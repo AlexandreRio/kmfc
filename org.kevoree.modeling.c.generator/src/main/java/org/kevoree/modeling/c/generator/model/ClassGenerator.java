@@ -39,6 +39,7 @@ public class ClassGenerator extends AGenerator {
         this.cls = cls;
         initGeneration(cls.getName());
 
+        //TODO organize function call and identify header and implementation
         generateBeginHeader();
         generateVirtualTableComment();
         generateInternalGetKey();
@@ -48,6 +49,7 @@ public class ClassGenerator extends AGenerator {
         generateMethodAdd();
         generateMethodRemove();
         generateGetterMetaClassName();
+        generateMethodNew();
         generateDeleteMethod();
     }
 
@@ -352,6 +354,14 @@ public class ClassGenerator extends AGenerator {
         } else {
             add_begin_header(HelperGenerator.genIncludeLocal("KMFContainer"));
         }
+    }
+
+    private  void generateMethodNew() {
+        VelocityContext context = new VelocityContext();
+        context.put("classname", cls.getName());
+        StringWriter result = new StringWriter();
+        TemplateManager.getInstance().getGen_method_new().merge(context, result);
+        add_C(result.toString());
     }
 
     public void link_generation() {
