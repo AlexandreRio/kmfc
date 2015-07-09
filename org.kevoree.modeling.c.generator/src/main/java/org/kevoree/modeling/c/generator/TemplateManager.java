@@ -10,6 +10,9 @@ public class TemplateManager {
 
     /** Templates with variables. */
     private Template gen_method_add;
+
+
+    private Template gen_method_add_unary_containment;
     private Template gen_method_remove;
     private Template gen_visitor;
     private Template gen_visitor_ref;
@@ -28,6 +31,7 @@ public class TemplateManager {
         ve.setProperty("file.resource.loader.class", ClasspathResourceLoader.class.getName()) ;
         ve.init();
         gen_method_add      = ve.getTemplate(BASE_DIR + "add_method.vm");
+        gen_method_add_unary_containment = ve.getTemplate(BASE_DIR + "add_unary_containment.vm");
         gen_method_remove   = ve.getTemplate(BASE_DIR + "remove_method.vm");
         gen_visitor         = ve.getTemplate(BASE_DIR + "visitor.vm");
         gen_visitor_ref     = ve.getTemplate(BASE_DIR + "visitor_ref.vm");
@@ -78,5 +82,9 @@ public class TemplateManager {
 
     public Template getTp_KMFContainer_fptr() {
         return tp_KMFContainer_fptr;
+    }
+
+    public Template getGen_method_add_unary_containment() {
+        return gen_method_add_unary_containment;
     }
 }

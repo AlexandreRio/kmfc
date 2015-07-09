@@ -45,7 +45,7 @@ public class ClassGenerator extends AGenerator {
         generateFunctionHeader();
         generateInit();
         generateAttributes();
-        //generateMethodAdd(cls);
+        generateMethodAdd();
         //generateMethodRemove(cls);
         generateGetterMetaClassName();
         generateDeleteMethod();
@@ -149,60 +149,45 @@ public class ClassGenerator extends AGenerator {
         }
     }
 
-    public void generateMethodAdd(EClass cls) {
+    public void generateMethodAdd() {
         for (EReference ref : cls.getEReferences()) {
             String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
             add_method_signature_H("void add" + ref.getName() + "(" + type + " *ptr);");
+            // function signature
+            add_C("static void\n" + cls.getName() + "_add" + HelperGenerator.genToUpperCaseFirstChar(ref.getName()) +
+                "(" + cls.getName() + "* const this, " + type + " *ptr) {");
 
+            StringWriter result = new StringWriter();
+            if (ref.getUpperBound() == -1) { // 0..* link
 
-            if (ref.getUpperBound() == -1) {
                 if (ref.getEReferenceType().getEIDAttribute() == null) {
-                    add_C("void " + cls.getName() + "::add" + ref.getName() + "(" + type + " *ptr){");
-                    add_C(ref.getName() + ".push_back(ptr);");
-                    add_C("}\n");
+                    // never happen… weird
+                    System.err.println("null id are not in the compiler scope");
                 } else {
                     VelocityContext context = new VelocityContext();
                     context.put("classname", cls.getName());
                     context.put("refname", ref.getName());
-                    context.put("typeadd", type);
+                    context.put("type", type);
+                    context.put("methname", HelperGenerator.genToUpperCaseFirstChar(ref.getName()));
 
-
-                    if (!ref.isContainment()) {
+                    if (!ref.isContainment())
                         context.put("iscontained", "");
-                    } else {
-                        StringBuilder iscontainer = new StringBuilder();
-                        iscontainer.append("\tany ptr_any = container;\n");
-                        iscontainer.append("\tRemoveFromContainerCommand  *cmd = new  RemoveFromContainerCommand(this,REMOVE,\"" + ref.getName() + "\",ptr_any);\n");
-                        iscontainer.append("\tcontainer->setEContainer(this,cmd,\"" + ref.getName() + "\");\n");
-                        context.put("iscontained", iscontainer.toString());
-                    }
+                    else
+                        context.put("iscontained", "ptr->eContainer = this;");
 
-
-                    StringWriter result = new StringWriter();
                     TemplateManager.getInstance().getGen_method_add().merge(context, result);
                     add_C(result.toString());
                 }
 
-            } else {
-                add_C("void " + cls.getName() + "::add" + ref.getName() + "(" + type + " *ptr){");
-
-                if (ref.isContainment()) {
-
-                    StringBuilder iscontainer = new StringBuilder();
-                    iscontainer.append("if(" + ref.getName() + " != ptr ){\n");
-                    iscontainer.append("if(" + ref.getName() + " != NULL ){\n");
-                    iscontainer.append(ref.getName() + "->setEContainer(NULL,NULL,\"\");\n");
-                    iscontainer.append("}\n");
-                    iscontainer.append("if(ptr != NULL ){\n");
-                    iscontainer.append("ptr->setEContainer(this,NULL,\"" + ref.getName() + "\");\n");
-                    iscontainer.append("}\n");
-
-
-                    iscontainer.append(ref.getName() + " =ptr;\n");
-                    iscontainer.append("}\n");
-                    add_C(iscontainer.toString());
+            } else { // Unary link
+                if (ref.isContainment()) { // if it's a container
+                    VelocityContext context = new VelocityContext();
+                    context.put("refname", ref.getName());
+                    context.put("methname", HelperGenerator.genToUpperCaseFirstChar(ref.getName()));
+                    TemplateManager.getInstance().getGen_method_add_unary_containment().merge(context, result);
+                    add_C(result.toString());
                 } else {
-                    add_C(ref.getName() + " =ptr;\n");
+                    add_C(ref.getName() + " = ptr;\n");
                 }
                 add_C("}\n");
             }

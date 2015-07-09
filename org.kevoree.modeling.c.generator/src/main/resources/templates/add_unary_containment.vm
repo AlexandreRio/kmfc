@@ -1,0 +1,5 @@
+	if (this->${refname} != NULL) {
+		this->VT->remove${methname}(this, ptr);
+	}
+	this->${refname} = ptr;
+	ptr->eContainer = this;

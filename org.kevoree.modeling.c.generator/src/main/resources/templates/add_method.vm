@@ -1,20 +1,20 @@
-#* @vtlvariable name="classname" type="java.lang.String" *#
-#* @vtlvariable name="refname" type="java.lang.String" *#
-#* @vtlvariable name="typeadd" type="java.lang.String" *#
+    ${type} *container = NULL;
+    char *internalKey = ptr->VT->internalGetKey(ptr);
 
-void ${classname}::add${refname}(${typeadd} *ptr)
-{
-    ${typeadd}  *container = (${typeadd} *)ptr;
-    if(container->internalGetKey().empty())
-    {
-        LOGGER_WRITE(Logger::WARNING,"The ${typeadd} cannot be added in ${classname} because the key is not defined");
-    }else
-    {
-        if(${refname}.find(container->internalGetKey()) == ${refname}.end())
-        {
-            ${refname}[container->internalGetKey()]=ptr;
-            ${iscontained}
+    if(internalKey == NULL) {
+        PRINTF("ERROR: The ${type} cannot be added in ${classname} because the key is not defined\n");
+    } else {
+        if(this->${refname} == NULL) {
+            this->${refname} = hashmap_new(get_key_for_hashmap);
+        }
+        if(hashmap_get(this->${refname}, internalKey, (void**)(&container)) == MAP_MISSING) {
+            if(hashmap_put(this->${refname}, internalKey, ptr) == MAP_OK) {
+                ${iscontained}
+            } else {
+                PRINTF("ERROR: ${refname} cannot be added!\n");
+            }
+        } else {
+            PRINTF("WARNING: id %s already exists in ${refname} map\n", internalKey);
         }
     }
 }
-
