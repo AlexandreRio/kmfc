@@ -1,13 +1,14 @@
 static ${type}
-* ${type}Find${name}ByID(${type}* const this, char *id) {
-${type} *value = NULL;
-if(this->${refname} != NULL) {
-	if(hashmap_get(this->${refname}, id, (void**)(&value)) == MAP_OK) {
-		return value;
+*${type}Find${name}ByID(${type}* const this, char *id) {
+	${type} *value = NULL;
+	if(this->${refname} != NULL) {
+		if(hashmap_get(this->${refname}, id, (void**)(&value)) == MAP_OK) {
+			return value;
+		} else {
+			return NULL;
+		}
 	} else {
 		return NULL;
 	}
-} else {
-	return NULL;
-}
 } // end of find
+
