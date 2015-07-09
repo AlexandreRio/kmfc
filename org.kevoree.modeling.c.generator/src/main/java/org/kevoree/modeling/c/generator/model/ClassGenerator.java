@@ -46,7 +46,7 @@ public class ClassGenerator extends AGenerator {
         generateInit();
         generateAttributes();
         generateMethodAdd();
-        //generateMethodRemove(cls);
+        generateMethodRemove();
         generateGetterMetaClassName();
         generateDeleteMethod();
     }
@@ -110,29 +110,24 @@ public class ClassGenerator extends AGenerator {
         add_C("}");
     }
 
-    private void generateMethodRemove(EClass cls) {
-
+    private void generateMethodRemove() {
         for (EReference ref : cls.getEReferences()) {
-
             String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
-            add_method_signature_H("void remove" + ref.getName() + "(" + type + " *ptr);");
 
-
+            add_C("static void\n" + cls.getName() + "_remove" + HelperGenerator.genToUpperCaseFirstChar(ref.getName()) +
+                    "(" + cls.getName() + "* const this, " + type + " *ptr) {");
             if (ref.getUpperBound() == -1) {
                 if (ref.getEReferenceType().getEIDAttribute() == null) {
-                    add_C("void " + cls.getName() + "::remove" + ref.getName() + "(" + type + " *ptr){");
-                    add_C("delete ptr;");
-                    add_C("}\n");
+                    System.err.println("null id are not in the compiler scope");
                 } else {
                     VelocityContext context = new VelocityContext();
-                    context.put("classname", cls.getName());
                     context.put("refname", ref.getName());
-                    context.put("typeadd", type);
-                    if (ref.isContainment()) {
-                        context.put("isContainment", "delete container;");  // TODO shared ptr
-                    } else {
-                        context.put("isContainment", "");
-                    }
+                    context.put("type", type);
+
+                    if (ref.isContainment())
+                        context.put("iscontained", "ptr->eContainer = NULL;");
+                    else
+                        context.put("iscontained", "");
 
                     StringWriter result = new StringWriter();
                     TemplateManager.getInstance().getGen_method_remove().merge(context, result);
@@ -140,19 +135,18 @@ public class ClassGenerator extends AGenerator {
                     add_C(result.toString());
                 }
 
-            } else {
-                add_C("void " + cls.getName() + "::remove" + ref.getName() + "(" + type + " *ptr){");
-                add_C("delete ptr;");
-                add_C("}\n");
+            } else { // Unary link
+                add_C("\tthis->" + ref.getName() + " = NULL;");
+                if (ref.isContainment())
+                    add_C("\tptr->eContainer = NULL;");
             }
-
-        }
-    }
+            add_C("}\n");
+        } // end for
+    } // end method
 
     public void generateMethodAdd() {
         for (EReference ref : cls.getEReferences()) {
             String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
-            add_method_signature_H("void add" + ref.getName() + "(" + type + " *ptr);");
             // function signature
             add_C("static void\n" + cls.getName() + "_add" + HelperGenerator.genToUpperCaseFirstChar(ref.getName()) +
                 "(" + cls.getName() + "* const this, " + type + " *ptr) {");
@@ -187,7 +181,7 @@ public class ClassGenerator extends AGenerator {
                     TemplateManager.getInstance().getGen_method_add_unary_containment().merge(context, result);
                     add_C(result.toString());
                 } else {
-                    add_C(ref.getName() + " = ptr;\n");
+                    add_C("\tthis->" + ref.getName() + " = ptr;");
                 }
                 add_C("}\n");
             }
