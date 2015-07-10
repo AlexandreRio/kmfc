@@ -14,6 +14,8 @@ We still have to decide whether lots of code is necessary for a C implementation
 
 Initial project didn't have a proper coding style, lots of clean up to do.
 
+You can also see the project [Roadmap](ROADMAP.md).
+
 ## Manipulation library
 
 See `org.kevoree.modeling.cpp.microframework` for tools to manipulate the classes (still in cpp, so unusable).

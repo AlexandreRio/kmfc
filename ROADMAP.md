@@ -1,0 +1,16 @@
+[x] Generate method signatures in header files
+[x] Generate structures in header files
+[x] Generate add and remove implementation
+[x] Generate init implementation
+[ ] Generate KMF_ID for nameless classes
+[x] Generate new implementation
+[x] Generate delete implementation
+[x] Generate find implementation
+[x] Generate getKey implementation
+[x] Generate meta class name implementation
+[x] Generate correct and minimal includes in header files
+[ ] Generate correct and minimal includes in implementation
+[ ] Implement visitor design pattern
+[ ] Implement serialization
+[ ] Implement deserialization
+[ ] Implement comparison
