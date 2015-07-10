@@ -26,6 +26,7 @@ public abstract class AGenerator {
     protected StringBuilder body;
     protected StringBuilder init;
     protected StringBuilder constructor;
+    protected StringBuilder initVT;
 
     protected StringBuilder begin_header;
     protected StringBuilder attributes;
@@ -37,8 +38,9 @@ public abstract class AGenerator {
     protected StringBuilder header_result;
 
     protected String className;
-    protected static Map<String, StringBuilder> classAttributes   = new HashMap<String, StringBuilder>();
+    protected static Map<String, StringBuilder> classAttributes = new HashMap<String, StringBuilder>();
     protected static Map<String, StringBuilder> classVirtualTable = new HashMap<String, StringBuilder>();
+    protected static Map<String, StringBuilder> classInitVT = new HashMap<String, StringBuilder>();
 
     protected void add_CONSTRUCTOR(String source) {
         constructor.append(source + "\n");
@@ -88,10 +90,13 @@ public abstract class AGenerator {
 
     public static void add_class_virtual_table(String className, String vt) {
         //TODO can be refactored to remove double access
-        if (classVirtualTable.containsKey(className))
-            classVirtualTable.get(className).append(vt.startsWith("\t") ? vt + "\n" : "\t" + vt + "\n");
+    }
+
+    public static void add_class_init_vt(String className, String vt) {
+        if (classInitVT.containsKey(className))
+            classInitVT.get(className).append(vt.startsWith("\t") ? vt + "\n" : "\t" + vt + "\n");
         else
-            classVirtualTable.put(className, new StringBuilder(vt.startsWith("\t") ? vt + "\n" : "\t" + vt + "\n"));
+            classInitVT.put(className, new StringBuilder(vt.startsWith("\t") ? vt + "\n" : "\t" + vt + "\n"));
     }
 
     public void add_begin_virtual_table_H(String vt) {
@@ -118,6 +123,7 @@ public abstract class AGenerator {
         body = new StringBuilder();
         init = new StringBuilder();
         constructor = new StringBuilder();
+        initVT = new StringBuilder();
 
         //H file
         begin_header = new StringBuilder();
@@ -145,5 +151,6 @@ public abstract class AGenerator {
 //        add_C("}\n");
 //    }
 
-    public void link_generation() {}
+    public void link_generation() {
+    }
 }
