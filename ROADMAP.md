@@ -3,14 +3,15 @@
 - [x] Generate add and remove implementation
 - [x] Generate init implementation
 - [ ] Initialize Virtual Table
-- [ ] Generate KMF_ID for nameless classes
+- [x] Generate KMF_ID for nameless classes
 - [x] Generate new implementation
-- [ ] Generate delete implementation
+- [x] Generate delete implementation
 - [x] Generate find implementation
 - [x] Generate getKey implementation
 - [x] Generate meta class name implementation
 - [x] Generate correct and minimal includes in header files
 - [ ] Generate correct and minimal includes in implementation
+
 - [ ] Implement visitor design pattern
 - [ ] Implement serialization
 - [ ] Implement deserialization

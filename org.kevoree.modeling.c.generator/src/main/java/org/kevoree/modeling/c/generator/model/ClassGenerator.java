@@ -108,7 +108,13 @@ public class ClassGenerator extends AGenerator {
         else
             System.err.println("Invalid number of parent for " + cls.getName());
 
-        add_init("init" + parentType + "((" + parentType + "*)this);");
+        add_init("\tinit" + parentType + "((" + parentType + "*)this);");
+
+        // if parent is KMFContainer, we generate a KMF_ID
+        if (cls.getEAllSuperTypes().size() == 0) {
+            add_init("\tmemset(&this->generated_KMF_ID[0], 0, sizeof(this->generated_KMF_ID));\n" +
+                    "\trand_str(this->generated_KMF_ID, 8);");
+        }
     }
 
     private void generateGetterMetaClassName() {
@@ -283,12 +289,15 @@ public class ClassGenerator extends AGenerator {
 
         add_ATTRIBUTE("/* " + cls.getName() + " */");
         for (EAttribute eAttribute : cls.getEAttributes()) {
-            String attr = ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName())
-                    + " " + eAttribute.getName() + ";";
-            add_class_attribute(cls.getName(), attr);
-            add_init("this->" + eAttribute.getName() + " = " + HelperGenerator.
-                    genDefaultValue(eAttribute.getEAttributeType().getName()) + ";");
-            add_ATTRIBUTE(attr);
+            // we have already assigned this attribute
+            if (!eAttribute.getName().equals("generated_KMF_ID")) {
+                String attr = ConverterDataTypes.getInstance().check_type(eAttribute.getEAttributeType().getName())
+                        + " " + eAttribute.getName() + ";";
+                add_class_attribute(cls.getName(), attr);
+                add_init("\tthis->" + eAttribute.getName() + " = " + HelperGenerator.
+                        genDefaultValue(eAttribute.getEAttributeType().getName()) + ";");
+                add_ATTRIBUTE(attr);
+            }
         }
 
 
