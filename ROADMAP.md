@@ -10,7 +10,7 @@
 - [x] Generate getKey implementation
 - [x] Generate meta class name implementation
 - [x] Generate correct and minimal includes in header files
-- [ ] Generate correct and minimal includes in implementation
+- [x] Generate correct and minimal includes in implementation
 
 - [ ] Implement visitor design pattern
 - [ ] Implement serialization

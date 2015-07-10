@@ -49,6 +49,7 @@ public class ClassGenerator extends AGenerator {
         generateMethodAdd();
         generateMethodRemove();
         generateGetterMetaClassName();
+        generateInitVT();
         generateMethodNew();
         generateMethodDelete();
     }
@@ -163,7 +164,7 @@ public class ClassGenerator extends AGenerator {
             String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
             // function signature
             add_C("static void\n" + cls.getName() + "_add" + HelperGenerator.genToUpperCaseFirstChar(ref.getName()) +
-                "(" + cls.getName() + "* const this, " + type + " *ptr) {");
+                    "(" + cls.getName() + "* const this, " + type + " *ptr) {");
 
             StringWriter result = new StringWriter();
             if (ref.getUpperBound() == -1) { // 0..* link
@@ -356,6 +357,8 @@ public class ClassGenerator extends AGenerator {
 
     public void generateBeginHeader() {
         String name = cls.getName();
+        add_C("#include \"" + name + ".h\"\n");
+
         add_begin_header(HelperGenerator.genIFDEF(name));
 
         add_begin_header("\n");
@@ -371,7 +374,25 @@ public class ClassGenerator extends AGenerator {
         }
     }
 
-    private  void generateMethodNew() {
+    /**
+     * @see #generateSuperAndVTAttr()
+     */
+    private void generateInitVT() {
+        //TODO only add self methods to a table
+        String initParent = "";
+        if (cls.getESuperTypes().size() == 1)
+            initParent = "\t.super = &" + HelperGenerator.genToLowerCaseFirstChar(cls.getESuperTypes().get(0).getName()) + "_VT;";
+        else if (cls.getESuperTypes().size() == 0)
+            initParent = ".super = &KMF_VT;";
+        initVT.append(initParent + "\n");
+    }
+
+//    private void generateInheritedInitVT() {
+//        for (EClass parent : cls.getEAllSuperTypes())
+//            initVT.append(classInitVT.get(parent.getName()));
+//    }
+
+    private void generateMethodNew() {
         VelocityContext context = new VelocityContext();
         context.put("classname", cls.getName());
         StringWriter result = new StringWriter();
@@ -386,6 +407,10 @@ public class ClassGenerator extends AGenerator {
         class_result.append(init);
         class_result.append("}\n");
         class_result.append(body);
+        add_C("const " + cls.getName() + "_VT "
+                + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT {");
+        class_result.append(initVT);
+        add_C("};");
 
         // header file
         generateInheritedAttributes();
