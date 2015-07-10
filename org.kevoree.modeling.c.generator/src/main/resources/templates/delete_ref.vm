@@ -1,0 +1,4 @@
+	if (this->${refname} != NULL) {
+		${iscontained}
+		hashmap_free(this->${refname});
+	}

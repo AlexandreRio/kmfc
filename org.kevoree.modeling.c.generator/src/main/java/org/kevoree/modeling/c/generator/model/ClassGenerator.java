@@ -58,36 +58,41 @@ public class ClassGenerator extends AGenerator {
     }
 
     private void generateMethodDelete() {
-        StringWriter result = new StringWriter();
+        add_C("static void\ndelete" + cls.getName() + "(" + cls.getName() + "* const this) {");
 
+        // call parent delete method
+        if (cls.getESuperTypes().size() == 1) {
+            String parentType = cls.getEAllSuperTypes().get(0).getName();
+            add_C("\t" + HelperGenerator.genToLowerCaseFirstChar(parentType) + "_VT.delete((" + parentType
+                    + ")*this);\n");
+        } else if (cls.getEAllSuperTypes().size() == 0) {
+            add_C("\tKMF_VT.delete((KMFContainer*)this);\n");
+        } else {
+            System.err.println("Invalid number of parent for " + cls.getName());
+        }
+
+        VelocityContext context;
+        StringWriter result;
+        // delete self attributes
         for (EReference ref : cls.getEAllReferences()) {
-
             if (ref.getUpperBound() == -1) {
-                if (ref.isContainment()) {
-                    if (ref.getEReferenceType().getEIDAttribute() != null) {
-                        VelocityContext context = new VelocityContext();
-                        context.put("refname", ref.getName());
-                        context.put("type", ref.getEReferenceType().getName());
+                if (ref.getEReferenceType().getEIDAttribute() != null) {
+                    context = new VelocityContext();
+                    result = new StringWriter();
+                    context.put("refname", ref.getName());
+                    if (ref.isContainment())
+                        context.put("iscontained", "deleteContainerContents(this->" + ref.getName() + ");");
+                    else
+                        context.put("iscontained", "");
 
-                        TemplateManager.getInstance().getGen_destructor_ref().merge(context, result);
-                    }
-                } else {
-                    add_DESTRUCTOR(ref.getName() + ".clear();");
+                    TemplateManager.getInstance().getGen_delete_ref().merge(context, result);
+                    add_C(result.toString());
                 }
-
-            } else {
-                if (ref.isContainment()) {
-                    result.append("if(" + ref.getName() + " != NULL){\n");
-                    result.append("delete " + ref.getName() + ";\n");
-                    result.append(ref.getName() + "= NULL;");
-                    result.append("}\n");
-                }
-
             }
-
+            //nothing to do for unary link ?
 
         }
-        add_DESTRUCTOR(result.toString());
+        add_C("}");
     }
 
     private void generateInit() {

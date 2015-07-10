@@ -26,7 +26,6 @@ public abstract class AGenerator {
     protected StringBuilder body;
     protected StringBuilder init;
     protected StringBuilder constructor;
-    protected StringBuilder destructor;
 
     protected StringBuilder begin_header;
     protected StringBuilder attributes;
@@ -43,10 +42,6 @@ public abstract class AGenerator {
 
     protected void add_CONSTRUCTOR(String source) {
         constructor.append(source + "\n");
-    }
-
-    protected void add_DESTRUCTOR(String source) {
-        destructor.append(source + "\n");
     }
 
     protected void add_C(String source) {
@@ -123,7 +118,6 @@ public abstract class AGenerator {
         body = new StringBuilder();
         init = new StringBuilder();
         constructor = new StringBuilder();
-        destructor = new StringBuilder();
 
         //H file
         begin_header = new StringBuilder();
