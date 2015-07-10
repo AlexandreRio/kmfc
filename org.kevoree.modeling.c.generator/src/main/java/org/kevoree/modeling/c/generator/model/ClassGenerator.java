@@ -50,14 +50,14 @@ public class ClassGenerator extends AGenerator {
         generateMethodRemove();
         generateGetterMetaClassName();
         generateMethodNew();
-        generateDeleteMethod();
+        generateMethodDelete();
     }
 
     private void generateVirtualTableComment() {
         add_virtual_table_H("/* " + cls.getName() + " */");
     }
 
-    private void generateDeleteMethod() {
+    private void generateMethodDelete() {
         StringWriter result = new StringWriter();
 
         for (EReference ref : cls.getEAllReferences()) {
@@ -125,6 +125,7 @@ public class ClassGenerator extends AGenerator {
                     VelocityContext context = new VelocityContext();
                     context.put("refname", ref.getName());
                     context.put("type", type);
+                    context.put("classname", cls.getName());
 
                     if (ref.isContainment())
                         context.put("iscontained", "ptr->eContainer = NULL;");

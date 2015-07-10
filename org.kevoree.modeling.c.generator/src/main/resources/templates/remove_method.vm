@@ -1,7 +1,7 @@
 	char *internalKey = ptr->VT->internalGetKey(ptr);
 
 	if (internalKey == NULL) {
-		PRINTF("ERROR: The ${type} cannot be removed in Instance because the key is not defined\n");
+		PRINTF("ERROR: The ${type} cannot be removed in ${classname} because the key is not defined\n");
 	}
 	else {
 		if (hashmap_remove(this->${refname}, internalKey) == MAP_OK) {
