@@ -406,6 +406,7 @@ public class ClassGenerator extends AGenerator {
         if (!cls.isAbstract()) {
             VelocityContext context = new VelocityContext();
             context.put("classname", cls.getName());
+            context.put("vtName", HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT");
             StringWriter result = new StringWriter();
             TemplateManager.getInstance().getGen_method_new().merge(context, result);
             add_new(result.toString());
