@@ -97,9 +97,6 @@ public class ClassGenerator extends AGenerator {
     }
 
     private void generateInit() {
-        // header
-        add_method_signature_H("void init" + cls.getName() + "(" + cls.getName() + "* const this);");
-
         // implementation
         String parentType = "";
         if (cls.getESuperTypes().size() == 1)
@@ -429,6 +426,7 @@ public class ClassGenerator extends AGenerator {
         header_result.append(attributes);
         header_result.append("} " + this.className + ";\n\n");
         header_result.append(self_attribute + "\n");
+        header_result.append("void init" + cls.getName() + "(" + cls.getName() + "* const this);\n");
         header_result.append(HelperGenerator.genENDIF());
     }
 
