@@ -4,7 +4,9 @@ import org.kevoree.modeling.c.generator.GenerationContext;
 import org.eclipse.emf.ecore.EClass;
 import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +42,7 @@ public abstract class AGenerator {
     protected StringBuilder header_result;
 
     protected String className;
+    protected List<String> typeToDef;
     protected static Map<String, StringBuilder> classAttributes = new HashMap<String, StringBuilder>();
     protected static Map<String, StringBuilder> classVirtualTable = new HashMap<String, StringBuilder>();
     protected static Map<String, StringBuilder> classInitVT = new HashMap<String, StringBuilder>();
@@ -129,6 +132,7 @@ public abstract class AGenerator {
 
         //H file
         begin_header = new StringBuilder();
+        typeToDef = new ArrayList<String>();
         //TODO duplicate of the HashMap
         attributes = new StringBuilder();
         method_signature = new StringBuilder();

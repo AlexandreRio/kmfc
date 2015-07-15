@@ -44,6 +44,7 @@ public class ClassGenerator extends AGenerator {
         generateVirtualTableComment();
         generateInternalGetKey();
         generateFunctionHeader();
+        generateLinkedClassTypeDef();
         generateInit();
         generateAttributes();
         generateMethodAdd();
@@ -54,6 +55,11 @@ public class ClassGenerator extends AGenerator {
         generateMethodDelete();
     }
 
+    private void generateLinkedClassTypeDef() {
+        add_begin_header("typedef struct _" + cls.getName() + " " + cls.getName() + ";\n");
+        for (String t : typeToDef)
+            add_begin_header("typedef struct _" + t + " " + t + ";\n");
+    }
     private void generateVirtualTableComment() {
         add_virtual_table_H("/* " + cls.getName() + " */");
     }
@@ -203,6 +209,9 @@ public class ClassGenerator extends AGenerator {
 
     public void generateFunctionHeader() {
         for (EReference ref : cls.getEReferences()) {
+            if (!typeToDef.contains(ref.getEType().getName()))
+                typeToDef.add(ref.getEType().getName());
+
             for (String methodName : new String[]{"Add", "Remove"}) {
                 String type = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
                 String name = HelperGenerator.genToUpperCaseFirstChar(ref.getName());
