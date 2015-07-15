@@ -18,9 +18,11 @@ public abstract class AGenerator {
     protected GenerationContext ctx;
 
     /**
-     * TODO
-     * StringBuilder can be safely replaced by String and + operator since the
+     * TODO: StringBuilder can be safely replaced by String and + operator since the
      * compiler will use them.
+     *
+     * It should be better to use List to store bare variables and in a final step produce
+     * a file with ; and <CR> and stuff
      */
     protected StringBuilder header;
     protected StringBuilder body;
