@@ -31,6 +31,7 @@ public abstract class AGenerator {
     protected StringBuilder init;
     protected StringBuilder constructor;
     protected StringBuilder initVT;
+    protected StringBuilder newmethod;
 
     protected StringBuilder begin_header;
     protected StringBuilder attributes;
@@ -73,6 +74,9 @@ public abstract class AGenerator {
         begin_header.append(source);
     }
 
+    protected void add_new(String source) {
+        newmethod.append(source);
+    }
     protected void add_ATTRIBUTE(String source) {
         attributes.append(source.startsWith("\t") ? source + "\n" : "\t" + source + "\n");
     }
@@ -129,6 +133,7 @@ public abstract class AGenerator {
         init = new StringBuilder();
         constructor = new StringBuilder();
         initVT = new StringBuilder();
+        newmethod = new StringBuilder();
 
         //H file
         begin_header = new StringBuilder();

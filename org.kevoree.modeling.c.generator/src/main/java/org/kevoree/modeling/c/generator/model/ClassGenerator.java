@@ -267,7 +267,8 @@ public class ClassGenerator extends AGenerator {
         } else if (cls.getESuperTypes().size() == 0) {
             fun = "\treturn this->generated_KMF_ID;";
         } else { // in all other cases we inherit from NamedElement
-            fun = "\treturn instance_VT.internalGetKey((NamedElement*)this);";
+            fun = "\treturn " + HelperGenerator.genToLowerCaseFirstChar(cls.getESuperTypes().get(0).getName())
+                    + "_VT.internalGetKey((" + cls.getESuperTypes().get(0).getName() + "*)this);";
         }
         add_C(fun);
         add_C("}\n");
@@ -407,7 +408,7 @@ public class ClassGenerator extends AGenerator {
             context.put("classname", cls.getName());
             StringWriter result = new StringWriter();
             TemplateManager.getInstance().getGen_method_new().merge(context, result);
-            add_C(result.toString());
+            add_new(result.toString());
         }
     }
 
@@ -422,6 +423,7 @@ public class ClassGenerator extends AGenerator {
                 + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT = {");
         class_result.append(initVT);
         add_C("};");
+        class_result.append(newmethod);
 
         // header file
         generateInheritedAttributes();
