@@ -9,15 +9,15 @@ package org.kevoree.modeling.c.generator.utils;
  */
 public class HelperGenerator {
 
-    public static final String internal_id_name  = "generated_KMF_ID";
+    public static final String internal_id_name = "generated_KMF_ID";
 
-    public static String genInclude(String name){
-        return   "#include <" + name + ">\n";
+    public static String genInclude(String name) {
+        return "#include <" + name + ">\n";
     }
 
 
-    public static String genIncludeLocal(String name){
-        return   "#include \"" + name + ".h\"\n";
+    public static String genIncludeLocal(String name) {
+        return "#include \"" + name + ".h\"\n";
     }
 
     public static String genToLowerCaseFirstChar(String name) {
@@ -32,19 +32,17 @@ public class HelperGenerator {
         String defVal = "NULL";
         if (type.equals("EString")) {
             defVal = "NULL";
-        }
-        else if (type.equals("EBoolean")) {
+        } else if (type.equals("EBoolean")) {
             defVal = "false";
-        }
-        else if (type.equals("EIntegerObject")) {
+        } else if (type.equals("EIntegerObject")) {
             defVal = "-1";
         }
         return defVal;
     }
 
-    public static String genIFDEF(String name){
-        return "#ifndef __"+name+"_H\n" +
-                "#define __"+name+"_H\n";
+    public static String genIFDEF(String name) {
+        return "#ifndef __" + name + "_H\n" +
+                "#define __" + name + "_H\n";
     }
 
     public static String genENDIF() {

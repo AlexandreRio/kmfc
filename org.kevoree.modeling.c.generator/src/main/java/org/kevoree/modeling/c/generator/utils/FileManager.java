@@ -2,9 +2,9 @@
  * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 3, 29 June 2007;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.gnu.org/licenses/lgpl-3.0.txt
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,25 +33,24 @@ public class FileManager {
     public static byte[] load(InputStream reader) throws IOException {
         int c;
         ArrayList<Byte> tab = new ArrayList<Byte>();
-        while((c = reader.read()) != -1) {
-            tab.add((byte)c);
+        while ((c = reader.read()) != -1) {
+            tab.add((byte) c);
         }
-        if (reader!=null)
+        if (reader != null)
             reader.close();
         return toByteArray(tab);
     }
 
 
-    public static void copyDirectory(File sourceLocation , File targetLocation) throws IOException {
+    public static void copyDirectory(File sourceLocation, File targetLocation) throws IOException {
         if (sourceLocation.isDirectory()) {
             if (!targetLocation.exists()) {
                 targetLocation.mkdir();
             }
 
             String[] children = sourceLocation.list();
-            for (int i=0; i<children.length; i++)
-            {
-                copyDirectory(new File(sourceLocation, children[i]),  new File(targetLocation, children[i]));
+            for (int i = 0; i < children.length; i++) {
+                copyDirectory(new File(sourceLocation, children[i]), new File(targetLocation, children[i]));
             }
         } else {
 
@@ -69,13 +68,13 @@ public class FileManager {
         }
     }
 
-    public static void unzipJar( String jarPath,String destinationDir) throws IOException {
+    public static void unzipJar(String jarPath, String destinationDir) throws IOException {
         File file = new File(jarPath);
         JarFile jar = new JarFile(file);
 
         // fist get all directories,
         // then make those directory on the destination Path
-        for (Enumeration<JarEntry> enums = jar.entries(); enums.hasMoreElements();) {
+        for (Enumeration<JarEntry> enums = jar.entries(); enums.hasMoreElements(); ) {
             JarEntry entry = (JarEntry) enums.nextElement();
 
             String fileName = destinationDir + File.separator + entry.getName();
@@ -88,7 +87,7 @@ public class FileManager {
         }
 
         //now create all files
-        for (Enumeration<JarEntry> enums = jar.entries(); enums.hasMoreElements();) {
+        for (Enumeration<JarEntry> enums = jar.entries(); enums.hasMoreElements(); ) {
             JarEntry entry = (JarEntry) enums.nextElement();
 
             String fileName = destinationDir + File.separator + entry.getName();
@@ -108,30 +107,28 @@ public class FileManager {
         }
     }
 
-    public static void writeFile(String path,String data,Boolean append) throws IOException
-    {
-        File file = new File(path.substring(0,path.lastIndexOf(File.separatorChar)));
+    public static void writeFile(String path, String data, Boolean append) throws IOException {
+        File file = new File(path.substring(0, path.lastIndexOf(File.separatorChar)));
         file.mkdirs();
 
-        FileWriter fileWriter = new FileWriter(path,append);
+        FileWriter fileWriter = new FileWriter(path, append);
         BufferedWriter out_j = new BufferedWriter(fileWriter);
         out_j.write(data);
         out_j.close();
     }
 
-    public static String copyFileFromStream( InputStream inputStream , String path, String targetName,boolean replace) throws IOException {
+    public static String copyFileFromStream(InputStream inputStream, String path, String targetName, boolean replace) throws IOException {
 
         if (inputStream != null) {
             File copy = new File(path + File.separator + targetName);
             copy.mkdirs();
-            if(replace)
-            {
-                if(copy.exists()){
-                    if(!copy.delete()){
-                       throw new IOException("delete file "+copy.getPath());
+            if (replace) {
+                if (copy.exists()) {
+                    if (!copy.delete()) {
+                        throw new IOException("delete file " + copy.getPath());
                     }
-                    if(!copy.createNewFile()){
-                        throw new IOException("createNewFile file "+copy.getPath());
+                    if (!copy.createNewFile()) {
+                        throw new IOException("createNewFile file " + copy.getPath());
                     }
                 }
             }
@@ -153,6 +150,7 @@ public class FileManager {
         }
         return null;
     }
+
     public static byte[] toByteArray(List<Byte> in) {
         final int n = in.size();
         byte ret[] = new byte[n];
@@ -162,21 +160,18 @@ public class FileManager {
         return ret;
     }
 
-    public  static byte[] load(String pathfile)
-    {
+    public static byte[] load(String pathfile) {
         File file = new File(pathfile);
         FileInputStream fis = null;
         BufferedInputStream bis = null;
         DataInputStream dis = null;
         ArrayList<Byte> tab = new ArrayList<Byte>();
-        try
-        {
+        try {
             fis = new FileInputStream(file);
             bis = new BufferedInputStream(fis);
             dis = new DataInputStream(bis);
-            while (dis.available() != 0)
-            {
-                tab.add((byte)dis.read());
+            while (dis.available() != 0) {
+                tab.add((byte) dis.read());
             }
 
         } catch (IOException e) {
@@ -191,7 +186,7 @@ public class FileManager {
                 ex.printStackTrace();
             }
         }
-        return  toByteArray(tab);
+        return toByteArray(tab);
     }
 
 
@@ -208,7 +203,6 @@ public class FileManager {
         }
         folder.delete();
     }
-
 
 
     public static String copyFileFromStream(String inputFile, String path, String targetName) throws IOException {

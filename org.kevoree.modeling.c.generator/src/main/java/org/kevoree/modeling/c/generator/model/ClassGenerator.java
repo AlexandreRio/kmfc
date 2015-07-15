@@ -62,6 +62,7 @@ public class ClassGenerator extends AGenerator {
             add_begin_header("typedef struct _" + t + " " + t + ";\n");
         }
     }
+
     private void generateVirtualTableComment() {
         add_virtual_table_H("/* " + cls.getName() + " */");
     }

@@ -22,7 +22,7 @@ public abstract class AGenerator {
     /**
      * TODO: StringBuilder can be safely replaced by String and + operator since the
      * compiler will use them.
-     *
+     * <p>
      * It should be better to use List to store bare variables and in a final step produce
      * a file with ; and <CR> and stuff
      */

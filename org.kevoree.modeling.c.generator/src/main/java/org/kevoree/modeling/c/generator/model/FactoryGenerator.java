@@ -16,30 +16,30 @@ import java.util.List;
  * Time: 08:50
  * To change this template use File | Settings | File Templates.
  */
-public class FactoryGenerator extends AGenerator
-{
+public class FactoryGenerator extends AGenerator {
 
     private StringBuilder result = new StringBuilder();
     private String factoryname;
     private List<String> classes = new ArrayList<String>();
+
     public FactoryGenerator(GenerationContext context) {
         super();
 
-        this.ctx=context;
-        factoryname ="Default"+ctx.getName_package()+"Factory";
+        this.ctx = context;
+        factoryname = "Default" + ctx.getName_package() + "Factory";
         initGeneration(ctx.getName_package());
         generateClassHeader();
     }
 
-    public void generateFactory(EClass e){
-        if(!e.isAbstract() && !e.isInterface()){
+    public void generateFactory(EClass e) {
+        if (!e.isAbstract() && !e.isInterface()) {
             generateClass(e);
             classes.add(e.getName());
         }
     }
 
 
-    public void generateClassHeader(){
+    public void generateClassHeader() {
         //add_H(HelperGenerator.genIFDEF(factoryname));
         //add_H(HelperGenerator.genIncludeLocal(ctx.getName_package()));
         //add_H(HelperGenerator.genInclude("microframework/api/KMFFactory.h"));
@@ -48,43 +48,41 @@ public class FactoryGenerator extends AGenerator
         //add_H("public:");
 
     }
-    public void generateClass(EClass e){
+
+    public void generateClass(EClass e) {
         add_C(e.getName() + "* create" + e.getName() + "(){return new " + e.getName() + "();\n};");
     }
 
-    public void generateVersion()
-    {
+    public void generateVersion() {
         //add_H("string getVersion();");
         add_C("string getVersion(){ return " + ctx.getVersion() + ";\n}");
     }
 
-    public void generateCreate(){
+    public void generateCreate() {
         add_C("KMFContainer* create(std::string metaClassName){");
-            for (String name : classes){
-                add_C("if(metaClassName.compare(\"org." + ctx.getName_package() + "." + name + "\")==0){");
-                add_C("return create" + name + "();");
-                add_C("}");
-            }
+        for (String name : classes) {
+            add_C("if(metaClassName.compare(\"org." + ctx.getName_package() + "." + name + "\")==0){");
+            add_C("return create" + name + "();");
+            add_C("}");
+        }
         add_C("return NULL;");
         add_C("}");
     }
-    public void write(){
+
+    public void write() {
         link_generation();
-        try
-        {
+        try {
             generateCreate();
             class_result.append("};\n"); // end class
             class_result.append(HelperGenerator.genENDIF());
 
-            FileManager.writeFile(ctx.getPackageGenerationDirectory()+factoryname+".h", header_result.toString(),false);
-            FileManager.writeFile(ctx.getPackageGenerationDirectory()+factoryname+".h", class_result.toString(),true);
+            FileManager.writeFile(ctx.getPackageGenerationDirectory() + factoryname + ".h", header_result.toString(), false);
+            FileManager.writeFile(ctx.getPackageGenerationDirectory() + factoryname + ".h", class_result.toString(), true);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-
 
 
 }

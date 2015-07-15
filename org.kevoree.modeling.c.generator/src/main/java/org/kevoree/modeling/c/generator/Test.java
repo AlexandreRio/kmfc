@@ -21,10 +21,7 @@ public class Test {
 
         Generator gen = new Generator(context);
         gen.generateModel();
-   // gen.generateEnvironnement();
-
-
-
+        // gen.generateEnvironnement();
 
 
     }

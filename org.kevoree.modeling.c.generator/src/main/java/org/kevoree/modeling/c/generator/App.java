@@ -44,28 +44,23 @@ public class App {
                 .create("d"));
 
 
-
-
-
-
-
-        try{
+        try {
 
             CommandLineParser parser = new GnuParser();
-            CommandLine  cmd = parser.parse(options, args);
+            CommandLine cmd = parser.parse(options, args);
 
 
             //     InputStream ecorefile = new FileInputStream(cmd.getOptionValue("i"));
 
             OutputStream out = System.out;
-            if(cmd.hasOption("o"))
+            if (cmd.hasOption("o"))
                 out = new FileOutputStream(cmd.getOptionValue("o"));
             String config = cmd.getOptionValue("c", "app.cfg");
 
 
-            String ecore_file=    cmd.getOptionValue("i");
-            String path=    cmd.getOptionValue("t");
-            Boolean debugmode=  Boolean.parseBoolean(cmd.getOptionValue("t"));
+            String ecore_file = cmd.getOptionValue("i");
+            String path = cmd.getOptionValue("t");
+            Boolean debugmode = Boolean.parseBoolean(cmd.getOptionValue("t"));
 
 
             GenerationContext context = new GenerationContext();
@@ -79,36 +74,34 @@ public class App {
             Generator gen = new Generator(context);
             gen.generateModel();
 
-        }
-        catch(MissingOptionException e){
+        } catch (MissingOptionException e) {
 
             boolean help = false;
-            try{
+            try {
                 Options helpOptions = new Options();
                 helpOptions.addOption("h", "help", false, "prints the help content");
                 CommandLineParser parser = new PosixParser();
                 CommandLine line = parser.parse(helpOptions, args);
-                if(line.hasOption("h")) help = true;
+                if (line.hasOption("h")) help = true;
+            } catch (Exception ex) {
             }
-            catch(Exception ex){ }
-            if(!help) System.err.println(e.getMessage());
+            if (!help) System.err.println(e.getMessage());
             //Et oui commons-cli permet aussi d'affiche l'aide
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp( "App" , options );
+            formatter.printHelp("App", options);
             System.exit(1);
-        } catch(MissingArgumentException e){
+        } catch (MissingArgumentException e) {
             System.err.println(e.getMessage());
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp( "App" , options );
+            formatter.printHelp("App", options);
             System.exit(1);
-        } catch(ParseException e){
-            System.err.println("Error while parsing the command line: "+e.getMessage());
+        } catch (ParseException e) {
+            System.err.println("Error while parsing the command line: " + e.getMessage());
             System.exit(1);
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
 
 }
