@@ -36,7 +36,7 @@ public class HelperGenerator {
         else if (type.equals("EBoolean")) {
             defVal = "false";
         }
-        else if (type.equals("EIntegerObject:")) {
+        else if (type.equals("EIntegerObject")) {
             defVal = "-1";
         }
         return defVal;
