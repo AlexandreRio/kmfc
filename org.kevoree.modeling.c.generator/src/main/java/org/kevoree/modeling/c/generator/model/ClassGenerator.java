@@ -57,8 +57,10 @@ public class ClassGenerator extends AGenerator {
 
     private void generateLinkedClassTypeDef() {
         add_begin_header("typedef struct _" + cls.getName() + " " + cls.getName() + ";\n");
-        for (String t : typeToDef)
+        for (String t : typeToDef) {
+            add_begin_header(HelperGenerator.genIncludeLocal(t));
             add_begin_header("typedef struct _" + t + " " + t + ";\n");
+        }
     }
     private void generateVirtualTableComment() {
         add_virtual_table_H("/* " + cls.getName() + " */");
@@ -71,7 +73,7 @@ public class ClassGenerator extends AGenerator {
         if (cls.getESuperTypes().size() == 1) {
             String parentType = cls.getEAllSuperTypes().get(0).getName();
             add_C("\t" + HelperGenerator.genToLowerCaseFirstChar(parentType) + "_VT.delete((" + parentType
-                    + ")*this);\n");
+                    + "*)this);\n");
         } else if (cls.getEAllSuperTypes().size() == 0) {
             add_C("\tKMF_VT.delete((KMFContainer*)this);\n");
         } else {
@@ -218,8 +220,8 @@ public class ClassGenerator extends AGenerator {
                 String ptrName = "fptr" + cls.getName() + methodName + name;
 
                 add_method_signature_H("typedef void (*" + ptrName + ")(" + cls.getName() + "*, " + type + "*);");
-                add_virtual_table_H(ptrName + " add" + name + ";");
-                add_class_virtual_table(cls.getName(), ptrName + " add" + name + ";");
+                add_virtual_table_H(ptrName + " " + HelperGenerator.genToLowerCaseFirstChar(methodName) + name + ";");
+                add_class_virtual_table(cls.getName(), ptrName + " " + HelperGenerator.genToLowerCaseFirstChar(methodName) + name + ";");
             }
         }
     }
@@ -284,7 +286,7 @@ public class ClassGenerator extends AGenerator {
         // implementation
         VelocityContext context = new VelocityContext();
         StringWriter result = new StringWriter();
-        context.put("type", type);
+        context.put("type", cls.getName());
         context.put("refname", ref.getName());
         context.put("name", eClass.getName());
         TemplateManager.getInstance().getGen_find_by_id().merge(context, result);
@@ -387,7 +389,7 @@ public class ClassGenerator extends AGenerator {
         //TODO only add self methods to a table
         String initParent = "";
         if (cls.getESuperTypes().size() == 1)
-            initParent = "\t.super = &" + HelperGenerator.genToLowerCaseFirstChar(cls.getESuperTypes().get(0).getName()) + "_VT;";
+            initParent = "\t.super = &" + HelperGenerator.genToLowerCaseFirstChar(cls.getESuperTypes().get(0).getName()) + "_VT,";
         else if (cls.getESuperTypes().size() == 0)
             initParent = ".super = &KMF_VT,";
         initVT.append(initParent + "\n");
