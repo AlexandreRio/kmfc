@@ -111,8 +111,8 @@ public class ClassGenerator extends AGenerator {
 
         add_init("\tinit" + parentType + "((" + parentType + "*)this);");
 
-        // if parent is KMFContainer, we generate a KMF_ID
-        if (cls.getEAllSuperTypes().size() == 0) {
+        // if parent is KMFContainer, we generate a KMF_ID and the class isn't NamedElement
+        if (cls.getEAllSuperTypes().size() == 0 && !cls.getName().equals("NamedElement")) {
             add_init("\tmemset(&this->generated_KMF_ID[0], 0, sizeof(this->generated_KMF_ID));\n" +
                     "\trand_str(this->generated_KMF_ID, 8);");
         }
@@ -383,7 +383,7 @@ public class ClassGenerator extends AGenerator {
         if (cls.getESuperTypes().size() == 1)
             initParent = "\t.super = &" + HelperGenerator.genToLowerCaseFirstChar(cls.getESuperTypes().get(0).getName()) + "_VT;";
         else if (cls.getESuperTypes().size() == 0)
-            initParent = ".super = &KMF_VT;";
+            initParent = ".super = &KMF_VT,";
         initVT.append(initParent + "\n");
     }
 
@@ -393,11 +393,13 @@ public class ClassGenerator extends AGenerator {
 //    }
 
     private void generateMethodNew() {
-        VelocityContext context = new VelocityContext();
-        context.put("classname", cls.getName());
-        StringWriter result = new StringWriter();
-        TemplateManager.getInstance().getGen_method_new().merge(context, result);
-        add_C(result.toString());
+        if (!cls.isAbstract()) {
+            VelocityContext context = new VelocityContext();
+            context.put("classname", cls.getName());
+            StringWriter result = new StringWriter();
+            TemplateManager.getInstance().getGen_method_new().merge(context, result);
+            add_C(result.toString());
+        }
     }
 
     public void link_generation() {
@@ -408,7 +410,7 @@ public class ClassGenerator extends AGenerator {
         class_result.append("}\n");
         class_result.append(body);
         add_C("const " + cls.getName() + "_VT "
-                + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT {");
+                + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT = {");
         class_result.append(initVT);
         add_C("};");
 
