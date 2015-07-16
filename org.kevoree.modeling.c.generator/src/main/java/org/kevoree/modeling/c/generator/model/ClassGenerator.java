@@ -290,6 +290,7 @@ public class ClassGenerator extends AGenerator {
         StringWriter result = new StringWriter();
         context.put("type", cls.getName());
         context.put("refname", ref.getName());
+        context.put("majrefname", HelperGenerator.genToUpperCaseFirstChar(ref.getName()));
         context.put("name", eClass.getName());
         TemplateManager.getInstance().getGen_find_by_id().merge(context, result);
         add_C(result.toString());
