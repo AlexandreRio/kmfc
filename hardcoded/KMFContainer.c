@@ -86,7 +86,7 @@ KMFContainer_visit(KMFContainer * const this, char *parent, fptrVisitAction acti
 	action(NULL, COLON, NULL);
 }
 
-const KMFContainer_VT KMF_VT = {
+const VT_KMFContainer VT_KMF = {
 		.super = NULL,
 		.metaClassName = NULL,
 		.internalGetKey = NULL,

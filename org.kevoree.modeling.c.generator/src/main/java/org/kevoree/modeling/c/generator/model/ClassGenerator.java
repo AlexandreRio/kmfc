@@ -73,10 +73,10 @@ public class ClassGenerator extends AGenerator {
         // call parent delete method
         if (cls.getESuperTypes().size() == 1) {
             String parentType = cls.getEAllSuperTypes().get(0).getName();
-            add_C("\t" + HelperGenerator.genToLowerCaseFirstChar(parentType) + "_VT.delete((" + parentType
+            add_C("\tvt_" + parentType + ".delete((" + parentType
                     + "*)this);\n");
         } else if (cls.getEAllSuperTypes().size() == 0) {
-            add_C("\tKMF_VT.delete((KMFContainer*)this);\n");
+            add_C("\tVT_KMF.delete((KMFContainer*)this);\n");
         } else {
             System.err.println("Invalid number of parent for " + cls.getName());
         }
@@ -229,14 +229,14 @@ public class ClassGenerator extends AGenerator {
 
     public void generateSuperAndVTAttr() {
         if (cls.getESuperTypes().size() == 1)
-            add_begin_virtual_table_H(cls.getESuperTypes().get(0).getName() + "_VT *super;");
+            add_begin_virtual_table_H("VT_" + cls.getESuperTypes().get(0).getName() + " *super;");
         else if (cls.getESuperTypes().size() == 0)
-            add_begin_virtual_table_H("KMFContainer_VT *super;");
+            add_begin_virtual_table_H("VT_KMFContainer *super;");
         else
             System.err.println("Invalid number of parent in " + cls.getName());
 
-        add_self_attribute_H("extern const " + cls.getName() + "_VT " +
-                HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT;");
+        add_self_attribute_H("extern const VT_" + cls.getName() + " " +
+                "vt_" + cls.getName() + ";");
     }
 
     /**
@@ -267,8 +267,8 @@ public class ClassGenerator extends AGenerator {
         } else if (cls.getESuperTypes().size() == 0) {
             fun = "\treturn this->generated_KMF_ID;";
         } else { // in all other cases we inherit from NamedElement
-            fun = "\treturn " + HelperGenerator.genToLowerCaseFirstChar(cls.getESuperTypes().get(0).getName())
-                    + "_VT.internalGetKey((" + cls.getESuperTypes().get(0).getName() + "*)this);";
+            fun = "\treturn vt_" + cls.getESuperTypes().get(0).getName()
+                    + ".internalGetKey((" + cls.getESuperTypes().get(0).getName() + "*)this);";
         }
         add_C(fun);
         add_C("}\n");
@@ -296,7 +296,7 @@ public class ClassGenerator extends AGenerator {
     }
 
     private void generateAttributes() {
-        add_ATTRIBUTE(cls.getName() + "_VT *VT;");
+        add_ATTRIBUTE("VT_" + cls.getName() + " *VT;");
 
         add_ATTRIBUTE("/* " + cls.getName() + " */");
         for (EAttribute eAttribute : cls.getEAttributes()) {
@@ -391,9 +391,9 @@ public class ClassGenerator extends AGenerator {
         //TODO only add self methods to a table
         String initParent = "";
         if (cls.getESuperTypes().size() == 1)
-            initParent = "\t.super = &" + HelperGenerator.genToLowerCaseFirstChar(cls.getESuperTypes().get(0).getName()) + "_VT,";
+            initParent = "\t.super = &vt_" + cls.getESuperTypes().get(0).getName() + ",";
         else if (cls.getESuperTypes().size() == 0)
-            initParent = ".super = &KMF_VT,";
+            initParent = ".super = &VT_KMF,";
         initVT.append(initParent + "\n");
     }
 
@@ -406,7 +406,7 @@ public class ClassGenerator extends AGenerator {
         if (!cls.isAbstract()) {
             VelocityContext context = new VelocityContext();
             context.put("classname", cls.getName());
-            context.put("vtName", HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT");
+            context.put("vtName", "vt_" + cls.getName());
             StringWriter result = new StringWriter();
             TemplateManager.getInstance().getGen_method_new().merge(context, result);
             add_new(result.toString());
@@ -420,8 +420,8 @@ public class ClassGenerator extends AGenerator {
         class_result.append(init);
         class_result.append("}\n");
         class_result.append(body);
-        add_C("const " + cls.getName() + "_VT "
-                + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) + "_VT = {");
+        add_C("const VT_" + cls.getName()
+                + " vt_" + cls.getName() + " = {");
         class_result.append(initVT);
         add_C("};");
         class_result.append(newmethod);
@@ -433,9 +433,9 @@ public class ClassGenerator extends AGenerator {
         header_result.append(begin_header.append("\n"));
         header_result.append(method_signature.append("\n"));
 
-        header_result.append("typedef struct _" + this.className + "_VT {\n");
+        header_result.append("typedef struct _VT_" + this.className + " {\n");
         header_result.append(virtual_table);
-        header_result.append("} " + this.className + "_VT;\n\n");
+        header_result.append("} VT_" + this.className + ";\n\n");
 
         header_result.append("typedef struct _" + this.className + " {\n");
         header_result.append(attributes);

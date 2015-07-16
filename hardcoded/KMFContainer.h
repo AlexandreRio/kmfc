@@ -6,7 +6,7 @@
 #include "Visitor.h"
 #include "hashmap.h"
 
-typedef struct _KMFContainer_VT KMFContainer_VT;
+typedef struct _VT_KMFContainer VT_KMFContainer;
 typedef struct _KMFContainer KMFContainer;
 
 typedef char* (*fptrKMFMetaClassName)(void*);
@@ -16,7 +16,7 @@ typedef void (*fptrVisit)(void*, char*, fptrVisitAction, fptrVisitActionRef, boo
 typedef void* (*fptrFindByPath)(void*, char*);
 typedef void (*fptrDelete)(void*);
 
-typedef struct _KMFContainer_VT {
+typedef struct _VT_KMFContainer {
 	void *super;
 	/*
 	 * KMFContainer_VT
@@ -27,10 +27,10 @@ typedef struct _KMFContainer_VT {
 	fptrVisit visit;
 	fptrFindByPath findByPath;
 	fptrDelete delete;
-} KMFContainer_VT;
+} VT_KMFContainer;
 
 typedef struct _KMFContainer {
-	KMFContainer_VT *VT;
+	VT_KMFContainer *VT;
 	/*
 	 * KMFContainer
 	 */
@@ -44,7 +44,7 @@ char* KMFContainer_get_path(void* this);
 
 char* get_key_for_hashmap(any_t t);
 
-extern const KMFContainer_VT KMF_VT;
+extern const VT_KMFContainer VT_KMF;
 
 /* usefull functions */
 char *my_strdup(const char *string);
