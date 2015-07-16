@@ -408,6 +408,7 @@ public class ClassGenerator extends AGenerator {
 
     private void generateMethodNew() {
         if (!cls.isAbstract()) {
+            add_method_signature_H(cls.getName() + "* new_" + cls.getName() + "(void);");
             VelocityContext context = new VelocityContext();
             context.put("classname", cls.getName());
             context.put("vtName", "vt_" + cls.getName());
