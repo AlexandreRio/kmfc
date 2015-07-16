@@ -386,6 +386,13 @@ public class ClassGenerator extends AGenerator {
         } else {
             add_begin_header(HelperGenerator.genIncludeLocal("KMFContainer"));
         }
+        add_begin_header("\n" +
+                "#define DEBUG 0\n" +
+                "#if DEBUG\n" +
+                "#define PRINTF(...) printf(__VA_ARGS__)\n" +
+                "#else\n" +
+                "#define PRINTF(...)\n" +
+                "#endif\n");
     }
 
     /**
