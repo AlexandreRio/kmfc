@@ -117,10 +117,11 @@ public class ClassGenerator extends AGenerator {
 
         add_init("\tinit" + parentType + "((" + parentType + "*)this);");
 
-        // if parent is KMFContainer, we generate a KMF_ID and the class isn't NamedElement
+        // if parent is KMFContainer and the class isn't NamedElement, we generate a KMF_ID
         if (cls.getEAllSuperTypes().size() == 0 && !cls.getName().equals("NamedElement")) {
             add_init("\tmemset(&this->generated_KMF_ID[0], 0, sizeof(this->generated_KMF_ID));\n" +
                     "\trand_str(this->generated_KMF_ID, 8);");
+            add_ATTRIBUTE("char generated_KMF_ID[9];");
         }
     }
 
@@ -258,10 +259,12 @@ public class ClassGenerator extends AGenerator {
             Template method = TemplateManager.getInstance().getTp_getKey_DeployUnit();
             method.merge(context, writer);
             fun = writer.toString();
+            add_ATTRIBUTE("char *internalKey;");
         } else if (cls.getName().equals("TypeDefinition")) {
             Template method = TemplateManager.getInstance().getTp_getKey_TypeDefinition();
             method.merge(context, writer);
             fun = writer.toString();
+            add_ATTRIBUTE("char *internalKey;");
         } else if (cls.getName().equals("NamedElement")) {
             fun = "\treturn this->name;";
         } else if (cls.getESuperTypes().size() == 0) {
