@@ -34,8 +34,10 @@ public class ClassGenerator extends AGenerator {
 
     /**
      * global generation method
+     *
+     * @param cls: EClass of the mm
      */
-    public void generateClass(EClass cls) throws IOException {
+    public void generateClass(EClass cls) {
         this.cls = cls;
         initGeneration(cls.getName());
 

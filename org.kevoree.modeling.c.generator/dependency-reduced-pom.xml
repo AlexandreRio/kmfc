@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>org.kevoree.modeling.c.generator</artifactId>
-  <name>Kevoree :: Modeling :: CPP :: Generator</name>
+  <name>Kevoree :: Modeling :: C :: Generator</name>
   <version>1.3.2</version>
   <developers>
     <developer>
