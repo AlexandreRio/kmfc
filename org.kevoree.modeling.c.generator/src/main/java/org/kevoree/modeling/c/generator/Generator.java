@@ -63,7 +63,7 @@ public class Generator {
             EObject eo = (EObject) i.next();
 
             if (eo instanceof EClass) {
-                Classifier c = initClassifier((EClass) eo);
+                Classifier c = Classifier.createFromEClass((EClass) eo);
 //                classGenerator.generateClass((EClass) eo);
 //                factoryGenerator.generateFactory((EClass) eo);
 
@@ -82,25 +82,5 @@ public class Generator {
         }
     }
 
-    private Classifier initClassifier(EClass cls) {
-        Classifier c = new Classifier(cls.getName(), cls.isAbstract());
-        System.out.println("Class " + cls.getName());
-
-        for (EAttribute attr : cls.getEAttributes()) {
-            String t = ConverterDataTypes.getInstance().check_type(attr.getEAttributeType().getName());
-            c.addVariable(new Variable(attr.getName(), t, Variable.LinkType.PRIMITIVE, false));
-        }
-
-        for (EReference ref : cls.getEReferences()) {
-            int bound = ref.getUpperBound();
-            Variable.LinkType lt = Variable.LinkType.UNARY_LINK;
-            if (bound == -1)
-                lt = Variable.LinkType.MULTIPLE_LINK;
-
-            String t = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
-            c.addVariable(new Variable(ref.getName(), t, lt, ref.isContainment()));
-        }
-        return c;
-    }
 
 }
