@@ -9,8 +9,11 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
 import org.kevoree.modeling.c.generator.model.ClassGenerator;
+import org.kevoree.modeling.c.generator.model.Classifier;
 import org.kevoree.modeling.c.generator.model.FactoryGenerator;
+import org.kevoree.modeling.c.generator.model.Variable;
 import org.kevoree.modeling.c.generator.utils.CheckerConstraint;
+import org.kevoree.modeling.c.generator.utils.ConverterDataTypes;
 import org.kevoree.modeling.c.generator.utils.FileManager;
 import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
@@ -46,15 +49,11 @@ public class Generator {
         ResourceSetImpl rs = new ResourceSetImpl();
         XMIResource resource = (XMIResource) rs.createResource(fileUri);
 
-        String package_name = "default";
-        StringBuilder list_file_h = new StringBuilder();
 
         CheckerConstraint checkerConstraint = new CheckerConstraint(context);
         checkerConstraint.verify(resource);
 
         ClassGenerator classGenerator;
-
-        FactoryGenerator factoryGenerator = null;
 
         resource.load(null);
         EcoreUtil.resolveAll(resource);
@@ -64,38 +63,44 @@ public class Generator {
             EObject eo = (EObject) i.next();
 
             if (eo instanceof EClass) {
-                classGenerator.generateClass((EClass) eo);
-                //factoryGenerator.generateFactory((EClass) eo);
+                Classifier c = initClassifier((EClass) eo);
+//                classGenerator.generateClass((EClass) eo);
+//                factoryGenerator.generateFactory((EClass) eo);
 
                 classes.append(HelperGenerator.genIncludeLocal(((EClass) eo).getName()));
                 this.generators.add(classGenerator);
-            } else if (eo instanceof EPackage) {
-                String name = ((EPackage) eo).getNsPrefix();
-                context.setName_package(name.replace(".", ""));
-
-                try {
-                    context.setRoot(((EClassImpl) EcoreUtil.getRootContainer(eo).eContents().get(0)).getName());
-                } catch (Exception e) {
-                }
-
-                FileManager.writeFile(context.getPackageGenerationDirectory() + "classes.cpp",
-                        HelperGenerator.genIncludeLocal(context.getName_package()), false);
-                factoryGenerator = new FactoryGenerator(context);
             }
-
         }
 
-        //factoryGenerator.write();
-        String output = context.getRootGenerationDirectory() + File.separatorChar + context.getName_package()
-                + File.separatorChar;
+        String output = context.getRootGenerationDirectory() + File.separatorChar +
+                context.getName_package() + File.separatorChar;
 
         for (ClassGenerator gen : this.generators) {
             gen.link_generation();
             gen.writeHeader();
             gen.writeClass();
         }
+    }
 
-//        FileManager.writeFile(output + context.getName_package() + ".h", classes.toString(), false);
+    private Classifier initClassifier(EClass cls) {
+        Classifier c = new Classifier(cls.getName(), cls.isAbstract());
+        System.out.println("Class " + cls.getName());
+
+        for (EAttribute attr : cls.getEAttributes()) {
+            String t = ConverterDataTypes.getInstance().check_type(attr.getEAttributeType().getName());
+            c.addVariable(new Variable(attr.getName(), t, Variable.LinkType.PRIMITIVE, false));
+        }
+
+        for (EReference ref : cls.getEReferences()) {
+            int bound = ref.getUpperBound();
+            Variable.LinkType lt = Variable.LinkType.UNARY_LINK;
+            if (bound == -1)
+                lt = Variable.LinkType.MULTIPLE_LINK;
+
+            String t = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
+            c.addVariable(new Variable(ref.getName(), t, lt, ref.isContainment()));
+        }
+        return c;
     }
 
 }

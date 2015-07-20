@@ -12,8 +12,8 @@ public class Test {
     public static void main(String args[]) throws Exception {
 
         GenerationContext context = new GenerationContext();
-        context.setRootGenerationDirectory("/home/ario/IRISA/kmfc");
-        context.setEcore("/home/ario/IRISA/kmfc/org.kevoree.modeling.c.generator/src/main/resources/metamodel/kevoree.ecore");
+        context.setRootGenerationDirectory("/home/orbital/IRISA/kmfc");
+        context.setEcore("/home/orbital/IRISA/kmfc/org.kevoree.modeling.c.generator/src/main/resources/metamodel/kevoree.ecore");
         context.setDebug_model(true);
         context.setVersion("1.0");
         context.setVersionmicroframework("1.3.2");

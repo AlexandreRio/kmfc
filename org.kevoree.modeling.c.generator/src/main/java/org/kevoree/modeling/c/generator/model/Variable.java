@@ -2,22 +2,28 @@ package org.kevoree.modeling.c.generator.model;
 
 public class Variable {
     private String name;
-    private Type type;
+    private String type;
+    private LinkType linkType;
     private boolean isContained;
 
-    public Variable(String name, Type type, boolean isContained) {
+    public Variable(String name, String type, LinkType linkType, boolean isContained) {
         this.name = name;
         this.type = type;
+        this.linkType = linkType;
         this.isContained = isContained;
     }
 
-    public Type getType() {
-        return type;
+    public LinkType getLinkType() {
+        return this.linkType;
+    }
+
+    public String getType() {
+        return this.type;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
-    public enum Type {PRIMITIVE, UNARY_LINK, MULTIPLE_LINK}
+    public enum LinkType {PRIMITIVE, UNARY_LINK, MULTIPLE_LINK}
 }
