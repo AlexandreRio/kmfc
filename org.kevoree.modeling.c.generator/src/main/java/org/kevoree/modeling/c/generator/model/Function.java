@@ -13,15 +13,25 @@ public class Function {
      */
     private boolean isPublic;
     private List<Parameter> parameters;
+    private String body;
 
     public Function(boolean isPublic, String signature) {
         this.isPublic = isPublic;
         this.signature = signature;
         this.parameters = new ArrayList<Parameter>();
+        this.body = "";
     }
 
     public String getSignature() {
         return signature;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
     }
 
     public boolean isPublic() {

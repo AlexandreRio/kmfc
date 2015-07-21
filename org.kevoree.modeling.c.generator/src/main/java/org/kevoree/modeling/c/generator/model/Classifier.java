@@ -30,9 +30,11 @@ public class Classifier {
         String sType = null;
         if (cls.getESuperTypes().size() > 0)
             sType = cls.getESuperTypes().get(0).getName();
+
         Classifier c = new Classifier(cls.getName(), sType, cls.isAbstract());
 
         c.createAttributes(cls);
+        c.createFunctionSignatures(cls);
         return c;
     }
 
@@ -54,6 +56,12 @@ public class Classifier {
 
     }
 
+    private void createFunctionSignatures(EClass cls) {
+        String metaClassNameSignature = "static char* " + this.name
+                + "_metaClassName(" + this.name + "* const this)";
+        Function metaClassFunction = new Function(true, metaClassNameSignature);
+    }
+
     private void addVariable(Variable var) {
         this.variables.add(var);
     }
@@ -68,6 +76,10 @@ public class Classifier {
 
     public boolean isAbstract() {
         return isAbstract;
+    }
+
+    public String getSuperClass() {
+        return superClass;
     }
 
     public List<Variable> getVariables() {
