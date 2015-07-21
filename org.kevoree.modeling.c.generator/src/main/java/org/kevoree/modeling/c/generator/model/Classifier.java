@@ -34,7 +34,9 @@ public class Classifier {
         Classifier c = new Classifier(cls.getName(), sType, cls.isAbstract());
 
         c.createAttributes(cls);
-        c.createFunctionSignatures(cls);
+
+
+//        c.createFunction(cls);
         return c;
     }
 
@@ -54,12 +56,36 @@ public class Classifier {
             this.addVariable(new Variable(ref.getName(), t, lt, ref.isContainment()));
         }
 
+        if (cls.getESuperTypes().size() == 1)
+            this.superClass = cls.getEAllSuperTypes().get(0).getName();
+        else if (cls.getEAllSuperTypes().size() == 0)
+            this.superClass = "KMFContainer";
+
+        if (!this.name.equals("NamedElement") && !this.superClass.equals("KMFContainer"))
+            this.addVariable(new Variable("generated_KMF_ID", "char*", Variable.LinkType.UNARY_LINK, false ));
     }
 
-    private void createFunctionSignatures(EClass cls) {
+    private void createFunction(EClass cls) {
+        this.createMetaClassNameFunction();
+        this.createInitFunction();
+    }
+
+    private void createMetaClassNameFunction() {
         String metaClassNameSignature = "static char* " + this.name
                 + "_metaClassName(" + this.name + "* const this)";
+        String metaClassNameBody = "\treturn \"" + this.name + "\";";
         Function metaClassFunction = new Function(true, metaClassNameSignature);
+        metaClassFunction.setBody(metaClassNameBody);
+        this.addFunction(metaClassFunction);
+    }
+
+    private void createInitFunction() {
+        String initSignature = "";
+        String initBody = "\tinit" + this.superClass + "((" + this.superClass
+                + "*)this);";
+        if (!this.name.equals("NamedElement") && !this.superClass.equals("KMFContainer"))
+            initBody += "\tmemset(&this->generated_KMF_ID[0], 0, sizeof(this->generated_KMF_ID));\n" +
+                    "\trand_str(this->generated_KMF_ID, 8);";
     }
 
     private void addVariable(Variable var) {
