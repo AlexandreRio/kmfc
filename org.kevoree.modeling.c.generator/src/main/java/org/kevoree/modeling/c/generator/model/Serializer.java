@@ -67,6 +67,21 @@ public abstract class Serializer {
         return ret;
     }
 
+    private static String generateAttributes(Classifier cls) {
+        String ret = "typedef struct _VT_" + cls.getName() + " {\n";
+        ret += "\tVT_" + cls.getName() + " *VT;\n";
+        for (Variable v : cls.getVariables()) {
+            if (v.getLinkType() == Variable.LinkType.UNARY_LINK)
+                ret += "\t" + v.getType() + " " + v.getName() + ";\n";
+            else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK)
+                ret += "\tmap_t " + v.getName() + ";\n";
+            else
+                ret += "\t" + v.getType() + " " + v.getName() + ";\n";
+        }
+        ret += "} VT_" + cls.getName() + ";\n\n";
+        return ret;
+    }
+
     private static String generateHeaderFile(Classifier cls) {
         String ret = "";
         ret += HelperGenerator.genIFDEF(cls.getName());
@@ -75,7 +90,7 @@ public abstract class Serializer {
         ret += generateFunctionSignatures(cls);
         ret += generateVT(cls);
         ret += "\n";
-//        ret += generateAttributes(cls);
+        ret += generateAttributes(cls);
         ret += "\n";
         ret += HelperGenerator.genENDIF();
         return ret;
