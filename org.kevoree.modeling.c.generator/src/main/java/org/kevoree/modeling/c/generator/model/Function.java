@@ -8,15 +8,17 @@ public class Function {
      * Return type, name and other attributes, like const.
      */
     private String signature;
+    private String returnType;
     /**
      * Whether it should be included in the header file.
      */
-    private boolean isPublic;
+    private Visibility_Type visibility;
     private List<Parameter> parameters;
     private String body;
 
-    public Function(String signature, boolean isPublic) {
-        this.isPublic = isPublic;
+    public Function(String signature, String returnType, Visibility_Type visibility_type) {
+        this.visibility = visibility_type;
+        this.returnType = returnType;
         this.signature = signature;
         this.parameters = new ArrayList<Parameter>();
         this.body = "";
@@ -34,8 +36,8 @@ public class Function {
         this.body = body;
     }
 
-    public boolean isPublic() {
-        return isPublic;
+    public Visibility_Type getVisibilityType() {
+        return visibility;
     }
 
     public void addParameter(Parameter param) {
@@ -45,4 +47,6 @@ public class Function {
     public List<Parameter> getParameters() {
         return parameters;
     }
+
+    public enum Visibility_Type {PRIVATE, IN_HEADER, IN_VT}
 }

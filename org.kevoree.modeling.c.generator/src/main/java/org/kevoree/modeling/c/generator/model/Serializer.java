@@ -2,13 +2,17 @@ package org.kevoree.modeling.c.generator.model;
 
 import org.apache.velocity.VelocityContext;
 import org.kevoree.modeling.c.generator.GenerationContext;
+import org.kevoree.modeling.c.generator.Generator;
 import org.kevoree.modeling.c.generator.TemplateManager;
+import org.kevoree.modeling.c.generator.model.Function.Visibility_Type;
 import org.kevoree.modeling.c.generator.utils.FileManager;
 import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Iterator;
+
+import static org.kevoree.modeling.c.generator.utils.HelperGenerator.genToLowerCaseFirstChar;
 
 public abstract class Serializer {
 
@@ -28,7 +32,7 @@ public abstract class Serializer {
     private static String generateFunctionSignatures(Classifier cls) {
         String ret = "";
         for (Function f : cls.getFunctions())
-            if (f.isPublic()) {
+            if (f.getVisibilityType() == Visibility_Type.IN_HEADER || f.getVisibilityType() == Visibility_Type.IN_VT) {
                 ret += f.getSignature() + "(";
                 Iterator<Parameter> iv = f.getParameters().iterator();
                 if (iv.hasNext())
@@ -51,7 +55,12 @@ public abstract class Serializer {
                 TemplateManager.getInstance().getTp_KMFContainer_fptr().merge(context, result);
                 ret += result.toString();
             } else {
-
+                ret += "\t/*" + sClass + "*/\n";
+                for (Function f : Generator.classifiers.get(sClass).getFunctions()) {
+                    if (f.getVisibilityType() == Visibility_Type.IN_VT)
+                        ret += "\tftpr" + f.getSignature() + " " +
+                                genToLowerCaseFirstChar(f.getSignature()) + ";\n";
+                }
             }
         }
         ret += "} VT_" + cls.getName() + ";\n\n";

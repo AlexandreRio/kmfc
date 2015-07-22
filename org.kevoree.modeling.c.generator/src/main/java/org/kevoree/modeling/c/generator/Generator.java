@@ -1,24 +1,21 @@
 package org.kevoree.modeling.c.generator;
 
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.*;
-import org.eclipse.emf.ecore.impl.EClassImpl;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
-import org.kevoree.modeling.c.generator.model.*;
+import org.kevoree.modeling.c.generator.model.Classifier;
+import org.kevoree.modeling.c.generator.model.Serializer;
 import org.kevoree.modeling.c.generator.utils.CheckerConstraint;
-import org.kevoree.modeling.c.generator.utils.ConverterDataTypes;
-import org.kevoree.modeling.c.generator.utils.FileManager;
-import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,16 +26,16 @@ import java.util.List;
  */
 public class Generator {
 
+    public static Map<String, Classifier> classifiers;
     private GenerationContext context;
     private String folderName = "kevoree";
     private File ecoreFile;
-    private List<Classifier> classifiers;
 
     public Generator(GenerationContext ctx) {
         this.context = ctx;
         this.context.setName_package(folderName);
         this.ecoreFile = ctx.getEcore();
-        this.classifiers = new ArrayList<Classifier>();
+        classifiers = new HashMap<String, Classifier>();
     }
 
     public void generateModel() throws Exception {
@@ -58,11 +55,11 @@ public class Generator {
 
             if (eo instanceof EClass) {
                 Classifier c = Classifier.createFromEClass((EClass) eo);
-                this.classifiers.add(c);
+                classifiers.put(((EClass) eo).getName(), c);
             }
         }
 
-        for (Classifier c : this.classifiers) {
+        for (Classifier c : classifiers.values()) {
             Serializer.writeHeader(c, context);
             Serializer.writeSource(c, context);
         }

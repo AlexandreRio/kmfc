@@ -3,11 +3,8 @@ package org.kevoree.modeling.c.generator.model;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
-import org.kevoree.modeling.c.generator.GenerationContext;
 import org.kevoree.modeling.c.generator.utils.ConverterDataTypes;
-import org.kevoree.modeling.c.generator.utils.FileManager;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +37,15 @@ public class Classifier {
         return c;
     }
 
+    public static List<String> getLinkedClassifier(Classifier cls) {
+        List<String> ret = new ArrayList<String>();
+        ret.add(cls.getSuperClass());
+        for (Variable v : cls.getVariables())
+            if (v.getLinkType() != Variable.LinkType.PRIMITIVE && !ret.contains(v.getType()))
+                ret.add(v.getType());
+        return ret;
+    }
+
     private void createAttributes(EClass cls) {
         for (EAttribute attr : cls.getEAttributes()) {
             String t = ConverterDataTypes.getInstance().check_type(attr.getEAttributeType().getName());
@@ -61,10 +67,10 @@ public class Classifier {
         else if (cls.getEAllSuperTypes().size() == 0)
             this.superClass = "KMFContainer";
 
-        //TODO see if loop should be after the single add call
+        if (!this.allSuperClass.contains("KMFContainer"))
+            this.addSuperType("KMFContainer");
         for (EClass ec : cls.getEAllSuperTypes())
             this.addSuperType(ec.getName());
-        this.addSuperType(this.superClass);
 
         if (!this.name.equals("NamedElement") && !this.superClass.equals("KMFContainer"))
             this.addVariable(new Variable("generated_KMF_ID", "char*", Variable.LinkType.UNARY_LINK, false));
@@ -76,11 +82,11 @@ public class Classifier {
     }
 
     private void createMetaClassNameFunction() {
-        String metaClassNameSignature = "static char* " + this.name
-                + "_metaClassName";
+        String metaClassNameSignature = this.name + "_metaClassName";
+        String returnType = "static char*";
         Parameter param = new Parameter(this.name + "* const", "this");
         String metaClassNameBody = "\treturn \"" + this.name + "\";";
-        Function metaClassFunction = new Function(metaClassNameSignature, false);
+        Function metaClassFunction = new Function(metaClassNameSignature, returnType, Function.Visibility_Type.PRIVATE);
         metaClassFunction.addParameter(param);
         metaClassFunction.setBody(metaClassNameBody);
         this.addFunction(metaClassFunction);
@@ -121,15 +127,6 @@ public class Classifier {
 
     public List<String> getAllSuperClass() {
         return allSuperClass;
-    }
-
-    public static List<String> getLinkedClassifier(Classifier cls) {
-        List<String> ret = new ArrayList<String>();
-        ret.add(cls.getSuperClass());
-        for (Variable v : cls.getVariables())
-            if (v.getLinkType() != Variable.LinkType.PRIMITIVE && !ret.contains(v.getType()))
-                ret.add(v.getType());
-        return ret;
     }
 
     public List<Variable> getVariables() {
