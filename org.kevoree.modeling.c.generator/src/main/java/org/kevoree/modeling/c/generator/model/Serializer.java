@@ -33,10 +33,12 @@ public abstract class Serializer {
         String ret = "";
         for (Function f : cls.getFunctions())
             if (f.getVisibilityType() == Visibility.IN_HEADER || f.getVisibilityType() == Visibility.IN_VT) {
-                ret += f.getSignature() + "(";
+                ret += f.getReturnType() + " " + f.getSignature() + "(";
                 Iterator<Parameter> iv = f.getParameters().iterator();
                 if (iv.hasNext())
                     ret += iv.next().getType();
+                else
+                    ret += "void";
                 while (iv.hasNext())
                     ret += ", " + iv.next();
                 ret += ");\n";
@@ -103,6 +105,7 @@ public abstract class Serializer {
         ret += "\n";
         ret += generateHeaderIncludes(cls);
         ret += generateFunctionSignatures(cls);
+        ret += "\n";
         ret += generateVT(cls);
         ret += "\n";
         ret += generateAttributes(cls);

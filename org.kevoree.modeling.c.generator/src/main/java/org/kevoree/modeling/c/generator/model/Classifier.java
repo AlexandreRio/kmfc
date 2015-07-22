@@ -88,11 +88,26 @@ public class Classifier {
         this.createMetaClassNameFunction();
         this.createInitFunction();
         this.createInternalGetKeyFunction();
-        //new
+        this.createNewFunction();
         //delete
         //add
         //remove
         //find
+    }
+
+    private void createNewFunction() {
+        if (!this.isAbstract) {
+            String newSignature = "new_" + this.name;
+            String returnType = this.name + "*";
+            VelocityContext context = new VelocityContext();
+            context.put("classname", this.name);
+            context.put("vtName", "vt_" + this.name);
+            StringWriter result = new StringWriter();
+            TemplateManager.getInstance().getGen_method_new().merge(context, result);
+            Function f = new Function(newSignature, returnType, Visibility.IN_HEADER);
+            f.setBody(result.toString());
+            this.addFunction(f);
+        }
     }
 
     private void createMetaClassNameFunction() {
@@ -183,4 +198,3 @@ public class Classifier {
     }
 
 }
-

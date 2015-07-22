@@ -28,6 +28,10 @@ public class Function {
         return signature;
     }
 
+    public String getReturnType() {
+        return returnType;
+    }
+
     public String getBody() {
         return body;
     }
