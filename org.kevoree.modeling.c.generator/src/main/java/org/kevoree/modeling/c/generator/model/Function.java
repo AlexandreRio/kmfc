@@ -15,7 +15,7 @@ public class Function {
     private List<Parameter> parameters;
     private String body;
 
-    public Function(boolean isPublic, String signature) {
+    public Function(String signature, boolean isPublic) {
         this.isPublic = isPublic;
         this.signature = signature;
         this.parameters = new ArrayList<Parameter>();
@@ -36,6 +36,10 @@ public class Function {
 
     public boolean isPublic() {
         return isPublic;
+    }
+
+    public void addParameter(Parameter param) {
+        this.parameters.add(param);
     }
 
     public List<Parameter> getParameters() {

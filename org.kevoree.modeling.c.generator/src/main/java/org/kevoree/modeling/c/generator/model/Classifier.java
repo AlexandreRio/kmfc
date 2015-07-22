@@ -36,7 +36,7 @@ public class Classifier {
         c.createAttributes(cls);
 
 
-//        c.createFunction(cls);
+        c.createFunction(cls);
         return c;
     }
 
@@ -62,7 +62,7 @@ public class Classifier {
             this.superClass = "KMFContainer";
 
         if (!this.name.equals("NamedElement") && !this.superClass.equals("KMFContainer"))
-            this.addVariable(new Variable("generated_KMF_ID", "char*", Variable.LinkType.UNARY_LINK, false ));
+            this.addVariable(new Variable("generated_KMF_ID", "char*", Variable.LinkType.UNARY_LINK, false));
     }
 
     private void createFunction(EClass cls) {
@@ -72,9 +72,11 @@ public class Classifier {
 
     private void createMetaClassNameFunction() {
         String metaClassNameSignature = "static char* " + this.name
-                + "_metaClassName(" + this.name + "* const this)";
+                + "_metaClassName";
+        Parameter param = new Parameter(this.name + "* const", "this");
         String metaClassNameBody = "\treturn \"" + this.name + "\";";
-        Function metaClassFunction = new Function(true, metaClassNameSignature);
+        Function metaClassFunction = new Function(metaClassNameSignature, false);
+        metaClassFunction.addParameter(param);
         metaClassFunction.setBody(metaClassNameBody);
         this.addFunction(metaClassFunction);
     }
@@ -108,6 +110,14 @@ public class Classifier {
         return superClass;
     }
 
+    public static List<String> getLinkedClassifier(Classifier cls) {
+        List<String> ret = new ArrayList<String>();
+        ret.add(cls.getSuperClass());
+        for (Variable v : cls.getVariables())
+            if (v.getLinkType() != Variable.LinkType.PRIMITIVE && !ret.contains(v.getType()))
+                ret.add(v.getType());
+        return ret;
+    }
     public List<Variable> getVariables() {
         return variables;
     }
@@ -116,13 +126,5 @@ public class Classifier {
         return functions;
     }
 
-    public void writeHeader(GenerationContext ctx) throws IOException {
-        FileManager.writeFile(ctx.getPackageGenerationDirectory() +
-                this.name + ".h", null, false);
-    }
-
-    public void writeClass(GenerationContext ctx) throws IOException {
-        FileManager.writeFile(ctx.getPackageGenerationDirectory() +
-                this.name + ".c", null, false);
-    }
 }
+

@@ -8,10 +8,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
-import org.kevoree.modeling.c.generator.model.ClassGenerator;
-import org.kevoree.modeling.c.generator.model.Classifier;
-import org.kevoree.modeling.c.generator.model.FactoryGenerator;
-import org.kevoree.modeling.c.generator.model.Variable;
+import org.kevoree.modeling.c.generator.model.*;
 import org.kevoree.modeling.c.generator.utils.CheckerConstraint;
 import org.kevoree.modeling.c.generator.utils.ConverterDataTypes;
 import org.kevoree.modeling.c.generator.utils.FileManager;
@@ -33,14 +30,15 @@ import java.util.List;
 public class Generator {
 
     private GenerationContext context;
+    private String folderName = "kevoree";
     private File ecoreFile;
-    private StringBuilder classes = new StringBuilder();
-    private List<ClassGenerator> generators;
+    private List<Classifier> classifiers;
 
     public Generator(GenerationContext ctx) {
         this.context = ctx;
+        this.context.setName_package(folderName);
         this.ecoreFile = ctx.getEcore();
-        this.generators = new ArrayList<ClassGenerator>();
+        this.classifiers = new ArrayList<Classifier>();
     }
 
     public void generateModel() throws Exception {
@@ -49,36 +47,24 @@ public class Generator {
         ResourceSetImpl rs = new ResourceSetImpl();
         XMIResource resource = (XMIResource) rs.createResource(fileUri);
 
-
         CheckerConstraint checkerConstraint = new CheckerConstraint(context);
         checkerConstraint.verify(resource);
-
-        ClassGenerator classGenerator;
 
         resource.load(null);
         EcoreUtil.resolveAll(resource);
 
         for (Iterator i = resource.getAllContents(); i.hasNext(); ) {
-            classGenerator = new ClassGenerator(context);
             EObject eo = (EObject) i.next();
 
             if (eo instanceof EClass) {
                 Classifier c = Classifier.createFromEClass((EClass) eo);
-//                classGenerator.generateClass((EClass) eo);
-//                factoryGenerator.generateFactory((EClass) eo);
-
-                classes.append(HelperGenerator.genIncludeLocal(((EClass) eo).getName()));
-                this.generators.add(classGenerator);
+                this.classifiers.add(c);
             }
         }
 
-        String output = context.getRootGenerationDirectory() + File.separatorChar +
-                context.getName_package() + File.separatorChar;
-
-        for (ClassGenerator gen : this.generators) {
-            gen.link_generation();
-            gen.writeHeader();
-            gen.writeClass();
+        for (Classifier c : this.classifiers) {
+            Serializer.writeHeader(c, context);
+            Serializer.writeSource(c, context);
         }
     }
 
