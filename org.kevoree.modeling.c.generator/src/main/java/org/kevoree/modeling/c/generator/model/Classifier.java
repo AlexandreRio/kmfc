@@ -8,6 +8,7 @@ import org.eclipse.emf.ecore.EReference;
 import org.kevoree.modeling.c.generator.TemplateManager;
 import org.kevoree.modeling.c.generator.model.Function.Visibility;
 import org.kevoree.modeling.c.generator.utils.ConverterDataTypes;
+import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -122,12 +123,22 @@ public class Classifier {
     }
 
     private void createInitFunction() {
-        String initSignature = "";
+        String initSignature = "init" + this.name;
+        String returnType = "void";
         String initBody = "\tinit" + this.superClass + "((" + this.superClass
                 + "*)this);";
         if (!this.name.equals("NamedElement") && !this.superClass.equals("KMFContainer"))
             initBody += "\tmemset(&this->generated_KMF_ID[0], 0, sizeof(this->generated_KMF_ID));\n" +
                     "\trand_str(this->generated_KMF_ID, 8);";
+        for (Variable v : this.getVariables())
+            if (!v.getLinkType().equals("generated_KMF_ID"))
+                initBody += "\tthis->" + v.getName() + " = " + HelperGenerator.
+                        genDefaultValue(v.getType()) + ";";
+        Parameter p = new Parameter(this.name + "*", "this");
+        Function initFunction = new Function(initSignature, returnType, Visibility.IN_HEADER);
+        initFunction.addParameter(p);
+        initFunction.setBody(initBody);
+        this.addFunction(initFunction);
     }
 
     private void createInternalGetKeyFunction() {
