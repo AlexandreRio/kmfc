@@ -79,6 +79,12 @@ public class Classifier {
     private void createFunction(EClass cls) {
         this.createMetaClassNameFunction();
         this.createInitFunction();
+        //getkey
+        //new
+        //delete
+        //add
+        //remove
+        //find
     }
 
     private void createMetaClassNameFunction() {

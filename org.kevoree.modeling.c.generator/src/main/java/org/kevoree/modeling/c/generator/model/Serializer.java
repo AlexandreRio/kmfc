@@ -67,9 +67,8 @@ public abstract class Serializer {
         return ret;
     }
 
-    private static String generateAttributes(Classifier cls) {
-        String ret = "typedef struct _VT_" + cls.getName() + " {\n";
-        ret += "\tVT_" + cls.getName() + " *VT;\n";
+    private static String generateAttributesFromClassifier(Classifier cls) {
+        String ret = "";
         for (Variable v : cls.getVariables()) {
             if (v.getLinkType() == Variable.LinkType.UNARY_LINK)
                 ret += "\t" + v.getType() + " " + v.getName() + ";\n";
@@ -78,6 +77,22 @@ public abstract class Serializer {
             else
                 ret += "\t" + v.getType() + " " + v.getName() + ";\n";
         }
+        return ret;
+    }
+
+    private static String generateAttributes(Classifier cls) {
+        String ret = "typedef struct _VT_" + cls.getName() + " {\n";
+        ret += "\tVT_" + cls.getName() + " *VT;\n";
+        for (String sClass : cls.getAllSuperClass())
+            if (sClass.equals("KMFContainer")) {
+                ret += "\t/* KMFContainer */\n" +
+                        "\tKMFContainer *eContainer;\n";
+            } else {
+                ret += "\t/* " + sClass + " */\n";
+                ret += generateAttributesFromClassifier(Generator.classifiers.get(sClass));
+            }
+        ret += "\t/* " + cls.getName() + " */\n";
+        ret += generateAttributesFromClassifier(cls);
         ret += "} VT_" + cls.getName() + ";\n\n";
         return ret;
     }
