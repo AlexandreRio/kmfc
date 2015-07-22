@@ -1,10 +1,13 @@
 package org.kevoree.modeling.c.generator.model;
 
+import org.apache.velocity.VelocityContext;
 import org.kevoree.modeling.c.generator.GenerationContext;
+import org.kevoree.modeling.c.generator.TemplateManager;
 import org.kevoree.modeling.c.generator.utils.FileManager;
 import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Iterator;
 
 public abstract class Serializer {
@@ -37,12 +40,34 @@ public abstract class Serializer {
         return ret;
     }
 
+    private static String generateVT(Classifier cls) {
+        String ret = "";
+        ret += "typedef struct _VT_" + cls.getName() + " {\n";
+        ret += "\tVT_" + cls.getSuperClass() + " *super;\n";
+        for (String sClass : cls.getAllSuperClass()) {
+            if (sClass.equals("KMFContainer")) {
+                VelocityContext context = new VelocityContext();
+                StringWriter result = new StringWriter();
+                TemplateManager.getInstance().getTp_KMFContainer_fptr().merge(context, result);
+                ret += result.toString();
+            } else {
+
+            }
+        }
+        ret += "} VT_" + cls.getName() + ";\n\n";
+        return ret;
+    }
+
     private static String generateHeaderFile(Classifier cls) {
         String ret = "";
         ret += HelperGenerator.genIFDEF(cls.getName());
         ret += "\n";
         ret += generateHeaderIncludes(cls);
         ret += generateFunctionSignatures(cls);
+        ret += generateVT(cls);
+        ret += "\n";
+//        ret += generateAttributes(cls);
+        ret += "\n";
         ret += HelperGenerator.genENDIF();
         return ret;
     }

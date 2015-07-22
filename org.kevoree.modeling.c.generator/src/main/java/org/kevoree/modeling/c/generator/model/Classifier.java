@@ -14,6 +14,7 @@ import java.util.List;
 public class Classifier {
     private String name;
     private String superClass;
+    private List<String> allSuperClass;
     private boolean isAbstract;
     private List<Variable> variables;
     private List<Function> functions;
@@ -22,6 +23,7 @@ public class Classifier {
         this.name = name;
         this.superClass = sClass;
         this.isAbstract = isAbstract;
+        this.allSuperClass = new ArrayList<String>();
         this.variables = new ArrayList<Variable>();
         this.functions = new ArrayList<Function>();
     }
@@ -34,8 +36,6 @@ public class Classifier {
         Classifier c = new Classifier(cls.getName(), sType, cls.isAbstract());
 
         c.createAttributes(cls);
-
-
         c.createFunction(cls);
         return c;
     }
@@ -60,6 +60,11 @@ public class Classifier {
             this.superClass = cls.getEAllSuperTypes().get(0).getName();
         else if (cls.getEAllSuperTypes().size() == 0)
             this.superClass = "KMFContainer";
+
+        //TODO see if loop should be after the single add call
+        for (EClass ec : cls.getEAllSuperTypes())
+            this.addSuperType(ec.getName());
+        this.addSuperType(this.superClass);
 
         if (!this.name.equals("NamedElement") && !this.superClass.equals("KMFContainer"))
             this.addVariable(new Variable("generated_KMF_ID", "char*", Variable.LinkType.UNARY_LINK, false));
@@ -94,6 +99,10 @@ public class Classifier {
         this.variables.add(var);
     }
 
+    private void addSuperType(String name) {
+        this.allSuperClass.add(name);
+    }
+
     private void addFunction(Function fun) {
         this.functions.add(fun);
     }
@@ -110,6 +119,10 @@ public class Classifier {
         return superClass;
     }
 
+    public List<String> getAllSuperClass() {
+        return allSuperClass;
+    }
+
     public static List<String> getLinkedClassifier(Classifier cls) {
         List<String> ret = new ArrayList<String>();
         ret.add(cls.getSuperClass());
@@ -118,6 +131,7 @@ public class Classifier {
                 ret.add(v.getType());
         return ret;
     }
+
     public List<Variable> getVariables() {
         return variables;
     }
