@@ -12,12 +12,12 @@ public class Function {
     /**
      * Whether it should be included in the header file.
      */
-    private Visibility_Type visibility;
+    private Visibility visibility;
     private List<Parameter> parameters;
     private String body;
 
-    public Function(String signature, String returnType, Visibility_Type visibility_type) {
-        this.visibility = visibility_type;
+    public Function(String signature, String returnType, Visibility visibility) {
+        this.visibility = visibility;
         this.returnType = returnType;
         this.signature = signature;
         this.parameters = new ArrayList<Parameter>();
@@ -36,7 +36,7 @@ public class Function {
         this.body = body;
     }
 
-    public Visibility_Type getVisibilityType() {
+    public Visibility getVisibilityType() {
         return visibility;
     }
 
@@ -48,5 +48,5 @@ public class Function {
         return parameters;
     }
 
-    public enum Visibility_Type {PRIVATE, IN_HEADER, IN_VT}
+    public enum Visibility {PRIVATE, IN_HEADER, IN_VT}
 }

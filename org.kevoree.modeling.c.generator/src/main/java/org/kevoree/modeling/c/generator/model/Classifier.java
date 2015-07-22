@@ -1,10 +1,15 @@
 package org.kevoree.modeling.c.generator.model;
 
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
+import org.kevoree.modeling.c.generator.TemplateManager;
+import org.kevoree.modeling.c.generator.model.Function.Visibility;
 import org.kevoree.modeling.c.generator.utils.ConverterDataTypes;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,12 +79,15 @@ public class Classifier {
 
         if (!this.name.equals("NamedElement") && !this.superClass.equals("KMFContainer"))
             this.addVariable(new Variable("generated_KMF_ID", "char*", Variable.LinkType.UNARY_LINK, false));
+
+        if (this.name.equals("DeployUnit") || this.name.equals("NamedElement"))
+            this.addVariable(new Variable("internalKey", "char*", Variable.LinkType.PRIMITIVE, false));
     }
 
     private void createFunction(EClass cls) {
         this.createMetaClassNameFunction();
         this.createInitFunction();
-        //getkey
+        this.createInternalGetKeyFunction();
         //new
         //delete
         //add
@@ -92,7 +100,7 @@ public class Classifier {
         String returnType = "static char*";
         Parameter param = new Parameter(this.name + "* const", "this");
         String metaClassNameBody = "\treturn \"" + this.name + "\";";
-        Function metaClassFunction = new Function(metaClassNameSignature, returnType, Function.Visibility_Type.PRIVATE);
+        Function metaClassFunction = new Function(metaClassNameSignature, returnType, Visibility.PRIVATE);
         metaClassFunction.addParameter(param);
         metaClassFunction.setBody(metaClassNameBody);
         this.addFunction(metaClassFunction);
@@ -105,6 +113,37 @@ public class Classifier {
         if (!this.name.equals("NamedElement") && !this.superClass.equals("KMFContainer"))
             initBody += "\tmemset(&this->generated_KMF_ID[0], 0, sizeof(this->generated_KMF_ID));\n" +
                     "\trand_str(this->generated_KMF_ID, 8);";
+    }
+
+    private void createInternalGetKeyFunction() {
+        VelocityContext context = new VelocityContext();
+        StringWriter writer = new StringWriter();
+        String internalGetKeySignature = this.name + "_internalGetKey";
+        String returnType = "static char*";
+        Parameter param = new Parameter(this.name + "* const", "this");
+
+        String body;
+        if (this.name.equals("DeployUnit")) {
+            Template method = TemplateManager.getInstance().getTp_getKey_DeployUnit();
+            method.merge(context, writer);
+            body = writer.toString();
+        } else if (this.name.equals("TypeDefinition")) {
+            Template method = TemplateManager.getInstance().getTp_getKey_TypeDefinition();
+            method.merge(context, writer);
+            body = writer.toString();
+        } else if (this.name.equals("NamedElement")) {
+            body = "\treturn this->name;";
+        } else if (this.superClass.equals("KMFContainer")) {
+            body = "\treturn this->generated_KMF_ID;";
+        } else { // in all other cases we inherit from NamedElement
+            body = "\treturn vt_" + this.superClass + ".internalGetKey((" +
+                    this.superClass + "*)this);";
+        }
+
+        Function internalGetKeyFunction = new Function(internalGetKeySignature, returnType, Visibility.IN_HEADER);
+        internalGetKeyFunction.addParameter(param);
+        internalGetKeyFunction.setBody(body);
+        this.addFunction(internalGetKeyFunction);
     }
 
     private void addVariable(Variable var) {

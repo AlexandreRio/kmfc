@@ -4,7 +4,7 @@ import org.apache.velocity.VelocityContext;
 import org.kevoree.modeling.c.generator.GenerationContext;
 import org.kevoree.modeling.c.generator.Generator;
 import org.kevoree.modeling.c.generator.TemplateManager;
-import org.kevoree.modeling.c.generator.model.Function.Visibility_Type;
+import org.kevoree.modeling.c.generator.model.Function.Visibility;
 import org.kevoree.modeling.c.generator.utils.FileManager;
 import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
@@ -32,7 +32,7 @@ public abstract class Serializer {
     private static String generateFunctionSignatures(Classifier cls) {
         String ret = "";
         for (Function f : cls.getFunctions())
-            if (f.getVisibilityType() == Visibility_Type.IN_HEADER || f.getVisibilityType() == Visibility_Type.IN_VT) {
+            if (f.getVisibilityType() == Visibility.IN_HEADER || f.getVisibilityType() == Visibility.IN_VT) {
                 ret += f.getSignature() + "(";
                 Iterator<Parameter> iv = f.getParameters().iterator();
                 if (iv.hasNext())
@@ -57,7 +57,7 @@ public abstract class Serializer {
             } else {
                 ret += "\t/*" + sClass + "*/\n";
                 for (Function f : Generator.classifiers.get(sClass).getFunctions()) {
-                    if (f.getVisibilityType() == Visibility_Type.IN_VT)
+                    if (f.getVisibilityType() == Visibility.IN_VT)
                         ret += "\tftpr" + f.getSignature() + " " +
                                 genToLowerCaseFirstChar(f.getSignature()) + ";\n";
                 }
