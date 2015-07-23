@@ -169,11 +169,34 @@ public class Classifier {
         this.addFunction(removeFunction);
     }
 
+    private void generateFindFunction(Variable v) {
+        String findSignature = "fptr" + this.name + "Find" + v.getName() + "ByID";
+        String returnType = v.getType() + "*";
+        Parameter p1 = new Parameter(this.name + "* const", "this");
+        Parameter p2 = new Parameter("char*", "id");
+
+        VelocityContext context = new VelocityContext();
+        StringWriter result = new StringWriter();
+        String findBody;
+        context.put("type", this.name);
+        context.put("refname", v.getName());
+        context.put("majrefname", HelperGenerator.genToUpperCaseFirstChar(v.getName()));
+        TemplateManager.getInstance().getGen_find_by_id().merge(context, result);
+        findBody = result.toString();
+
+        Function findFunction = new Function(findSignature, returnType, Visibility.IN_VT);
+        findFunction.addParameter(p1);
+        findFunction.addParameter(p2);
+        findFunction.setBody(findBody);
+        this.addFunction(findFunction);
+    }
+
     private void createAttributesManipulationFunctions() {
         for (Variable v : this.getVariables()) {
             this.generateAddFunction(v);
             this.generateRemoveFunction(v);
-            //find
+            if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK)
+                this.generateFindFunction(v);
         }
     }
 
