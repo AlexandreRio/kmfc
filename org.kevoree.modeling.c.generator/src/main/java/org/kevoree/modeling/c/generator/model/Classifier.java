@@ -90,7 +90,7 @@ public class Classifier {
         this.createInitFunction();
         this.createInternalGetKeyFunction();
         this.createNewFunction();
-        //delete
+        this.createDeleteFunction();
         //add
         //remove
         //find
@@ -109,6 +109,36 @@ public class Classifier {
             f.setBody(result.toString());
             this.addFunction(f);
         }
+    }
+
+    private void createDeleteFunction() {
+        String deleteSignature = "delete" + this.name;
+        String returnType = "static void";
+        Parameter param = new Parameter(this.name + "* const", "this");
+        String deleteBody = "\tvt_" + this.superClass + ".delete((" + this.superClass
+                + "*)this);\n";
+
+        VelocityContext context;
+        StringWriter result;
+        for (Variable v : this.getVariables()) {
+            if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
+                context = new VelocityContext();
+                result = new StringWriter();
+                context.put("refname", v.getName());
+                if (v.isContained())
+                    context.put("iscontained", "deleteContainerContents(this->" + this.name + ");");
+                else
+                    context.put("iscontained", "");
+
+                TemplateManager.getInstance().getGen_delete_ref().merge(context, result);
+                deleteBody += result.toString();
+            }
+        }
+
+        Function deleteFunction = new Function(deleteSignature, returnType, Visibility.IN_HEADER);
+        deleteFunction.addParameter(param);
+        deleteFunction.setBody(deleteBody);
+        this.addFunction(deleteFunction);
     }
 
     private void createMetaClassNameFunction() {

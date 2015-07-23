@@ -25,5 +25,9 @@ public class Variable {
         return this.name;
     }
 
+    public boolean isContained() {
+        return this.isContained;
+    }
+
     public enum LinkType {PRIMITIVE, UNARY_LINK, MULTIPLE_LINK}
 }
