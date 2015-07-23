@@ -145,7 +145,7 @@ public class Classifier {
         String metaClassNameSignature = this.name + "_metaClassName";
         String returnType = "static char*";
         Parameter param = new Parameter(this.name + "* const", "this");
-        String metaClassNameBody = "\treturn \"" + this.name + "\";";
+        String metaClassNameBody = "\treturn \"" + this.name + "\";\n";
         Function metaClassFunction = new Function(metaClassNameSignature, returnType, Visibility.PRIVATE);
         metaClassFunction.addParameter(param);
         metaClassFunction.setBody(metaClassNameBody);
@@ -161,7 +161,7 @@ public class Classifier {
             initBody += "\tmemset(&this->generated_KMF_ID[0], 0, sizeof(this->generated_KMF_ID));\n" +
                     "\trand_str(this->generated_KMF_ID, 8);\n";
         for (Variable v : this.getVariables())
-            if (!v.getLinkType().equals("generated_KMF_ID"))
+            if (!v.getName().equals("generated_KMF_ID"))
                 initBody += "\tthis->" + v.getName() + " = " + HelperGenerator.
                         genDefaultValue(v.getType()) + ";\n";
         Parameter p = new Parameter(this.name + "*", "this");
