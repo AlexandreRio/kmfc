@@ -114,8 +114,33 @@ public abstract class Serializer {
         return ret;
     }
 
+    private static String generateBodyIncludes(Classifier cls) {
+        String ret = "";
+        for (String s : Classifier.getLinkedClassifier(cls))
+            ret += HelperGenerator.genIncludeLocal(s);
+        return ret;
+    }
+
     private static String generateSourceFile(Classifier cls) {
         String ret = "";
+        ret += HelperGenerator.genIncludeLocal(cls.getName());
+        ret += "\n";
+        ret += generateBodyIncludes(cls);
+        ret += "\n";
+        for (Function f : cls.getFunctions()) {
+            ret += f.getReturnType() + "\n";
+            ret += f.getSignature() + "(";
+            Iterator<Parameter> iv = f.getParameters().iterator();
+            if (iv.hasNext())
+                ret += iv.next().getType();
+            else
+                ret += "void";
+            while (iv.hasNext())
+                ret += ", " + iv.next();
+            ret += ")\n{\n";
+            ret += f.getBody();
+            ret += "}\n\n";
+        }
         return ret;
     }
 

@@ -156,14 +156,14 @@ public class Classifier {
         String initSignature = "init" + this.name;
         String returnType = "void";
         String initBody = "\tinit" + this.superClass + "((" + this.superClass
-                + "*)this);";
+                + "*)this);\n";
         if (!this.name.equals("NamedElement") && !this.superClass.equals("KMFContainer"))
             initBody += "\tmemset(&this->generated_KMF_ID[0], 0, sizeof(this->generated_KMF_ID));\n" +
-                    "\trand_str(this->generated_KMF_ID, 8);";
+                    "\trand_str(this->generated_KMF_ID, 8);\n";
         for (Variable v : this.getVariables())
             if (!v.getLinkType().equals("generated_KMF_ID"))
                 initBody += "\tthis->" + v.getName() + " = " + HelperGenerator.
-                        genDefaultValue(v.getType()) + ";";
+                        genDefaultValue(v.getType()) + ";\n";
         Parameter p = new Parameter(this.name + "*", "this");
         Function initFunction = new Function(initSignature, returnType, Visibility.IN_HEADER);
         initFunction.addParameter(p);
