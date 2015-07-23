@@ -91,9 +91,57 @@ public class Classifier {
         this.createInternalGetKeyFunction();
         this.createNewFunction();
         this.createDeleteFunction();
-        //add
-        //remove
-        //find
+        this.createAttributesManipulationFunctions();
+    }
+
+    private void generateAddFunction(Variable v) {
+        String addSignature = this.name + "_add" + HelperGenerator.genToUpperCaseFirstChar(v.getName());
+        String returnType = "static void";
+        Parameter p1 = new Parameter(this.name + "* const", "this");
+        Parameter p2 = new Parameter(v.getType() + "*", "ptr");
+
+        StringWriter result = new StringWriter();
+        String addBody;
+        if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
+            VelocityContext context = new VelocityContext();
+            context.put("classname", this.name);
+            context.put("refname", v.getName());
+            context.put("type", v.getType());
+            context.put("methname", HelperGenerator.genToUpperCaseFirstChar(v.getName()));
+
+            if (!v.isContained())
+                context.put("iscontained", "");
+            else
+                context.put("iscontained", "ptr->eContainer = this;");
+
+            TemplateManager.getInstance().getGen_method_add().merge(context, result);
+            addBody = result.toString();
+        } else {
+            if (v.isContained()) { // if it's a container
+                VelocityContext context = new VelocityContext();
+                context.put("refname", v.getName());
+                context.put("methname", HelperGenerator.genToUpperCaseFirstChar(v.getName()));
+                TemplateManager.getInstance().getGen_method_add_unary_containment().merge(context, result);
+                addBody = result.toString();
+            } else {
+                addBody = "\tthis->" + v.getName() + " = ptr;";
+            }
+        }
+
+        Function addFunction = new Function(addSignature, returnType, Visibility.IN_VT);
+        addFunction.addParameter(p1);
+        addFunction.addParameter(p2);
+        addFunction.setBody(addBody);
+        this.addFunction(addFunction);
+    }
+
+    private void createAttributesManipulationFunctions() {
+        for (Variable v : this.getVariables()) {
+            this.generateAddFunction(v);
+            //add
+            //remove
+            //find
+        }
     }
 
     private void createNewFunction() {
