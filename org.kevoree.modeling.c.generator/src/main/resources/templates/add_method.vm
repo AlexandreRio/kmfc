@@ -17,4 +17,3 @@
 			PRINTF("WARNING: id %s already exists in ${refname} map\n", internalKey);
 		}
 	}
-}

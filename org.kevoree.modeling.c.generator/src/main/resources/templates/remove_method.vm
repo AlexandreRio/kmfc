@@ -10,3 +10,4 @@
 			PRINTF("ERROR: component %s cannot be removed!\n", internalKey);
 		}
 	}
+

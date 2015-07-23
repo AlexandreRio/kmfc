@@ -40,7 +40,7 @@ public abstract class Serializer {
                 else
                     ret += "void";
                 while (iv.hasNext())
-                    ret += ", " + iv.next();
+                    ret += ", " + iv.next().getType();
                 ret += ");\n";
             }
         return ret;
