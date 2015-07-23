@@ -39,7 +39,7 @@ public class Classifier {
         Classifier c = new Classifier(cls.getName(), sType, cls.isAbstract());
 
         c.createAttributes(cls);
-        c.createFunction(cls);
+        c.createFunction();
         return c;
     }
 
@@ -85,7 +85,7 @@ public class Classifier {
             this.addVariable(new Variable("internalKey", "char*", Variable.LinkType.PRIMITIVE, false));
     }
 
-    private void createFunction(EClass cls) {
+    private void createFunction() {
         this.createMetaClassNameFunction();
         this.createInitFunction();
         this.createInternalGetKeyFunction();
@@ -135,11 +135,44 @@ public class Classifier {
         this.addFunction(addFunction);
     }
 
+    private void generateRemoveFunction(Variable v) {
+        String removeSignature = this.name + "_remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName());
+        String returnType = "static void";
+        Parameter p1 = new Parameter(this.name + "* const", "this");
+        Parameter p2 = new Parameter(v.getType() + "*", "ptr");
+
+        StringWriter result = new StringWriter();
+        String removeBody;
+        if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
+            VelocityContext context = new VelocityContext();
+            context.put("refname", v.getName());
+            context.put("type", v.getType());
+            context.put("classname", this.name);
+
+            if (v.isContained())
+                context.put("iscontained", "ptr->eContainer = NULL;");
+            else
+                context.put("iscontained", "");
+
+            TemplateManager.getInstance().getGen_method_remove().merge(context, result);
+            removeBody = result.toString();
+        } else {
+            removeBody = "\tthis->" + v.getName() + " = NULL;";
+            if (v.isContained())
+                removeBody += "\tptr->eContainer = NULL;";
+        }
+
+        Function removeFunction = new Function(removeSignature, returnType, Visibility.IN_VT);
+        removeFunction.addParameter(p1);
+        removeFunction.addParameter(p2);
+        removeFunction.setBody(removeBody);
+        this.addFunction(removeFunction);
+    }
+
     private void createAttributesManipulationFunctions() {
         for (Variable v : this.getVariables()) {
             this.generateAddFunction(v);
-            //add
-            //remove
+            this.generateRemoveFunction(v);
             //find
         }
     }
@@ -264,10 +297,6 @@ public class Classifier {
 
     public String getName() {
         return name;
-    }
-
-    public boolean isAbstract() {
-        return isAbstract;
     }
 
     public String getSuperClass() {
