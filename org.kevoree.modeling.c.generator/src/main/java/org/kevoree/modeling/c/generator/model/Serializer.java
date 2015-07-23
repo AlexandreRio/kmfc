@@ -139,12 +139,16 @@ public abstract class Serializer {
             ret += f.getReturnType() + "\n";
             ret += f.getSignature() + "(";
             Iterator<Parameter> iv = f.getParameters().iterator();
-            if (iv.hasNext())
-                ret += iv.next().getType();
-            else
+            if (iv.hasNext()) {
+                Parameter p = iv.next();
+                ret += p.getType() + " " + p.getName();
+            } else {
                 ret += "void";
-            while (iv.hasNext())
-                ret += ", " + iv.next();
+            }
+            while (iv.hasNext()) {
+                Parameter p = iv.next();
+                ret += ", " + p.getType() + " " + p.getName();
+            }
             ret += ")\n{\n";
             ret += f.getBody();
             ret += "}\n\n";
