@@ -292,12 +292,12 @@ public class Classifier {
             method.merge(context, writer);
             body = writer.toString();
         } else if (this.name.equals("NamedElement")) {
-            body = "\treturn this->name;";
+            body = "\treturn this->name;\n";
         } else if (this.superClass.equals("KMFContainer")) {
-            body = "\treturn this->generated_KMF_ID;";
+            body = "\treturn this->generated_KMF_ID;\n";
         } else { // in all other cases we inherit from NamedElement
             body = "\treturn vt_" + this.superClass + ".internalGetKey((" +
-                    this.superClass + "*)this);";
+                    this.superClass + "*)this);\n";
         }
 
         Function internalGetKeyFunction = new Function(internalGetKeySignature, returnType, Visibility.IN_HEADER);
