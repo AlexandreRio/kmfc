@@ -97,7 +97,7 @@ public class Classifier {
     private void generateAddFunction(Variable v) {
         String addSignature = this.name + "Add" + HelperGenerator.genToUpperCaseFirstChar(v.getName());
         String returnType = "void";
-        Parameter p1 = new Parameter(this.name + "* const", "this");
+        Parameter p1 = new Parameter(this.name + "*", "this", true);
         Parameter p2;
         if (v.getType().equals("char*"))
             p2 = new Parameter(v.getType(), "ptr");
@@ -142,7 +142,7 @@ public class Classifier {
     private void generateRemoveFunction(Variable v) {
         String removeSignature = this.name + "Remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName());
         String returnType = "void";
-        Parameter p1 = new Parameter(this.name + "* const", "this");
+        Parameter p1 = new Parameter(this.name + "*", "this", true);
         Parameter p2;
         if (v.getType().equals("char*"))
             p2 = new Parameter(v.getType(), "ptr");
@@ -180,7 +180,7 @@ public class Classifier {
     private void generateFindFunction(Variable v) {
         String findSignature = this.name + "Find" + v.getName() + "ByID";
         String returnType = v.getType() + "*";
-        Parameter p1 = new Parameter(this.name + "* const", "this");
+        Parameter p1 = new Parameter(this.name + "*", "this", true);
         Parameter p2 = new Parameter("char*", "id");
 
         VelocityContext context = new VelocityContext();
@@ -226,7 +226,7 @@ public class Classifier {
     private void createDeleteFunction() {
         String deleteSignature = "delete" + this.name;
         String returnType = "void";
-        Parameter param = new Parameter(this.name + "* const", "this");
+        Parameter param = new Parameter(this.name + "*", "this", true);
         String deleteBody = "\tvt_" + this.superClass + ".delete((" + this.superClass
                 + "*)this);\n";
 
@@ -256,7 +256,7 @@ public class Classifier {
     private void createMetaClassNameFunction() {
         String metaClassNameSignature = this.name + "_metaClassName";
         String returnType = "char*";
-        Parameter param = new Parameter(this.name + "* const", "this");
+        Parameter param = new Parameter(this.name + "*", "this", true);
         String metaClassNameBody = "\treturn \"" + this.name + "\";\n";
         Function metaClassFunction = new Function(metaClassNameSignature, returnType, Visibility.PRIVATE, true);
         metaClassFunction.addParameter(param);
@@ -288,7 +288,7 @@ public class Classifier {
         StringWriter writer = new StringWriter();
         String internalGetKeySignature = this.name + "_internalGetKey";
         String returnType = "char*";
-        Parameter param = new Parameter(this.name + "* const", "this");
+        Parameter param = new Parameter(this.name + "*", "this", true);
 
         String body;
         if (this.name.equals("DeployUnit")) {

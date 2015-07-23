@@ -77,7 +77,7 @@ public abstract class Serializer {
                 ret += "\tftpr" + f.getSignature() + " " +
                         genToLowerCaseFirstChar(f.getSignature()) + ";\n";
         }
-        ret += "} VT_" + cls.getName() + ";\n\n";
+        ret += "} VT_" + cls.getName() + ";\n";
         return ret;
     }
 
@@ -95,7 +95,7 @@ public abstract class Serializer {
     }
 
     private static String generateAttributes(Classifier cls) {
-        String ret = "typedef struct _VT_" + cls.getName() + " {\n";
+        String ret = "typedef struct _" + cls.getName() + " {\n";
         ret += "\tVT_" + cls.getName() + " *VT;\n";
         for (String sClass : cls.getAllSuperClass())
             if (sClass.equals("KMFContainer")) {
@@ -107,25 +107,24 @@ public abstract class Serializer {
             }
         ret += "\t/* " + cls.getName() + " */\n";
         ret += generateAttributesFromClassifier(cls);
-        ret += "} VT_" + cls.getName() + ";\n\n";
+        ret += "} " + cls.getName() + ";\n";
         return ret;
     }
 
     private static String generateTypeDefFptr(Classifier cls) {
         String ret = "";
         for (Function f : cls.getFunctions()) {
-            System.out.println(f.getSignature());
-            ret += "typedef " + f.getReturnType() + " (*fptr" + f.getSignature() + ")(";
+            ret += "typedef " + f.getReturnType() + " (*ftpr" + f.getSignature() + ")(";
             Iterator<Parameter> iv = f.getParameters().iterator();
             if (iv.hasNext()) {
                 Parameter p = iv.next();
-                ret += p.getType() + " " + p.getName();
+                ret += p.getType();
             } else {
                 ret += "void";
             }
             while (iv.hasNext()) {
                 Parameter p = iv.next();
-                ret += ", " + p.getType() + " " + p.getName();
+                ret += ", " + p.getType();
             }
             ret += ");\n";
         }
