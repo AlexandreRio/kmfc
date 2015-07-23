@@ -95,8 +95,8 @@ public class Classifier {
     }
 
     private void generateAddFunction(Variable v) {
-        String addSignature = this.name + "_add" + HelperGenerator.genToUpperCaseFirstChar(v.getName());
-        String returnType = "static void";
+        String addSignature = this.name + "Add" + HelperGenerator.genToUpperCaseFirstChar(v.getName());
+        String returnType = "void";
         Parameter p1 = new Parameter(this.name + "* const", "this");
         Parameter p2 = new Parameter(v.getType() + "*", "ptr");
 
@@ -128,7 +128,7 @@ public class Classifier {
             }
         }
 
-        Function addFunction = new Function(addSignature, returnType, Visibility.IN_VT);
+        Function addFunction = new Function(addSignature, returnType, Visibility.IN_VT, true);
         addFunction.addParameter(p1);
         addFunction.addParameter(p2);
         addFunction.setBody(addBody);
@@ -136,8 +136,8 @@ public class Classifier {
     }
 
     private void generateRemoveFunction(Variable v) {
-        String removeSignature = this.name + "_remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName());
-        String returnType = "static void";
+        String removeSignature = this.name + "Remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName());
+        String returnType = "void";
         Parameter p1 = new Parameter(this.name + "* const", "this");
         Parameter p2 = new Parameter(v.getType() + "*", "ptr");
 
@@ -162,7 +162,7 @@ public class Classifier {
                 removeBody += "\tptr->eContainer = NULL;";
         }
 
-        Function removeFunction = new Function(removeSignature, returnType, Visibility.IN_VT);
+        Function removeFunction = new Function(removeSignature, returnType, Visibility.IN_VT, true);
         removeFunction.addParameter(p1);
         removeFunction.addParameter(p2);
         removeFunction.setBody(removeBody);
@@ -170,7 +170,7 @@ public class Classifier {
     }
 
     private void generateFindFunction(Variable v) {
-        String findSignature = "fptr" + this.name + "Find" + v.getName() + "ByID";
+        String findSignature = this.name + "Find" + v.getName() + "ByID";
         String returnType = v.getType() + "*";
         Parameter p1 = new Parameter(this.name + "* const", "this");
         Parameter p2 = new Parameter("char*", "id");
@@ -217,7 +217,7 @@ public class Classifier {
 
     private void createDeleteFunction() {
         String deleteSignature = "delete" + this.name;
-        String returnType = "static void";
+        String returnType = "void";
         Parameter param = new Parameter(this.name + "* const", "this");
         String deleteBody = "\tvt_" + this.superClass + ".delete((" + this.superClass
                 + "*)this);\n";
@@ -239,7 +239,7 @@ public class Classifier {
             }
         }
 
-        Function deleteFunction = new Function(deleteSignature, returnType, Visibility.IN_HEADER);
+        Function deleteFunction = new Function(deleteSignature, returnType, Visibility.IN_HEADER, true);
         deleteFunction.addParameter(param);
         deleteFunction.setBody(deleteBody);
         this.addFunction(deleteFunction);
@@ -247,10 +247,10 @@ public class Classifier {
 
     private void createMetaClassNameFunction() {
         String metaClassNameSignature = this.name + "_metaClassName";
-        String returnType = "static char*";
+        String returnType = "char*";
         Parameter param = new Parameter(this.name + "* const", "this");
         String metaClassNameBody = "\treturn \"" + this.name + "\";\n";
-        Function metaClassFunction = new Function(metaClassNameSignature, returnType, Visibility.PRIVATE);
+        Function metaClassFunction = new Function(metaClassNameSignature, returnType, Visibility.PRIVATE, true);
         metaClassFunction.addParameter(param);
         metaClassFunction.setBody(metaClassNameBody);
         this.addFunction(metaClassFunction);
@@ -279,7 +279,7 @@ public class Classifier {
         VelocityContext context = new VelocityContext();
         StringWriter writer = new StringWriter();
         String internalGetKeySignature = this.name + "_internalGetKey";
-        String returnType = "static char*";
+        String returnType = "char*";
         Parameter param = new Parameter(this.name + "* const", "this");
 
         String body;
@@ -300,7 +300,7 @@ public class Classifier {
                     this.superClass + "*)this);\n";
         }
 
-        Function internalGetKeyFunction = new Function(internalGetKeySignature, returnType, Visibility.IN_HEADER);
+        Function internalGetKeyFunction = new Function(internalGetKeySignature, returnType, Visibility.IN_HEADER, true);
         internalGetKeyFunction.addParameter(param);
         internalGetKeyFunction.setBody(body);
         this.addFunction(internalGetKeyFunction);

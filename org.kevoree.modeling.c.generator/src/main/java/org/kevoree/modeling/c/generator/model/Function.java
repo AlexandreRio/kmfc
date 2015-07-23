@@ -9,6 +9,7 @@ public class Function {
      */
     private String signature;
     private String returnType;
+    private boolean isStatic;
     /**
      * Whether it should be included in the header file.
      */
@@ -19,9 +20,15 @@ public class Function {
     public Function(String signature, String returnType, Visibility visibility) {
         this.visibility = visibility;
         this.returnType = returnType;
+        this.isStatic = false;
         this.signature = signature;
         this.parameters = new ArrayList<Parameter>();
         this.body = "";
+    }
+
+    public Function(String signature, String returnType, Visibility visibility, boolean isStatic) {
+        this(signature, returnType, visibility);
+        this.isStatic = isStatic;
     }
 
     public String getSignature() {
@@ -38,6 +45,10 @@ public class Function {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public boolean isStatic() {
+        return isStatic;
     }
 
     public Visibility getVisibilityType() {

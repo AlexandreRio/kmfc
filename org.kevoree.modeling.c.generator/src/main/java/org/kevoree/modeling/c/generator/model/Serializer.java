@@ -20,11 +20,17 @@ public abstract class Serializer {
         String ret = "";
         ret += HelperGenerator.genInclude("string.h");
         ret += HelperGenerator.genInclude("stdio.h");
+        ret += HelperGenerator.genIncludeLocal("hashmap");
         ret += "\n";
 
         ret += HelperGenerator.genTypeDef(cls.getName());
-        for (String s : Classifier.getLinkedClassifier(cls))
-            ret += HelperGenerator.genTypeDef(s);
+        for (String s : Classifier.getLinkedClassifier(cls)) {
+            if (s.equals("KMFContainer"))
+                ret += HelperGenerator.genIncludeLocal("KMFContainer");
+            else
+                ret += HelperGenerator.genTypeDef(s);
+
+        }
         ret += "\n";
         return ret;
     }
@@ -32,7 +38,7 @@ public abstract class Serializer {
     private static String generateFunctionSignatures(Classifier cls) {
         String ret = "";
         for (Function f : cls.getFunctions())
-            if (f.getVisibilityType() == Visibility.IN_HEADER || f.getVisibilityType() == Visibility.IN_VT) {
+            if (f.getVisibilityType() == Visibility.IN_HEADER) {
                 ret += f.getReturnType() + " " + f.getSignature() + "(";
                 Iterator<Parameter> iv = f.getParameters().iterator();
                 if (iv.hasNext())
@@ -64,6 +70,12 @@ public abstract class Serializer {
                                 genToLowerCaseFirstChar(f.getSignature()) + ";\n";
                 }
             }
+        }
+        ret += "\t/*" + cls.getName() + "*/\n";
+        for (Function f : Generator.classifiers.get(cls.getName()).getFunctions()) {
+            if (f.getVisibilityType() == Visibility.IN_VT)
+                ret += "\tftpr" + f.getSignature() + " " +
+                        genToLowerCaseFirstChar(f.getSignature()) + ";\n";
         }
         ret += "} VT_" + cls.getName() + ";\n\n";
         return ret;
@@ -99,11 +111,34 @@ public abstract class Serializer {
         return ret;
     }
 
+    private static String generateTypeDefFptr(Classifier cls) {
+        String ret = "";
+        for (Function f : cls.getFunctions()) {
+            System.out.println(f.getSignature());
+            ret += "typedef " + f.getReturnType() + " (*fptr" + f.getSignature() + ")(";
+            Iterator<Parameter> iv = f.getParameters().iterator();
+            if (iv.hasNext()) {
+                Parameter p = iv.next();
+                ret += p.getType() + " " + p.getName();
+            } else {
+                ret += "void";
+            }
+            while (iv.hasNext()) {
+                Parameter p = iv.next();
+                ret += ", " + p.getType() + " " + p.getName();
+            }
+            ret += ");\n";
+        }
+        return ret;
+    }
+
     private static String generateHeaderFile(Classifier cls) {
         String ret = "";
         ret += HelperGenerator.genIFDEF(cls.getName());
         ret += "\n";
         ret += generateHeaderIncludes(cls);
+        ret += "\n";
+        ret += generateTypeDefFptr(cls);
         ret += generateFunctionSignatures(cls);
         ret += "\n";
         ret += generateVT(cls);
@@ -128,6 +163,7 @@ public abstract class Serializer {
         return result.toString();
     }
 
+
     private static String generateSourceFile(Classifier cls) {
         String ret = "";
         ret += HelperGenerator.genIncludeLocal(cls.getName());
@@ -136,6 +172,8 @@ public abstract class Serializer {
         ret += generateDebug();
         ret += "\n";
         for (Function f : cls.getFunctions()) {
+            if (f.isStatic())
+                ret += "static ";
             ret += f.getReturnType() + "\n";
             ret += f.getSignature() + "(";
             Iterator<Parameter> iv = f.getParameters().iterator();
