@@ -1,7 +1,7 @@
-	/* KMFContainer */
+#[[	/* KMFContainer */
 	fptrKMFMetaClassName metaClassName;
 	fptrKMFInternalGetKey internalGetKey;
 	fptrKMFGetPath getPath;
 	fptrVisit visit;
 	fptrFindByPath findByPath;
-	fptrDelete delete;
+	fptrDelete delete;]]#
