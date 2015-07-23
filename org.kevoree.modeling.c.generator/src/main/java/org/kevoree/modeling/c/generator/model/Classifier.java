@@ -98,7 +98,11 @@ public class Classifier {
         String addSignature = this.name + "Add" + HelperGenerator.genToUpperCaseFirstChar(v.getName());
         String returnType = "void";
         Parameter p1 = new Parameter(this.name + "* const", "this");
-        Parameter p2 = new Parameter(v.getType() + "*", "ptr");
+        Parameter p2;
+        if (v.getType().equals("char*"))
+            p2 = new Parameter(v.getType(), "ptr");
+        else
+            p2 = new Parameter(v.getType() + "*", "ptr");
 
         StringWriter result = new StringWriter();
         String addBody;
@@ -139,7 +143,11 @@ public class Classifier {
         String removeSignature = this.name + "Remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName());
         String returnType = "void";
         Parameter p1 = new Parameter(this.name + "* const", "this");
-        Parameter p2 = new Parameter(v.getType() + "*", "ptr");
+        Parameter p2;
+        if (v.getType().equals("char*"))
+            p2 = new Parameter(v.getType(), "ptr");
+        else
+            p2 = new Parameter(v.getType() + "*", "ptr");
 
         StringWriter result = new StringWriter();
         String removeBody;
