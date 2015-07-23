@@ -121,11 +121,19 @@ public abstract class Serializer {
         return ret;
     }
 
+    private static String generateDebug() {
+        VelocityContext context = new VelocityContext();
+        StringWriter result = new StringWriter();
+        TemplateManager.getInstance().getTp_print_debug().merge(context, result);
+        return result.toString();
+    }
+
     private static String generateSourceFile(Classifier cls) {
         String ret = "";
         ret += HelperGenerator.genIncludeLocal(cls.getName());
         ret += "\n";
         ret += generateBodyIncludes(cls);
+        ret += generateDebug();
         ret += "\n";
         for (Function f : cls.getFunctions()) {
             ret += f.getReturnType() + "\n";
