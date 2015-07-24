@@ -87,7 +87,7 @@ public abstract class Serializer {
         String ret = "";
         for (Variable v : cls.getVariables()) {
             if (v.getLinkType() == Variable.LinkType.UNARY_LINK)
-                ret += "\t" + v.getType() + " " + v.getName() + ";\n";
+                ret += "\t" + v.getType() + " *" + v.getName() + ";\n";
             else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK)
                 ret += "\tmap_t " + v.getName() + ";\n";
             else
