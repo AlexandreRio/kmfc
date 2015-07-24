@@ -2,7 +2,7 @@
 - [x] Generate structures in header files
 - [x] Generate add and remove implementation
 - [x] Generate init implementation
-- [ ] Initialize Virtual Table
+- [x] Initialize Virtual Table
 - [x] Generate KMF_ID for nameless classes
 - [x] Generate new implementation
 - [x] Generate delete implementation

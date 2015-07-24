@@ -177,6 +177,12 @@ public abstract class Serializer {
         ret += "\t.metaClassName = " + cls.getName() + "_metaClassName,\n";
         ret += "\t.internalGetKey = " + cls.getName() + "_internalGetKey,\n";
         ret += "\t.delete = delete" + cls.getName() + ",\n";
+        for (Function f : cls.getFunctions()) {
+            if (f.getVisibilityType() == Visibility.IN_VT) {
+                ret += "\t." + genToLowerCaseFirstChar(f.getSignature()) + " = "
+                        + f.getSignature() + ",\n";
+            }
+        }
         ret += "};\n";
         return ret;
     }
