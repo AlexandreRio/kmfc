@@ -145,6 +145,8 @@ public abstract class Serializer {
         ret += "\n";
         ret += generateAttributes(cls);
         ret += "\n";
+        ret += "extern const VT_" + cls.getName() + " vt_" + cls.getName() + ";\n";
+        ret += "\n";
         ret += HelperGenerator.genENDIF();
         return ret;
     }

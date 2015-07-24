@@ -121,6 +121,7 @@ public class Classifier {
             if (v.isContained()) { // if it's a container
                 VelocityContext context = new VelocityContext();
                 context.put("refname", v.getName());
+                context.put("name", HelperGenerator.genToLowerCaseFirstChar(this.name));
                 context.put("methname", HelperGenerator.genToUpperCaseFirstChar(v.getName()));
                 TemplateManager.getInstance().getGen_method_add_unary_containment().merge(context, result);
                 addBody = result.toString();
@@ -266,9 +267,11 @@ public class Classifier {
         String returnType = "void";
         String initBody = "\tinit" + this.superClass + "((" + this.superClass
                 + "*)this);\n";
-        if (!this.name.equals("NamedElement") && !this.superClass.equals("KMFContainer"))
+
+        if (this.containsVariable("generated_KMF_ID"))
             initBody += "\tmemset(&this->generated_KMF_ID[0], 0, sizeof(this->generated_KMF_ID));\n" +
                     "\trand_str(this->generated_KMF_ID, 8);\n";
+
         for (Variable v : this.getVariables())
             if (!v.getName().equals("generated_KMF_ID"))
                 initBody += "\tthis->" + v.getName() + " = " + HelperGenerator.
@@ -296,7 +299,7 @@ public class Classifier {
             Template method = TemplateManager.getInstance().getTp_getKey_TypeDefinition();
             method.merge(context, writer);
             body = writer.toString();
-        } else if (this.name.equals("NamedElement")) {
+        } else if (this.name.equals("NamedElement") || this.name.equals("DictionaryValue")) {
             body = "\treturn this->name;\n";
         } else if (this.superClass.equals("KMFContainer")) {
             body = "\treturn this->generated_KMF_ID;\n";
@@ -311,6 +314,12 @@ public class Classifier {
         this.addFunction(internalGetKeyFunction);
     }
 
+    private boolean containsVariable(String name) {
+        for (Variable v : this.getVariables())
+            if (v.getName().equals(name))
+                return true;
+        return false;
+    }
     private void addVariable(Variable var) {
         this.variables.add(var);
     }
