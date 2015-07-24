@@ -78,9 +78,6 @@ public class Classifier {
         for (EClass ec : cls.getEAllSuperTypes())
             this.addSuperType(ec.getName());
 
-//        if (!this.name.equals("NamedElement") && this.superClass.equals("KMFContainer"))
-//            this.addVariable(new Variable("generated_KMF_ID", "char*", Variable.LinkType.PRIMITIVE, false));
-
         if (this.name.equals("NamedElement"))
             this.addVariable(new Variable("internalKey", "char*", Variable.LinkType.PRIMITIVE, false));
     }
@@ -128,7 +125,7 @@ public class Classifier {
                 TemplateManager.getInstance().getGen_method_add_unary_containment().merge(context, result);
                 addBody = result.toString();
             } else {
-                addBody = "\tthis->" + v.getName() + " = ptr;";
+                addBody = "\tthis->" + v.getName() + " = ptr;\n";
             }
         }
 
@@ -158,16 +155,16 @@ public class Classifier {
             context.put("classname", this.name);
 
             if (v.isContained())
-                context.put("iscontained", "ptr->eContainer = NULL;");
+                context.put("iscontained", "ptr->eContainer = NULL;\n");
             else
                 context.put("iscontained", "");
 
             TemplateManager.getInstance().getGen_method_remove().merge(context, result);
             removeBody = result.toString();
         } else {
-            removeBody = "\tthis->" + v.getName() + " = NULL;";
+            removeBody = "\tthis->" + v.getName() + " = NULL;\n";
             if (v.isContained())
-                removeBody += "\tptr->eContainer = NULL;";
+                removeBody += "\tptr->eContainer = NULL;\n";
         }
 
         Function removeFunction = new Function(removeSignature, returnType, Visibility.IN_VT, true);
@@ -192,7 +189,7 @@ public class Classifier {
         TemplateManager.getInstance().getGen_find_by_id().merge(context, result);
         findBody = result.toString();
 
-        Function findFunction = new Function(findSignature, returnType, Visibility.IN_VT);
+        Function findFunction = new Function(findSignature, returnType, Visibility.IN_VT, true);
         findFunction.addParameter(p1);
         findFunction.addParameter(p2);
         findFunction.setBody(findBody);
@@ -238,7 +235,7 @@ public class Classifier {
                 result = new StringWriter();
                 context.put("refname", v.getName());
                 if (v.isContained())
-                    context.put("iscontained", "deleteContainerContents(this->" + this.name + ");");
+                    context.put("iscontained", "deleteContainerContents(this->" + v.getName() + ");");
                 else
                     context.put("iscontained", "");
 
