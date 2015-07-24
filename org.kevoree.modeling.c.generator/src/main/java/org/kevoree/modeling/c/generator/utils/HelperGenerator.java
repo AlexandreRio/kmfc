@@ -20,6 +20,10 @@ public class HelperGenerator {
         return "#include \"" + name + ".h\"\n";
     }
 
+    public static String genTypeDef(String name) {
+        return "typedef struct _" + name + " " + name + ";\n";
+    }
+
     public static String genToLowerCaseFirstChar(String name) {
         return Character.toLowerCase(name.charAt(0)) + name.substring(1);
     }

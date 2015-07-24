@@ -7,20 +7,17 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 public class TemplateManager {
 
     private static String BASE_DIR = "templates/";
-
+    private static TemplateManager self;
+    protected VelocityEngine ve = new VelocityEngine();
     /**
      * Templates with variables.
      */
     private Template gen_method_add;
-
-
     private Template gen_method_add_unary_containment;
     private Template gen_method_remove;
     private Template gen_visitor;
     private Template gen_visitor_ref;
     private Template gen_delete_ref;
-
-
     private Template gen_method_new;
     private Template gen_find_by_id;
     /**
@@ -29,10 +26,7 @@ public class TemplateManager {
     private Template tp_getKey_DeployUnit;
     private Template tp_getKey_TypeDefinition;
     private Template tp_KMFContainer_fptr;
-
-    protected VelocityEngine ve = new VelocityEngine();
-
-    private static TemplateManager self;
+    private Template tp_print_debug;
 
     private TemplateManager() {
         ve.setProperty("file.resource.loader.class", ClasspathResourceLoader.class.getName());
@@ -48,6 +42,7 @@ public class TemplateManager {
         tp_getKey_DeployUnit = ve.getTemplate(BASE_DIR + "internalGetKey_DeployUnit.vm");
         tp_getKey_TypeDefinition = ve.getTemplate(BASE_DIR + "internalGetKey_TypeDefinition.vm");
         tp_KMFContainer_fptr = ve.getTemplate(BASE_DIR + "kmfcontainer_fptr.vm");
+        tp_print_debug = ve.getTemplate(BASE_DIR + "print_debug.vm");
     }
 
     public static TemplateManager getInstance() {
@@ -90,6 +85,10 @@ public class TemplateManager {
 
     public Template getTp_KMFContainer_fptr() {
         return tp_KMFContainer_fptr;
+    }
+
+    public Template getTp_print_debug() {
+        return tp_print_debug;
     }
 
     public Template getGen_method_add_unary_containment() {

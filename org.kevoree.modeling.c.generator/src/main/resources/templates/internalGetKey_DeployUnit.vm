@@ -1,4 +1,4 @@
-	if (this->internalKey == NULL) {
+#[[	if (this->internalKey == NULL) {
 		char* internalKey;
 
 		internalKey = malloc(sizeof(char) * (strlen(this->groupName) + strlen("/") +
@@ -17,4 +17,4 @@
 		return internalKey;
 	} else {
 		return this->internalKey;
-	}
+	}]]#

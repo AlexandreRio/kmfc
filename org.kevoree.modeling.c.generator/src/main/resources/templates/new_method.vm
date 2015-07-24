@@ -1,4 +1,3 @@
-${classname}* new_${classname}(void) {
 	${classname}* pObj = NULL;
 	/* Allocating memory */
 	pObj = malloc(sizeof(${classname}));
@@ -18,4 +17,3 @@ ${classname}* new_${classname}(void) {
 	init${classname}(pObj);
 
 	return pObj;
-}
