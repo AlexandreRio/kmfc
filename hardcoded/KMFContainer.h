@@ -44,7 +44,7 @@ char* KMFContainer_get_path(void* this);
 
 char* get_key_for_hashmap(any_t t);
 
-extern const VT_KMFContainer VT_KMF;
+extern const VT_KMFContainer vt_KMFContainer;
 
 /* usefull functions */
 char *my_strdup(const char *string);
