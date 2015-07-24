@@ -79,7 +79,7 @@ public class Classifier {
             this.addSuperType(ec.getName());
 
         if (!this.name.equals("NamedElement") && !this.superClass.equals("KMFContainer"))
-            this.addVariable(new Variable("generated_KMF_ID", "char*", Variable.LinkType.UNARY_LINK, false));
+            this.addVariable(new Variable("generated_KMF_ID", "char*", Variable.LinkType.PRIMITIVE, false));
 
         if (this.name.equals("DeployUnit") || this.name.equals("NamedElement"))
             this.addVariable(new Variable("internalKey", "char*", Variable.LinkType.PRIMITIVE, false));

@@ -11,27 +11,27 @@ import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Iterator;
+import java.util.List;
 
 import static org.kevoree.modeling.c.generator.utils.HelperGenerator.genToLowerCaseFirstChar;
 
 public abstract class Serializer {
 
     private static String generateHeaderIncludes(Classifier cls) {
+        List<String> linkedClass = Classifier.getLinkedClassifier(cls);
         String ret = "";
         ret += HelperGenerator.genInclude("string.h");
         ret += HelperGenerator.genInclude("stdio.h");
         ret += HelperGenerator.genIncludeLocal("hashmap");
+        if (linkedClass.contains("KMFContainer"))
+            ret += HelperGenerator.genIncludeLocal("KMFContainer");
         ret += "\n";
 
         ret += HelperGenerator.genTypeDef(cls.getName());
-        for (String s : Classifier.getLinkedClassifier(cls)) {
-            if (s.equals("KMFContainer"))
-                ret += HelperGenerator.genIncludeLocal("KMFContainer");
-            else
-                ret += HelperGenerator.genTypeDef(s);
-
-        }
+        for (String s : linkedClass)
+            ret += HelperGenerator.genTypeDef(s);
         ret += "\n";
+
         return ret;
     }
 
@@ -136,7 +136,6 @@ public abstract class Serializer {
         ret += HelperGenerator.genIFDEF(cls.getName());
         ret += "\n";
         ret += generateHeaderIncludes(cls);
-        ret += "\n";
         ret += generateTypeDefFptr(cls);
         ret += generateFunctionSignatures(cls);
         ret += "\n";
