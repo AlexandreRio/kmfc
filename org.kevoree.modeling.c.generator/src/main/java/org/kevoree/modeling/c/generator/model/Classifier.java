@@ -78,10 +78,10 @@ public class Classifier {
         for (EClass ec : cls.getEAllSuperTypes())
             this.addSuperType(ec.getName());
 
-        if (!this.name.equals("NamedElement") && !this.superClass.equals("KMFContainer"))
-            this.addVariable(new Variable("generated_KMF_ID", "char*", Variable.LinkType.PRIMITIVE, false));
+//        if (!this.name.equals("NamedElement") && this.superClass.equals("KMFContainer"))
+//            this.addVariable(new Variable("generated_KMF_ID", "char*", Variable.LinkType.PRIMITIVE, false));
 
-        if (this.name.equals("DeployUnit") || this.name.equals("NamedElement"))
+        if (this.name.equals("NamedElement"))
             this.addVariable(new Variable("internalKey", "char*", Variable.LinkType.PRIMITIVE, false));
     }
 
@@ -308,7 +308,7 @@ public class Classifier {
                     this.superClass + "*)this);\n";
         }
 
-        Function internalGetKeyFunction = new Function(internalGetKeySignature, returnType, Visibility.IN_HEADER, true);
+        Function internalGetKeyFunction = new Function(internalGetKeySignature, returnType, Visibility.PRIVATE, true);
         internalGetKeyFunction.addParameter(param);
         internalGetKeyFunction.setBody(body);
         this.addFunction(internalGetKeyFunction);
