@@ -90,8 +90,13 @@ public abstract class Serializer {
                 ret += "\t" + v.getType() + " *" + v.getName() + ";\n";
             else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK)
                 ret += "\tmap_t " + v.getName() + ";\n";
-            else
-                ret += "\t" + v.getType() + " " + v.getName() + ";\n";
+            else {
+                if (v.getName().equals("generated_KMF_ID"))
+                    ret += "\t" + v.getType() + " " + v.getName() + "[9];\n";
+                else
+                    ret += "\t" + v.getType() + " " + v.getName() + ";\n";
+
+            }
         }
         return ret;
     }
@@ -168,6 +173,7 @@ public abstract class Serializer {
     private static String generateInitVT(Classifier cls) {
         String ret = "const\n";
         ret += "VT_" + cls.getName() + " vt_" + cls.getName() + " = {\n";
+        ret += "\t.super = &vt_" + cls.getSuperClass() + ",\n";
         ret += "};\n";
         return ret;
     }
@@ -178,8 +184,6 @@ public abstract class Serializer {
         ret += "\n";
         ret += generateBodyIncludes(cls);
         ret += generateDebug();
-        ret += "\n";
-        ret += generateInitVT(cls);
         ret += "\n";
         for (Function f : cls.getFunctions()) {
             if (f.isStatic())
@@ -201,6 +205,7 @@ public abstract class Serializer {
             ret += f.getBody();
             ret += "}\n\n";
         }
+        ret += generateInitVT(cls);
         return ret;
     }
 

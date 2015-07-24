@@ -54,7 +54,11 @@ public class Classifier {
 
     private void createAttributes(EClass cls) {
         for (EAttribute attr : cls.getEAttributes()) {
-            String t = ConverterDataTypes.getInstance().check_type(attr.getEAttributeType().getName());
+            String t;
+            if (attr.getName().equals("generated_KMF_ID"))
+                t = "char";
+            else
+                t = ConverterDataTypes.getInstance().check_type(attr.getEAttributeType().getName());
             this.addVariable(new Variable(attr.getName(), t, Variable.LinkType.PRIMITIVE, false));
         }
 
@@ -199,10 +203,12 @@ public class Classifier {
 
     private void createAttributesManipulationFunctions() {
         for (Variable v : this.getVariables()) {
-            this.generateAddFunction(v);
-            this.generateRemoveFunction(v);
-            if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK)
-                this.generateFindFunction(v);
+            if (!v.getName().equals("generated_KMF_ID")) {
+                this.generateAddFunction(v);
+                this.generateRemoveFunction(v);
+                if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK)
+                    this.generateFindFunction(v);
+            }
         }
     }
 
