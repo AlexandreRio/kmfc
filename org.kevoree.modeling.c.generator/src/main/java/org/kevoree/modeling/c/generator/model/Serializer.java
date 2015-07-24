@@ -163,6 +163,12 @@ public abstract class Serializer {
         return result.toString();
     }
 
+    private static String generateInitVT(Classifier cls) {
+        String ret = "const\n";
+        ret += "VT_" + cls.getName() + " vt_" + cls.getName() + " = {\n";
+        ret += "};\n";
+        return ret;
+    }
 
     private static String generateSourceFile(Classifier cls) {
         String ret = "";
@@ -170,6 +176,8 @@ public abstract class Serializer {
         ret += "\n";
         ret += generateBodyIncludes(cls);
         ret += generateDebug();
+        ret += "\n";
+        ret += generateInitVT(cls);
         ret += "\n";
         for (Function f : cls.getFunctions()) {
             if (f.isStatic())

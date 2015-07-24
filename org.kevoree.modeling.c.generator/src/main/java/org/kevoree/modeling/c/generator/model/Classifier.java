@@ -247,7 +247,7 @@ public class Classifier {
             }
         }
 
-        Function deleteFunction = new Function(deleteSignature, returnType, Visibility.IN_HEADER, true);
+        Function deleteFunction = new Function(deleteSignature, returnType, Visibility.PRIVATE, true);
         deleteFunction.addParameter(param);
         deleteFunction.setBody(deleteBody);
         this.addFunction(deleteFunction);
