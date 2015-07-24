@@ -23,8 +23,10 @@ public abstract class Serializer {
         ret += HelperGenerator.genInclude("string.h");
         ret += HelperGenerator.genInclude("stdio.h");
         ret += HelperGenerator.genIncludeLocal("hashmap");
-        if (linkedClass.contains("KMFContainer"))
+        if (!cls.getAllSuperClass().contains("KMFContainer"))
             ret += HelperGenerator.genIncludeLocal("KMFContainer");
+        for (String s : cls.getAllSuperClass())
+            ret += HelperGenerator.genIncludeLocal(s);
         ret += "\n";
 
         ret += HelperGenerator.genTypeDef(cls.getName());
