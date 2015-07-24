@@ -174,6 +174,9 @@ public abstract class Serializer {
         String ret = "const\n";
         ret += "VT_" + cls.getName() + " vt_" + cls.getName() + " = {\n";
         ret += "\t.super = &vt_" + cls.getSuperClass() + ",\n";
+        ret += "\t.metaClassName = " + cls.getName() + "_metaClassName,\n";
+        ret += "\t.internalGetKey = " + cls.getName() + "_internalGetKey,\n";
+        ret += "\t.delete = delete" + cls.getName() + ",\n";
         ret += "};\n";
         return ret;
     }
