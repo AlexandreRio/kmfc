@@ -203,6 +203,7 @@ public class Classifier {
 
     private void createAttributesManipulationFunctions() {
         for (Variable v : this.getVariables()) {
+            /** TODO add field on {@link Variable} to avoid ad hoc */
             if (!v.getName().equals("generated_KMF_ID")) {
                 this.generateAddFunction(v);
                 this.generateRemoveFunction(v);
