@@ -299,6 +299,8 @@ public class Classifier {
             Template method = TemplateManager.getInstance().getTp_getKey_TypeDefinition();
             method.merge(context, writer);
             body = writer.toString();
+        } else if (this.name.equals("Repository")) {
+            body = "\treturn this->url;\n";
         } else if (this.name.equals("NamedElement") || this.name.equals("DictionaryValue")) {
             body = "\treturn this->name;\n";
         } else if (this.superClass.equals("KMFContainer")) {
