@@ -17,29 +17,20 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * Created with IntelliJ IDEA.
- * User: jed
- * Date: 28/10/13
- * Time: 11:46
- * To change this templates use File | Settings | File Templates.
- */
 public class Generator {
 
     public static Map<String, Classifier> classifiers;
     private GenerationContext context;
-    private String folderName = "kevoree";
-    private File ecoreFile;
+    private File eCoreFile;
 
     public Generator(GenerationContext ctx) {
         this.context = ctx;
-        this.context.setName_package(folderName);
-        this.ecoreFile = ctx.getEcore();
+        this.eCoreFile = ctx.getECore();
         classifiers = new HashMap<String, Classifier>();
     }
 
     public void generateModel() throws Exception {
-        URI fileUri = URI.createFileURI(ecoreFile.getAbsolutePath());
+        URI fileUri = URI.createFileURI(eCoreFile.getAbsolutePath());
         Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("ecore", new EcoreResourceFactoryImpl());
         ResourceSetImpl rs = new ResourceSetImpl();
         XMIResource resource = (XMIResource) rs.createResource(fileUri);
@@ -66,4 +57,6 @@ public class Generator {
     }
 
 
+    public void generateEnvironmement() {
+    }
 }

@@ -220,13 +220,13 @@ public abstract class Serializer {
 
     public static void writeHeader(Classifier cls, GenerationContext ctx) throws IOException {
         String header = generateHeaderFile(cls);
-        FileManager.writeFile(ctx.getPackageGenerationDirectory() +
+        FileManager.writeFile(ctx.getGenerationDirectory() +
                 cls.getName() + ".h", header, false);
     }
 
     public static void writeSource(Classifier cls, GenerationContext ctx) throws IOException {
         String source = generateSourceFile(cls);
-        FileManager.writeFile(ctx.getPackageGenerationDirectory() +
+        FileManager.writeFile(ctx.getGenerationDirectory() +
                 cls.getName() + ".c", source, false);
     }
 }

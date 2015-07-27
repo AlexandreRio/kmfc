@@ -2,8 +2,9 @@ package org.kevoree.modeling.c.generator;
 
 import org.apache.commons.cli.*;
 
-
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 
 /**
@@ -63,12 +64,13 @@ public class App {
             Boolean debugmode = Boolean.parseBoolean(cmd.getOptionValue("t"));
 
 
+            //FIXME
             GenerationContext context = new GenerationContext();
-            context.setRootGenerationDirectory(path);
-            context.setEcore(ecore_file);
-            context.setDebug_model(false);
-            context.setVersion("1.3");
-            context.setVersionmicroframework("1.3");
+            context.setGenerationDirectory(path);
+            context.setECore(ecore_file);
+//            context.setDebug_model(false);
+//            context.setVersion("1.3");
+//            context.setVersionmicroframework("1.3");
 
 
             Generator gen = new Generator(context);

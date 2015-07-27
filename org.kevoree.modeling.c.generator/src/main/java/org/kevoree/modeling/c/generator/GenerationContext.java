@@ -2,88 +2,45 @@ package org.kevoree.modeling.c.generator;
 
 import java.io.File;
 
-/**
- * Created with IntelliJ IDEA.
- * User: jed
- * Date: 28/10/13
- * Time: 11:26
- * To change this templates use File | Settings | File Templates.
- */
 public class GenerationContext {
-    private String rootGenerationDirectory = "";
-    private File ecore=null;
-    private String name_package ="";
-    private String root ="";
+
+    private String root = "";
+    private File eCore = null;
+    private String generationDirectory = "";
+    private String framework = "";
+
     private boolean debug_model = false;
-    private String versionmicroframework = "";
 
-    private String version="";
-    public String getRootGenerationDirectory() {
-        return rootGenerationDirectory;
-    }
-
-    public void setRootGenerationDirectory(String rootGenerationDirectory) {
-
-        this.rootGenerationDirectory = rootGenerationDirectory;
-    }
-
-    public File getEcore() {
-        return ecore;
-    }
-
-    public void setEcore(String ecore) throws Exception {
-        if(!(new File(ecore)).exists()){
-
-            throw new Exception("The ecore file is empty");
-        }
-        this.ecore = new File(ecore);
-    }
-
-    public void setEcore(File ecore) {
-        this.ecore = ecore;
-    }
-
-    public String getName_package() {
-        return name_package;
-    }
-
-    public void setName_package(String name_package) {
-        this.name_package = name_package;
-    }
-
-    public String getVersionmicroframework() {
-        return versionmicroframework;
-    }
-
-    public void setVersionmicroframework(String versionmicroframework) {
-        this.versionmicroframework = versionmicroframework;
-    }
-
-    public String getRoot() {
-        return root;
-    }
+    private String versionMicroFramework = "";
+    private String version = "";
 
     public void setRoot(String root) {
         this.root = root;
     }
 
-    public boolean isDebug_model() {
-        return debug_model;
+    public File getECore() {
+        return this.eCore;
     }
 
-    public void setDebug_model(boolean debug_model) {
-        this.debug_model = debug_model;
+    public void setECore(String eCore) throws Exception {
+        if (!(new File(this.root + eCore)).exists())
+            throw new Exception("The eCore file is empty.");
+        this.eCore = new File(this.root + eCore);
     }
 
-    public String getPackageGenerationDirectory() {
-        return getRootGenerationDirectory()+File.separatorChar+getName_package()+File.separatorChar;
+    public String getFramework() {
+        return this.framework;
     }
 
-    public String getVersion() {
-        return version;
+    public void setFramework(String framework) {
+        this.framework = framework;
     }
 
-    public void setVersion(String version) {
-        this.version = version;
+    public String getGenerationDirectory() {
+        return this.root + this.generationDirectory;
+    }
+
+    public void setGenerationDirectory(String output) {
+        this.generationDirectory = output;
     }
 }
