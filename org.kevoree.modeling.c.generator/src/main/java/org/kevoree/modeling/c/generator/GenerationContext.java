@@ -40,8 +40,8 @@ public class GenerationContext {
         return this.framework;
     }
 
-    public String getGenerationDirectory() {
-        return this.generationDirectory.getAbsolutePath() + File.separator;
+    public File getGenerationDirectory() {
+        return this.generationDirectory;
     }
 
     public void setGenerationDirectory(String output) {

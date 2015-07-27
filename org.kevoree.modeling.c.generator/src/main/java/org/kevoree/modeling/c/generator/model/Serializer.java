@@ -8,6 +8,7 @@ import org.kevoree.modeling.c.generator.model.Function.Visibility;
 import org.kevoree.modeling.c.generator.utils.FileManager;
 import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Iterator;
@@ -220,13 +221,13 @@ public abstract class Serializer {
 
     public static void writeHeader(Classifier cls, GenerationContext ctx) throws IOException {
         String header = generateHeaderFile(cls);
-        FileManager.writeFile(ctx.getGenerationDirectory() +
+        FileManager.writeFile(ctx.getGenerationDirectory().getAbsolutePath() + File.separator +
                 cls.getName() + ".h", header, false);
     }
 
     public static void writeSource(Classifier cls, GenerationContext ctx) throws IOException {
         String source = generateSourceFile(cls);
-        FileManager.writeFile(ctx.getGenerationDirectory() +
+        FileManager.writeFile(ctx.getGenerationDirectory().getAbsolutePath() + File.separator +
                 cls.getName() + ".c", source, false);
     }
 }

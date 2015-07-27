@@ -13,6 +13,9 @@ import org.kevoree.modeling.c.generator.model.Serializer;
 import org.kevoree.modeling.c.generator.utils.CheckerConstraint;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -27,6 +30,23 @@ public class Generator {
         this.context = ctx;
         this.eCoreFile = ctx.getECore();
         classifiers = new HashMap<String, Classifier>();
+    }
+
+    private void delete(File f) throws IOException {
+        if (f.isDirectory()) {
+            for (File c : f.listFiles())
+                delete(c);
+        }
+        if (!f.delete())
+            throw new FileNotFoundException("Failed to delete file: " + f);
+    }
+
+    public void clean() {
+        try {
+            this.delete(this.context.getGenerationDirectory());
+        } catch (IOException e) {
+            System.err.println("error in clean");
+        }
     }
 
     public void generateModel() throws Exception {
@@ -56,10 +76,11 @@ public class Generator {
         }
     }
 
-    public void generateEnvironment() {
+    public void generateEnvironment() throws IOException {
+        File dest;
         for (File f : this.context.getFramework().listFiles()) {
-//            Files.copy(f.toPath(), this.context.getGenerationDirectory().toP)
-            System.out.println(f.getAbsolutePath());
+            dest = new File(this.context.getGenerationDirectory() + File.separator + f.getName());
+            Files.copy(f.toPath(), dest.toPath());
         }
     }
 }
