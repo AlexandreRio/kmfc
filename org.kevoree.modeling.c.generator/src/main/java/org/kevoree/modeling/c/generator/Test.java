@@ -12,12 +12,12 @@ public class Test {
         context.setRoot(root);
         context.setGenerationDirectory(output);
         context.setECore(eCore);
-        context.setFramework(framework);
+        context.setFrameworkDirectory(framework);
 //        context.setVersion("1.0");
 //        context.setVersionMicroFramework("1.3.2");
 
         Generator gen = new Generator(context);
         gen.generateModel();
-        gen.generateEnvironmement();
+        gen.generateEnvironment();
     }
 }

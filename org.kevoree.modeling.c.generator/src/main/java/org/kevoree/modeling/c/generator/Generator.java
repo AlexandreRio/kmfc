@@ -56,7 +56,10 @@ public class Generator {
         }
     }
 
-
-    public void generateEnvironmement() {
+    public void generateEnvironment() {
+        for (File f : this.context.getFramework().listFiles()) {
+//            Files.copy(f.toPath(), this.context.getGenerationDirectory().toP)
+            System.out.println(f.getAbsolutePath());
+        }
     }
 }
