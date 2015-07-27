@@ -15,7 +15,6 @@ import org.kevoree.modeling.c.generator.utils.CheckerConstraint;
 import org.kevoree.modeling.c.generator.utils.FileManager;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -35,18 +34,9 @@ public class Generator {
         classifiers = new HashMap<String, Classifier>();
     }
 
-    private void delete(File f) throws IOException {
-        if (f.isDirectory()) {
-            for (File c : f.listFiles())
-                delete(c);
-        }
-        if (!f.delete())
-            throw new FileNotFoundException("Failed to delete file: " + f);
-    }
-
     public void clean() {
         try {
-            this.delete(this.context.getGenerationDirectory());
+            FileManager.delete(this.context.getGenerationDirectory());
         } catch (IOException e) {
             System.err.println("Error while cleaning output directory: " + e.getMessage());
         }
@@ -87,6 +77,13 @@ public class Generator {
         }
     }
 
+    /**
+     * Generate a CMakeLists.txt file based on the meta-model and the hardcoded framework.
+     *
+     * @throws IOException
+     * @see Generator#classifiers
+     * @see GenerationContext#framework
+     */
     private void generateCMakeLists() throws IOException {
         String sourceList = "";
         for (String s : Generator.classifiers.keySet())

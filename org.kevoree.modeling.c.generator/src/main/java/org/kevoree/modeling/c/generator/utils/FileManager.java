@@ -189,21 +189,14 @@ public class FileManager {
         return toByteArray(tab);
     }
 
-
-    /* Utility fonctions */
-    public static void deleteOldFile(File folder) {
-        if (folder.isDirectory()) {
-            for (File f : folder.listFiles()) {
-                if (f.isFile()) {
-                    f.delete();
-                } else {
-                    deleteOldFile(f);
-                }
-            }
+    public static void delete(File f) throws IOException {
+        if (f.isDirectory()) {
+            for (File c : f.listFiles())
+                delete(c);
         }
-        folder.delete();
+        if (!f.delete())
+            throw new FileNotFoundException("Failed to delete file: " + f);
     }
-
 
     public static String copyFileFromStream(String inputFile, String path, String targetName) throws IOException {
         InputStream inputStream = FileManager.class.getClassLoader().getResourceAsStream(inputFile);
