@@ -3,8 +3,14 @@ project(kevoree-c-model)
 
 include_directories(.)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
+find_package(Check REQUIRED)
+include_directories(${CHECK_INCLUDE_DIRS})
+
 set(SRC ${source_list})
 set(CMAKE_CXX_FLAGS "-std=c11 -m32 -g -O0 ${CMAKE_CXX_FLAGS}")
-set(CMAKE_C_FLAGS "-std=c11 -w -m32 -g -D_BSD_SOURCE" ${CMAKE_C_FLAGS})
+set(CMAKE_C_FLAGS "-std=c11 -w -g -D_BSD_SOURCE" ${CMAKE_C_FLAGS})
+set(LIBS ${LIBS} ${CHECK_LIBRARIES})
 
 add_executable(main ${SRC})
+target_link_libraries(main ${LIBS} pthread)

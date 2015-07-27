@@ -69,11 +69,16 @@ public class Generator {
         }
     }
 
+    //TODO refactor me
     private void copyFramework() throws IOException {
         File dest;
         for (File f : this.context.getFramework().listFiles()) {
-            dest = new File(this.context.getGenerationDirectory() + File.separator + f.getName());
-            Files.copy(f.toPath(), dest.toPath());
+            if (f.isDirectory()) {
+                FileManager.copyDirectory(f, new File(this.context.getGenerationDirectory() + File.separator + f.getName()));
+            } else {
+                dest = new File(this.context.getGenerationDirectory() + File.separator + f.getName());
+                Files.copy(f.toPath(), dest.toPath());
+            }
         }
     }
 
