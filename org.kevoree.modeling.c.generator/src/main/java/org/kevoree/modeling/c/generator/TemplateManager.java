@@ -6,7 +6,6 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
 public class TemplateManager {
 
-    private static String BASE_DIR = "templates/";
     private static TemplateManager self;
     protected VelocityEngine ve = new VelocityEngine();
     /**
@@ -30,8 +29,10 @@ public class TemplateManager {
     private Template tp_print_debug;
 
     private TemplateManager() {
+        String BASE_DIR = "templates/";
         ve.setProperty("file.resource.loader.class", ClasspathResourceLoader.class.getName());
         ve.init();
+
         gen_method_add = ve.getTemplate(BASE_DIR + "add_method.vm");
         gen_method_add_unary_containment = ve.getTemplate(BASE_DIR + "add_unary_containment.vm");
         gen_method_remove = ve.getTemplate(BASE_DIR + "remove_method.vm");
@@ -41,6 +42,7 @@ public class TemplateManager {
         gen_method_new = ve.getTemplate(BASE_DIR + "new_method.vm");
         gen_find_by_id = ve.getTemplate(BASE_DIR + "findById_method.vm");
         gen_cmakelists = ve.getTemplate(BASE_DIR + "cmake.vm");
+
         tp_getKey_DeployUnit = ve.getTemplate(BASE_DIR + "internalGetKey_DeployUnit.vm");
         tp_getKey_TypeDefinition = ve.getTemplate(BASE_DIR + "internalGetKey_TypeDefinition.vm");
         tp_KMFContainer_fptr = ve.getTemplate(BASE_DIR + "kmfcontainer_fptr.vm");

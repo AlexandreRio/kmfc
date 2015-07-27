@@ -1,5 +1,6 @@
 package org.kevoree.modeling.c.generator;
 
+import org.apache.velocity.VelocityContext;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
@@ -11,10 +12,12 @@ import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
 import org.kevoree.modeling.c.generator.model.Classifier;
 import org.kevoree.modeling.c.generator.model.Serializer;
 import org.kevoree.modeling.c.generator.utils.CheckerConstraint;
+import org.kevoree.modeling.c.generator.utils.FileManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,7 +48,7 @@ public class Generator {
         try {
             this.delete(this.context.getGenerationDirectory());
         } catch (IOException e) {
-            System.err.println("error in clean");
+            System.err.println("Error while cleaning output directory: " + e.getMessage());
         }
     }
 
@@ -76,11 +79,36 @@ public class Generator {
         }
     }
 
-    public void generateEnvironment() throws IOException {
+    private void copyFramework() throws IOException {
         File dest;
         for (File f : this.context.getFramework().listFiles()) {
             dest = new File(this.context.getGenerationDirectory() + File.separator + f.getName());
             Files.copy(f.toPath(), dest.toPath());
+        }
+    }
+
+    private void generateCMakeLists() throws IOException {
+        String sourceList = "";
+        for (String s : Generator.classifiers.keySet())
+            sourceList += s + ".c ";
+        for (File f : this.context.getFramework().listFiles()) {
+            if (f.isFile() && f.getName().endsWith(".c"))
+                sourceList += f.getName() + " ";
+        }
+        VelocityContext context = new VelocityContext();
+        context.put("source_list", sourceList);
+        StringWriter result = new StringWriter();
+        TemplateManager.getInstance().getGen_cmakelists().merge(context, result);
+        FileManager.writeFile(this.context.getGenerationDirectory().getAbsolutePath() + File.separator +
+                "CMakeLists.txt", result.toString(), false);
+    }
+
+    public void generateEnvironment() {
+        try {
+            this.copyFramework();
+            this.generateCMakeLists();
+        } catch (IOException e) {
+            System.err.println("Error while generating environment: " + e.getMessage());
         }
     }
 }
