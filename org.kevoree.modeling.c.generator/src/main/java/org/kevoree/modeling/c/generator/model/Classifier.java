@@ -302,7 +302,7 @@ public class Classifier {
             Template method = TemplateManager.getInstance().getTp_getKey_DeployUnit();
             method.merge(context, writer);
             body = writer.toString();
-        } else if (this.name.equals("TypeDefinition")) {
+        } else if (this.name.equals("TypeDefinition") && this.containsVariable("version")) {
             Template method = TemplateManager.getInstance().getTp_getKey_TypeDefinition();
             method.merge(context, writer);
             body = writer.toString();
