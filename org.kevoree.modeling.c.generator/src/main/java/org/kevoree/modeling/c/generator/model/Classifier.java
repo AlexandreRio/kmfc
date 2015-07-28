@@ -290,6 +290,9 @@ public class Classifier {
         this.addFunction(initFunction);
     }
 
+    /**
+     * TODO should be easier to produce code based on attributes and not on class name
+     */
     private void createInternalGetKeyFunction() {
         VelocityContext context = new VelocityContext();
         StringWriter writer = new StringWriter();
@@ -308,7 +311,8 @@ public class Classifier {
             body = writer.toString();
         } else if (this.name.equals("Repository")) {
             body = "\treturn this->url;\n";
-        } else if (this.name.equals("NamedElement") || this.name.equals("DictionaryValue")) {
+        } else if (this.name.equals("NamedElement") ||
+                (this.name.equals("DictionaryValue") && this.containsVariable("name"))) {
             body = "\treturn this->name;\n";
         } else if (this.superClass.equals("KMFContainer")) {
             body = "\treturn this->generated_KMF_ID;\n";
