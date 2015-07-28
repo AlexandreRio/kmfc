@@ -1,6 +1,6 @@
 # KMFC
 
-Rewrite of a cpp code generator from kevoree metal-model.
+Rewrite of a cpp code generator from kevoree meta-model.
 Original write is by [Jean-Emile](https://github.com/Jean-Emile) and is located [here](https://github.com/kevoree/kmfcpp).
 
 ## Class generator
@@ -10,12 +10,13 @@ for further reading.
 
 ### Progress
 
-We still have to decide whether lots of code is necessary for a C implementation or not. This can lead to a massive refactoring.
-
-Initial project didn't have a proper coding style, lots of clean up to do.
+We currently produce a full structure of classes to store instance of models. This is being manually tested but will
+soon be tested at code generation.
 
 You can also see the project [Roadmap](ROADMAP.md).
 
 ## Manipulation library
 
-See `org.kevoree.modeling.cpp.microframework` for tools to manipulate the classes (still in cpp, so unusable).
+See `org.kevoree.modeling.c.generator/src/main/resources/hardcoded/` to see some "in action" usage.
+
+A real micro framework is still on its way.
