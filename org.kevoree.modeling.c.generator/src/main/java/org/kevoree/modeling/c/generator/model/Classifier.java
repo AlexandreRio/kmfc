@@ -353,6 +353,10 @@ public class Classifier {
         return superClass;
     }
 
+    public boolean isAbstract() {
+        return isAbstract;
+    }
+
     public List<String> getAllSuperClass() {
         return allSuperClass;
     }

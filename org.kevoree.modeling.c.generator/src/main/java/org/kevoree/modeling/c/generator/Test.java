@@ -17,7 +17,6 @@ public class Test {
 //        context.setVersionMicroFramework("1.3.2");
 
         Generator gen = new Generator(context);
-        gen.clean();
         gen.generateModel();
         gen.generateEnvironment();
     }

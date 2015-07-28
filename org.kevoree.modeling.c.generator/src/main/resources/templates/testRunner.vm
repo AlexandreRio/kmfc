@@ -1,0 +1,25 @@
+#foreach( $class in $classifiers )
+#[[#include "]]#$class.getName()#[[Test.h"]]#
+#end
+
+#[[#include ]]#<stdlib.h>
+#[[#include ]]#<check.h>
+
+int main(void)
+{
+  int number_failed;
+  SRunner *sr;
+
+#foreach( $class in $classifiers)
+  #if ($foreach.count == 1)
+sr = srunner_create($class.getName()#[[_suite());]]#
+#else
+srunner_add_suite(sr, $class.getName()#[[_suite());]]#
+#end
+#end
+
+  srunner_run_all(sr, CK_NORMAL);
+  number_failed = srunner_ntests_failed(sr);
+  srunner_free(sr);
+  return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+}

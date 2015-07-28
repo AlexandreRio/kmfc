@@ -16,7 +16,7 @@ import java.util.List;
 
 import static org.kevoree.modeling.c.generator.utils.HelperGenerator.genToLowerCaseFirstChar;
 
-public abstract class Serializer {
+public abstract class ClassSerializer {
 
     private static String generateHeaderIncludes(Classifier cls) {
         List<String> linkedClass = Classifier.getLinkedClassifier(cls);

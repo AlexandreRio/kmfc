@@ -20,6 +20,9 @@ public class TemplateManager {
     private Template gen_method_new;
     private Template gen_find_by_id;
     private Template gen_cmakelists;
+    private Template gen_test_runner;
+    private Template gen_test_header;
+    private Template gen_test_source;
     /**
      * Templates with no variables.
      */
@@ -42,6 +45,9 @@ public class TemplateManager {
         gen_method_new = ve.getTemplate(BASE_DIR + "new_method.vm");
         gen_find_by_id = ve.getTemplate(BASE_DIR + "findById_method.vm");
         gen_cmakelists = ve.getTemplate(BASE_DIR + "cmake.vm");
+        gen_test_runner = ve.getTemplate(BASE_DIR + "testRunner.vm");
+        gen_test_header = ve.getTemplate(BASE_DIR + "testHeader.vm");
+        gen_test_source = ve.getTemplate(BASE_DIR + "testSource.vm");
 
         tp_getKey_DeployUnit = ve.getTemplate(BASE_DIR + "internalGetKey_DeployUnit.vm");
         tp_getKey_TypeDefinition = ve.getTemplate(BASE_DIR + "internalGetKey_TypeDefinition.vm");
@@ -89,6 +95,18 @@ public class TemplateManager {
 
     public Template getGen_cmakelists() {
         return gen_cmakelists;
+    }
+
+    public Template getGen_test_runner() {
+        return gen_test_runner;
+    }
+
+    public Template getGen_test_header() {
+        return gen_test_header;
+    }
+
+    public Template getGen_test_source() {
+        return gen_test_source;
     }
 
     public Template getTp_getKey_DeployUnit() {

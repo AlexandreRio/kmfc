@@ -9,8 +9,9 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
+import org.kevoree.modeling.c.generator.model.ClassSerializer;
 import org.kevoree.modeling.c.generator.model.Classifier;
-import org.kevoree.modeling.c.generator.model.Serializer;
+import org.kevoree.modeling.c.generator.model.TestSerializer;
 import org.kevoree.modeling.c.generator.utils.CheckerConstraint;
 import org.kevoree.modeling.c.generator.utils.FileManager;
 
@@ -24,6 +25,9 @@ import java.util.Map;
 
 public class Generator {
 
+    /**
+     * List of all created Classifier, key is the name of the Classifier.
+     */
     public static Map<String, Classifier> classifiers;
     private GenerationContext context;
     private File eCoreFile;
@@ -32,9 +36,16 @@ public class Generator {
         this.context = ctx;
         this.eCoreFile = ctx.getECore();
         classifiers = new HashMap<String, Classifier>();
+
+        this.clean();
     }
 
-    public void clean() {
+    /**
+     * Delete all files under the output directory.
+     *
+     * @see GenerationContext#generationDirectory
+     */
+    private void clean() {
         try {
             FileManager.delete(this.context.getGenerationDirectory());
         } catch (IOException e) {
@@ -64,17 +75,17 @@ public class Generator {
         }
 
         for (Classifier c : classifiers.values()) {
-            Serializer.writeHeader(c, context);
-            Serializer.writeSource(c, context);
+            ClassSerializer.writeHeader(c, context);
+            ClassSerializer.writeSource(c, context);
         }
     }
 
-    //TODO refactor me
     private void copyFramework() throws IOException {
         File dest;
         for (File f : this.context.getFramework().listFiles()) {
             if (f.isDirectory()) {
-                FileManager.copyDirectory(f, new File(this.context.getGenerationDirectory() + File.separator + f.getName()));
+                FileManager.copyDirectory(f, new File(this.context.getGenerationDirectory() +
+                        File.separator + f.getName()));
             } else {
                 dest = new File(this.context.getGenerationDirectory() + File.separator + f.getName());
                 Files.copy(f.toPath(), dest.toPath());
@@ -90,9 +101,12 @@ public class Generator {
      * @see GenerationContext#framework
      */
     private void generateCMakeLists() throws IOException {
-        String sourceList = "";
-        for (String s : Generator.classifiers.keySet())
-            sourceList += s + ".c ";
+        String sourceList = "main.c ";
+        for (Classifier c : Generator.classifiers.values()) {
+            sourceList += c.getName() + ".c ";
+            if (!c.isAbstract())
+                sourceList += c.getName() + "Test.c ";
+        }
         for (File f : this.context.getFramework().listFiles()) {
             if (f.isFile() && f.getName().endsWith(".c"))
                 sourceList += f.getName() + " ";
@@ -105,10 +119,31 @@ public class Generator {
                 "CMakeLists.txt", result.toString(), false);
     }
 
+    private void generateTests() throws IOException {
+        Map<String, Classifier> concreteClass = new HashMap<String, Classifier>();
+        //generate test suites
+        for (Classifier c : Generator.classifiers.values()) {
+            if (!c.isAbstract()) {
+                concreteClass.put(c.getName(), c);
+                TestSerializer.writeHeader(c, context);
+                TestSerializer.writeSource(c, context);
+            }
+        }
+
+        //generate test runner
+        VelocityContext context = new VelocityContext();
+        context.put("classifiers", concreteClass);
+        StringWriter result = new StringWriter();
+        TemplateManager.getInstance().getGen_test_runner().merge(context, result);
+        FileManager.writeFile(this.context.getGenerationDirectory().getAbsolutePath() + File.separator +
+                "main.c", result.toString(), false);
+    }
+
     public void generateEnvironment() {
         try {
             this.copyFramework();
             this.generateCMakeLists();
+            this.generateTests();
         } catch (IOException e) {
             System.err.println("Error while generating environment: " + e.getMessage());
         }
