@@ -1,6 +1,9 @@
 #[[	if (this->internalKey == NULL) {
 		char* internalKey;
 
+		if (this->groupName == NULL|| this->hashcode == NULL|| this->name == NULL|| this->version == NULL)
+			return NULL;
+
 		internalKey = malloc(sizeof(char) * (strlen(this->groupName) + strlen("/") +
 				strlen(this->hashcode) + strlen("/") +
 				strlen(this->name) + strlen("/") +

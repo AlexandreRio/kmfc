@@ -1,5 +1,8 @@
 #[[	char* internalKey = NULL;
 
+    if (this->name == NULL|| this->version == NULL)
+        return NULL;
+
 	if (this->internalKey == NULL) {
 		internalKey = malloc(sizeof(char) * (strlen(this->name) + strlen("/") + strlen(this->version)) + 1);
 
