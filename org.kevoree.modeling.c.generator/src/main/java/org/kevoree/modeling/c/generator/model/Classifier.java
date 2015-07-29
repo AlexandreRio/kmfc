@@ -73,7 +73,7 @@ public class Classifier {
         }
 
         if (cls.getESuperTypes().size() == 1)
-            this.superClass = cls.getEAllSuperTypes().get(0).getName();
+            this.superClass = cls.getESuperTypes().get(0).getName();
         else if (cls.getEAllSuperTypes().size() == 0)
             this.superClass = "KMFContainer";
 
