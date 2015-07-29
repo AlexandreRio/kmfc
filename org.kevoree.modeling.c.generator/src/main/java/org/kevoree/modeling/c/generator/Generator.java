@@ -129,11 +129,6 @@ public class Generator {
         TemplateManager.getInstance().getGen_cmakelists().merge(context, result);
         FileManager.writeFile(this.context.getGenerationDirectory().getAbsolutePath() + File.separator +
                 "CMakeLists.txt", result.toString(), false);
-
-        System.out.println("debug");
-        System.out.println("source: " + sourceList);
-        System.out.println("test: " + testList);
-        System.out.println("main: " + mainFile);
     }
 
     private void generateTests() throws IOException {
