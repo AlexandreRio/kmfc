@@ -27,11 +27,22 @@ public class TestSerializer {
                 cls.getName() + "Test.h", header, false);
     }
 
-    private static Map generateTestSuite(Classifier cls) {
-        Map<String, String> ret = new HashMap<String, String>();
-        String code = "\t" + cls.getName() + " *o = new_" + cls.getName() + "();\n";
+    private static String metaClassNameTestSerializer(Classifier cls) {
+        String code = cls.getName() + " *o = new_" + cls.getName() + "();\n";
         code += "\tck_assert_str_eq(o->VT->metaClassName(o), \"" + cls.getName() + "\");";
-        ret.put("metaClassNameTest", code);
+        return code;
+    }
+
+    private static String internalGetKeyTestSerializer(Classifier cls) {
+        String code = cls.getName() + " *o = new_" + cls.getName() + "();\n";
+        code += "\tck_assert_str_ne(o->VT->internalGetKey(o), \"\");";
+        return code;
+    }
+
+    private static Map<String, String> generateTestSuite(Classifier cls) {
+        Map<String, String> ret = new HashMap<String, String>();
+        ret.put("metaClassNameTest", metaClassNameTestSerializer(cls));
+        ret.put("internalGetKeyTest", internalGetKeyTestSerializer(cls));
         return ret;
     }
 
