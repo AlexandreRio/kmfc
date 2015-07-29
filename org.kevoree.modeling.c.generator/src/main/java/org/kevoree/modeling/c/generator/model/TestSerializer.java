@@ -11,6 +11,9 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Serialize all the tests of a Classifier
+ */
 public class TestSerializer {
 
     private static String generateHeaderFile(Classifier cls) {
@@ -27,12 +30,26 @@ public class TestSerializer {
                 cls.getName() + "Test.h", header, false);
     }
 
+    /**
+     * Test if the metaClassName returns the name of the class.
+     *
+     * @param cls Classifier to test.
+     * @return C Unit test code.
+     */
     private static String metaClassNameTestSerializer(Classifier cls) {
         String code = cls.getName() + " *o = new_" + cls.getName() + "();\n";
         code += "\tck_assert_str_eq(o->VT->metaClassName(o), \"" + cls.getName() + "\");";
         return code;
     }
 
+    /**
+     * Test if the internalGetKey function returns a non empty string.
+     * Some mandatory attributes are set before the call since the only constructor
+     * available doesn't accept parameter.
+     *
+     * @param cls Classifier to test.
+     * @return C Unit test code.
+     */
     private static String internalGetKeyTestSerializer(Classifier cls) {
         String code = cls.getName() + " *o = new_" + cls.getName() + "();\n";
         /** Set some mandatory attributes */
@@ -48,10 +65,18 @@ public class TestSerializer {
         return code;
     }
 
+    /**
+     * Create a test suite for the given Classifier
+     *
+     * @param cls Classifier to test.
+     * @return Map the name of the test with its source code
+     */
     private static Map<String, String> generateTestSuite(Classifier cls) {
         Map<String, String> ret = new HashMap<String, String>();
         ret.put("metaClassNameTest", metaClassNameTestSerializer(cls));
         ret.put("internalGetKeyTest", internalGetKeyTestSerializer(cls));
+        // test self attributes set/get
+        // test inherited attributes set/get
         return ret;
     }
 

@@ -23,6 +23,13 @@ public class Classifier {
     private List<Variable> variables;
     private List<Function> functions;
 
+    /**
+     * Class representation
+     *
+     * @param name       Name of the class
+     * @param sClass     Direct super class
+     * @param isAbstract If the class is abstract
+     */
     public Classifier(String name, String sClass, boolean isAbstract) {
         this.name = name;
         this.superClass = sClass;
@@ -44,6 +51,15 @@ public class Classifier {
         return c;
     }
 
+    /**
+     * Create a list of all the Classifier this Classifier is linked to.
+     * This may be a super class or a link.
+     * A Classifier is unique is the link, even if the Classifier has 2 links to
+     * a specific Classifier.
+     *
+     * @param cls A classifier
+     * @return List of all the linked Classifier
+     */
     public static List<String> getLinkedClassifier(Classifier cls) {
         List<String> ret = new ArrayList<String>();
         ret.add(cls.getSuperClass());
@@ -338,9 +354,13 @@ public class Classifier {
 
     /**
      * Only to call after full parsing! Safe to call when serializing
+     * Check if the current Classifier contains a Variable with this given or if
+     * any super classes contains it.
      *
-     * @param name
-     * @return
+     * @see Variable
+     * @see #containsVariable(String)
+     * @param name Name of the Variable
+     * @return If the produced class will contain this Variable
      */
     public boolean inheritVariable(String name) {
         if (this.containsVariable(name))
