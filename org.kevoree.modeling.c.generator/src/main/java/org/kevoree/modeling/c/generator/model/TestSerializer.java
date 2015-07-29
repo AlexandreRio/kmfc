@@ -35,6 +35,14 @@ public class TestSerializer {
 
     private static String internalGetKeyTestSerializer(Classifier cls) {
         String code = cls.getName() + " *o = new_" + cls.getName() + "();\n";
+        /** Set some mandatory attributes */
+        if (cls.inheritVariable("name"))
+            code += "\to->name = \"some_name\";\n";
+        if (cls.inheritVariable("version"))
+            code += "\to->version = \"some_version\";\n";
+        if (cls.inheritVariable("url"))
+            code += "\to->url = \"some_url\";\n";
+
         code += "\tif (o->VT->internalGetKey(o) == NULL)\n\t\tck_abort();\n";
         code += "\tck_assert_str_ne(o->VT->internalGetKey(o), \"\");";
         return code;
