@@ -33,26 +33,31 @@ public class TemplateManager {
 
     private TemplateManager() {
         String BASE_DIR = "templates/";
+        String CODE_DIR = "code/";
+        String TEST_DIR = "test/";
+        String SOURCE_DIR = "source/";
+        String HEADER_DIR = "header/";
         ve.setProperty("file.resource.loader.class", ClasspathResourceLoader.class.getName());
         ve.init();
 
-        gen_method_add = ve.getTemplate(BASE_DIR + "add_method.vm");
-        gen_method_add_unary_containment = ve.getTemplate(BASE_DIR + "add_unary_containment.vm");
-        gen_method_remove = ve.getTemplate(BASE_DIR + "remove_method.vm");
-        gen_visitor = ve.getTemplate(BASE_DIR + "visitor.vm");
-        gen_visitor_ref = ve.getTemplate(BASE_DIR + "visitor_ref.vm");
-        gen_delete_ref = ve.getTemplate(BASE_DIR + "delete_ref.vm");
-        gen_method_new = ve.getTemplate(BASE_DIR + "new_method.vm");
-        gen_find_by_id = ve.getTemplate(BASE_DIR + "findById_method.vm");
+        //TODO refactor path, template structure and even names!
+        gen_method_add = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "add_method.vm");
+        gen_method_add_unary_containment = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "add_unary_containment.vm");
+        gen_method_remove = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "remove_method.vm");
+        gen_visitor = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "visitor.vm");
+        gen_visitor_ref = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "visitor_ref.vm");
+        gen_delete_ref = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "delete_ref.vm");
+        gen_method_new = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "new_method.vm");
+        gen_find_by_id = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "findById_method.vm");
         gen_cmakelists = ve.getTemplate(BASE_DIR + "cmake.vm");
-        gen_test_runner = ve.getTemplate(BASE_DIR + "testRunner.vm");
-        gen_test_header = ve.getTemplate(BASE_DIR + "testHeader.vm");
-        gen_test_source = ve.getTemplate(BASE_DIR + "testSource.vm");
+        gen_test_runner = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "testRunner.vm");
+        gen_test_header = ve.getTemplate(BASE_DIR + TEST_DIR + HEADER_DIR + "testHeader.vm");
+        gen_test_source = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "testSource.vm");
 
-        tp_getKey_DeployUnit = ve.getTemplate(BASE_DIR + "internalGetKey_DeployUnit.vm");
-        tp_getKey_TypeDefinition = ve.getTemplate(BASE_DIR + "internalGetKey_TypeDefinition.vm");
-        tp_KMFContainer_fptr = ve.getTemplate(BASE_DIR + "kmfcontainer_fptr.vm");
-        tp_print_debug = ve.getTemplate(BASE_DIR + "print_debug.vm");
+        tp_getKey_DeployUnit = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "internalGetKey_DeployUnit.vm");
+        tp_getKey_TypeDefinition = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "internalGetKey_TypeDefinition.vm");
+        tp_KMFContainer_fptr = ve.getTemplate(BASE_DIR + CODE_DIR + HEADER_DIR + "kmfcontainer_fptr.vm");
+        tp_print_debug = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "print_debug.vm");
     }
 
     public static TemplateManager getInstance() {
