@@ -8,9 +8,14 @@ find_package(Check REQUIRED)
 include_directories(${CHECK_INCLUDE_DIRS})
 
 set(SRC ${source_list})
+set(TEST_SRC ${test_list})
 set(CMAKE_CXX_FLAGS "-std=c11 -m32 -g -O0 ${CMAKE_CXX_FLAGS}")
 set(CMAKE_C_FLAGS "-std=c11 -w -g -D_BSD_SOURCE" ${CMAKE_C_FLAGS})
 set(LIBS ${LIBS} ${CHECK_LIBRARIES})
 
-add_executable(main ${SRC})
-target_link_libraries(main ${LIBS} pthread)
+add_executable(test_runner ${SRC} ${TEST_SRC} test_runner.c)
+target_link_libraries(test_runner ${LIBS} pthread)
+
+#foreach($main in $main_list)
+add_executable($main.replace(".c", "") ${SRC} $main)
+#end

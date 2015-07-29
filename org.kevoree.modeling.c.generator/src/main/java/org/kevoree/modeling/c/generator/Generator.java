@@ -19,9 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class Generator {
 
@@ -96,27 +94,46 @@ public class Generator {
     /**
      * Generate a CMakeLists.txt file based on the meta-model and the hardcoded framework.
      *
+     * Source file are stored in sourceList along with framework files, except main files.
+     * For every main files in the framework an executable is created.
+     *
+     * To be considered as a main file it has to be named main*.c
+     *
      * @throws IOException
      * @see Generator#classifiers
      * @see GenerationContext#framework
+     * @see TemplateManager#gen_cmakelists
      */
     private void generateCMakeLists() throws IOException {
-        String sourceList = "main.c ";
+        String sourceList = "";
+        String testList = "";
+        List<String> mainFile = new ArrayList<String>();
+
         for (Classifier c : Generator.classifiers.values()) {
             sourceList += c.getName() + ".c ";
             if (!c.isAbstract())
-                sourceList += c.getName() + "Test.c ";
+                testList += c.getName() + "Test.c ";
         }
         for (File f : this.context.getFramework().listFiles()) {
-            if (f.isFile() && f.getName().endsWith(".c"))
+            if (f.isFile() && f.getName().endsWith(".c") && !f.getName().startsWith("main"))
                 sourceList += f.getName() + " ";
+            else if (f.isFile() && f.getName().endsWith(".c") && f.getName().startsWith("main"))
+                mainFile.add(f.getName());
         }
+
         VelocityContext context = new VelocityContext();
         context.put("source_list", sourceList);
+        context.put("test_list", testList);
+        context.put("main_list", mainFile);
         StringWriter result = new StringWriter();
         TemplateManager.getInstance().getGen_cmakelists().merge(context, result);
         FileManager.writeFile(this.context.getGenerationDirectory().getAbsolutePath() + File.separator +
                 "CMakeLists.txt", result.toString(), false);
+
+        System.out.println("debug");
+        System.out.println("source: " + sourceList);
+        System.out.println("test: " + testList);
+        System.out.println("main: " + mainFile);
     }
 
     private void generateTests() throws IOException {
@@ -136,7 +153,7 @@ public class Generator {
         StringWriter result = new StringWriter();
         TemplateManager.getInstance().getGen_test_runner().merge(context, result);
         FileManager.writeFile(this.context.getGenerationDirectory().getAbsolutePath() + File.separator +
-                "main.c", result.toString(), false);
+                "test_runner.c", result.toString(), false);
     }
 
     public void generateEnvironment() {
