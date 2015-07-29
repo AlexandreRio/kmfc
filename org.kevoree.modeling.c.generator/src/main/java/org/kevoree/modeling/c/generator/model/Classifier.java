@@ -5,6 +5,7 @@ import org.apache.velocity.VelocityContext;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
+import org.kevoree.modeling.c.generator.Generator;
 import org.kevoree.modeling.c.generator.TemplateManager;
 import org.kevoree.modeling.c.generator.model.Function.Visibility;
 import org.kevoree.modeling.c.generator.utils.ConverterDataTypes;
@@ -222,6 +223,7 @@ public class Classifier {
             context.put("vtName", "vt_" + this.name);
             StringWriter result = new StringWriter();
             TemplateManager.getInstance().getGen_method_new().merge(context, result);
+
             Function f = new Function(newSignature, returnType, Visibility.IN_HEADER);
             f.setBody(result.toString());
             this.addFunction(f);
@@ -333,6 +335,22 @@ public class Classifier {
                 return true;
         return false;
     }
+
+    /**
+     * Only to call after full parsing! Safe to call when serializing
+     *
+     * @param name
+     * @return
+     */
+    public boolean inheritVariable(String name) {
+        if (this.containsVariable(name))
+            return true;
+        for (String s : this.allSuperClass)
+            if (!s.equals("KMFContainer") && Generator.classifiers.get(s).containsVariable(name))
+                return true;
+        return false;
+    }
+
     private void addVariable(Variable var) {
         this.variables.add(var);
     }
