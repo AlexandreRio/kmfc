@@ -6,26 +6,25 @@
 #foreach ($test in $testSuite.keySet())
 START_TEST ($test)
 {
-  $testSuite.get($test)
+	$testSuite.get($test)
 }
 END_TEST
 
 #end
-
 Suite* $name#[[_suite(void)]]#
 {
-  Suite *s;
-  TCase *tc_core;
+	Suite *s;
+	TCase *tc_core;
 
-  s = suite_create("$name");
+	s = suite_create("$name");
 
-  /* Core test case */
-  tc_core = tcase_create("Core");
+	/* Core test case */
+	tc_core = tcase_create("Core");
 
 #foreach( $test in $testSuite.keySet() )
-  tcase_add_test(tc_core, $test);
+	tcase_add_test(tc_core, $test);
 #end
-  suite_add_tcase(s, tc_core);
+	suite_add_tcase(s, tc_core);
 
-  return s;
+	return s;
 }
