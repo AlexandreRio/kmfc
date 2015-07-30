@@ -62,12 +62,23 @@ public class TestSerializer {
             code += "\to->version = \"some_version\";\n";
         if (cls.inheritVariable("url"))
             code += "\to->url = \"some_url\";\n";
+        if (cls.inheritVariable("groupName"))
+            code += "\to->groupName = \"some_group_name\";\n";
+        if (cls.inheritVariable("hashcode"))
+            code += "\to->hashcode = \"some_hashcode\";\n";
 
         code += "\tif (o->VT->internalGetKey(o) == NULL)\n\t\tck_abort();\n";
         code += "\tck_assert_str_ne(o->VT->internalGetKey(o), \"\");";
         return code;
     }
 
+    /**
+     * TODO refactor to test variable and loop over class and super class variable
+     * TODO refactor to setup and tear down
+     *
+     * @param cls
+     * @return
+     */
     private static Map<String, String> selfAttributeTestSerializer(Classifier cls) {
         Map<String, String> functions = new HashMap<String, String>();
         String funName;
@@ -77,7 +88,7 @@ public class TestSerializer {
 
                 Classifier c = Generator.classifiers.get(v.getType());
                 if (c != null && !c.isAbstract()) {
-                    funName = "remove" + v.getName() + "WhenSetManually";
+                    funName = "remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "WhenSetManually";
                     funCode = cls.getName() + "*o = new_" + cls.getName() + "();\n";
                     funCode += "\t" + v.getType() + " *ptr = new_" + v.getType() + "();\n";
                     funCode += "\to->" + v.getName() + " = ptr;\n";
@@ -87,7 +98,39 @@ public class TestSerializer {
                     funCode += "\tck_assert(o->" + v.getName() + " == NULL);";
                     functions.put(funName, funCode);
                 }
+
             } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
+                Classifier c = Generator.classifiers.get(v.getType());
+                if (c != null && !c.isAbstract()) {
+                    funName = "remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "AfterAdd";
+                    funCode = cls.getName() + "*o = new_" + cls.getName() + "();\n";
+                    if (cls.inheritVariable("name"))
+                        funCode += "\to->name = \"some_name\";\n";
+                    if (cls.inheritVariable("version"))
+                        funCode += "\to->version = \"some_version\";\n";
+                    if (cls.inheritVariable("url"))
+                        funCode += "\to->url = \"some_url\";\n";
+                    if (cls.inheritVariable("groupName"))
+                        funCode += "\to->groupName = \"some_group_name\";\n";
+                    if (cls.inheritVariable("hashcode"))
+                        funCode += "\to->hashcode = \"some_hashcode\";\n";
+                    funCode += "\t" + v.getType() + " *ptr = new_" + v.getType() + "();\n";
+                    if (c.inheritVariable("name"))
+                        funCode += "\tptr->name = \"some_name\";\n";
+                    if (c.inheritVariable("version"))
+                        funCode += "\tptr->version = \"some_version\";\n";
+                    if (c.inheritVariable("url"))
+                        funCode += "\tptr->url = \"some_url\";\n";
+                    if (c.inheritVariable("groupName"))
+                        funCode += "\tptr->groupName = \"some_group_name\";\n";
+                    if (c.inheritVariable("hashcode"))
+                        funCode += "\tptr->hashcode = \"some_hashcode\";\n";
+
+                    funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) +
+                            "Add" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "(o, ptr);\n";
+
+                    functions.put(funName, funCode);
+                }
 
             } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
                 if (v.getType().equals("char*")) {
@@ -102,6 +145,7 @@ public class TestSerializer {
                     funCode += "\tck_assert(o->" + v.getName() + " == NULL);";
                     functions.put(funName, funCode);
                 }
+
             }
         }
         return functions;
@@ -118,6 +162,7 @@ public class TestSerializer {
         ret.put("metaClassNameTest", metaClassNameTestSerializer(cls));
         ret.put("internalGetKeyTest", internalGetKeyTestSerializer(cls));
         Map<String, String> selfAttrTest = selfAttributeTestSerializer(cls);
+
         for (String fun : selfAttrTest.keySet())
             ret.put(fun, selfAttrTest.get(fun));
         // test inherited attributes set/get
