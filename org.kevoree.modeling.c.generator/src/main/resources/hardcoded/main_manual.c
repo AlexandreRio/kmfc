@@ -6,9 +6,9 @@
 
 int main(void)
 {
-    Group *g = new_Group();
-    ContainerNode *n = new_ContainerNode();
-    //print an error because nothing happen
-    g->VT->groupAddSubNodes(g, n);
-
+  Group *o = new_Group();
+  o->name = "some_name";
+  ContainerNode *ptr = new_ContainerNode();
+  ptr->name = "some_name";
+  o->VT->groupAddSubNodes(o, ptr);
 }
