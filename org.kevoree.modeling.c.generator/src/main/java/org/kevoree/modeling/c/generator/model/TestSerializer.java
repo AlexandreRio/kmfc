@@ -74,11 +74,6 @@ public class TestSerializer {
         String funCode;
         for (Variable v : cls.getVariables()) {
             if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
-                //actually this test nothing…
-                funName = "remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "WhenNotSet";
-                funCode = cls.getName() + "*o = new_" + cls.getName() + "();\n";
-                funCode += "\tck_assert(o->" + v.getName() + " == NULL);";
-                functions.put(funName, funCode);
 
                 Classifier c = Generator.classifiers.get(v.getType());
                 if (c != null && !c.isAbstract()) {
