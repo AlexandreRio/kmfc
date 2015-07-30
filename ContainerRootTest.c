@@ -3,23 +3,6 @@
 #include <stdlib.h>
 #include <check.h>
 
-START_TEST (metaClassTest)
-{
-  Group *g = new_Group();
-
-  ck_assert_str_eq(g->VT->metaClassName(g), "Group");
-}
-END_TEST
-
-START_TEST (nameTest)
-{
-  Group *g = new_Group();
-  g->name = "test";
-
-  ck_assert_str_eq(g->VT->internalGetKey(g), "test");
-}
-END_TEST
-
 START_TEST (findByIdTest)
 {
   ContainerRoot *r = new_ContainerRoot();
