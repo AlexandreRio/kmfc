@@ -45,6 +45,22 @@ public class TestSerializer {
         return code;
     }
 
+    private static String initObject(Classifier cls, String pointerName) {
+        String code = cls.getName() + " *" + pointerName + " = new_" + cls.getName() + "();\n";
+        /** Set some mandatory attributes */
+        if (cls.inheritVariable("name"))
+            code += "\t" + pointerName + "->name = \"some_name\";\n";
+        if (cls.inheritVariable("version"))
+            code += "\t" + pointerName + "->version = \"some_version\";\n";
+        if (cls.inheritVariable("url"))
+            code += "\t" + pointerName + " ->url = \"some_url\";\n";
+        if (cls.inheritVariable("groupName"))
+            code += "\t" + pointerName + " ->groupName = \"some_group_name\";\n";
+        if (cls.inheritVariable("hashcode"))
+            code += "\t" + pointerName + "->hashcode = \"some_hashcode\";\n";
+        return code;
+    }
+
     /**
      * Test if the internalGetKey function returns a non empty string.
      * Some mandatory attributes are set before the call since the only constructor
@@ -54,19 +70,7 @@ public class TestSerializer {
      * @return C Unit test code.
      */
     private static String internalGetKeyTestSerializer(Classifier cls) {
-        String code = cls.getName() + " *o = new_" + cls.getName() + "();\n";
-        /** Set some mandatory attributes */
-        if (cls.inheritVariable("name"))
-            code += "\to->name = \"some_name\";\n";
-        if (cls.inheritVariable("version"))
-            code += "\to->version = \"some_version\";\n";
-        if (cls.inheritVariable("url"))
-            code += "\to->url = \"some_url\";\n";
-        if (cls.inheritVariable("groupName"))
-            code += "\to->groupName = \"some_group_name\";\n";
-        if (cls.inheritVariable("hashcode"))
-            code += "\to->hashcode = \"some_hashcode\";\n";
-
+        String code = initObject(cls, "o");
         code += "\tif (o->VT->internalGetKey(o) == NULL)\n\t\tck_abort();\n";
         code += "\tck_assert_str_ne(o->VT->internalGetKey(o), \"\");";
         return code;
@@ -103,32 +107,10 @@ public class TestSerializer {
                 Classifier c = Generator.classifiers.get(v.getType());
                 if (c != null && !c.isAbstract()) {
                     funName = "remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "AfterAdd";
-                    funCode = cls.getName() + "*o = new_" + cls.getName() + "();\n";
-                    if (cls.inheritVariable("name"))
-                        funCode += "\to->name = \"some_name\";\n";
-                    if (cls.inheritVariable("version"))
-                        funCode += "\to->version = \"some_version\";\n";
-                    if (cls.inheritVariable("url"))
-                        funCode += "\to->url = \"some_url\";\n";
-                    if (cls.inheritVariable("groupName"))
-                        funCode += "\to->groupName = \"some_group_name\";\n";
-                    if (cls.inheritVariable("hashcode"))
-                        funCode += "\to->hashcode = \"some_hashcode\";\n";
-                    funCode += "\t" + v.getType() + " *ptr = new_" + v.getType() + "();\n";
-                    if (c.inheritVariable("name"))
-                        funCode += "\tptr->name = \"some_name\";\n";
-                    if (c.inheritVariable("version"))
-                        funCode += "\tptr->version = \"some_version\";\n";
-                    if (c.inheritVariable("url"))
-                        funCode += "\tptr->url = \"some_url\";\n";
-                    if (c.inheritVariable("groupName"))
-                        funCode += "\tptr->groupName = \"some_group_name\";\n";
-                    if (c.inheritVariable("hashcode"))
-                        funCode += "\tptr->hashcode = \"some_hashcode\";\n";
-
+                    funCode = initObject(cls, "o");
+                    funCode += initObject(c, "ptr");
                     funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) +
                             "Add" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "(o, ptr);\n";
-
                     functions.put(funName, funCode);
                 }
 
