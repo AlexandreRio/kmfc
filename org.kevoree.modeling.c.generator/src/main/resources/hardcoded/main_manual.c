@@ -1,5 +1,4 @@
 #include "Group.h"
-#include "ContainerNode.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -7,8 +6,10 @@
 int main(void)
 {
   Group *o = new_Group();
-  o->name = "some_name";
-  ContainerNode *ptr = new_ContainerNode();
-  ptr->name = "some_name";
-  o->VT->groupAddSubNodes(o, ptr);
+  char* str = "my_str";
+  o->internalKey = str;
+  printf("%s\n", o->internalKey);
+  printf("%p", o->VT->namedElementRemoveInternalKey);
+  //o->VT->namedElementRemoveInternalKey((NamedElement*)o, str);
+
 }
