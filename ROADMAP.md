@@ -11,6 +11,9 @@
 - [x] Generate meta class name implementation
 - [x] Generate correct and minimal includes in header files
 - [x] Generate correct and minimal includes in implementation
+- [x] Use an intermediate representation
+- [x] Generate CMakeLists.txt file
+- [ ] Produce setter and getter Unit Testing
 
 - [ ] Implement visitor design pattern
 - [ ] Implement serialization
