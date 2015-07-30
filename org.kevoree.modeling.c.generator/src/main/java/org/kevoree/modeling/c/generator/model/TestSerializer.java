@@ -19,7 +19,10 @@ import java.util.Map;
  */
 public class TestSerializer {
 
+    //TODO refactor, remove useless include
     private static String generateHeaderFile(Classifier cls) {
+        String header = "";
+        header += HelperGenerator.genIFDEF(cls.getName() + "_Test");
         VelocityContext context = new VelocityContext();
         StringWriter result = new StringWriter();
         context.put("name", cls.getName());
@@ -31,7 +34,9 @@ public class TestSerializer {
                         allLinkedClasses.add(ls);
         context.put("classes", allLinkedClasses);
         TemplateManager.getInstance().getGen_test_header().merge(context, result);
-        return result.toString();
+        header += result.toString();
+        header += HelperGenerator.genENDIF();
+        return header;
     }
 
     public static void writeHeader(Classifier cls, GenerationContext ctx) throws IOException {
