@@ -2,8 +2,10 @@ package org.kevoree.modeling.c.generator.model;
 
 import org.apache.velocity.VelocityContext;
 import org.kevoree.modeling.c.generator.GenerationContext;
+import org.kevoree.modeling.c.generator.Generator;
 import org.kevoree.modeling.c.generator.TemplateManager;
 import org.kevoree.modeling.c.generator.utils.FileManager;
+import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +22,7 @@ public class TestSerializer {
         VelocityContext context = new VelocityContext();
         StringWriter result = new StringWriter();
         context.put("name", cls.getName());
+        context.put("classes", Classifier.getLinkedClassifier(cls));
         TemplateManager.getInstance().getGen_test_header().merge(context, result);
         return result.toString();
     }
@@ -65,6 +68,50 @@ public class TestSerializer {
         return code;
     }
 
+    private static Map<String, String> selfAttributeTestSerializer(Classifier cls) {
+        Map<String, String> functions = new HashMap<String, String>();
+        String funName;
+        String funCode;
+        for (Variable v : cls.getVariables()) {
+            if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
+                //actually this test nothing…
+                funName = "remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "WhenNotSet";
+                funCode = cls.getName() + "*o = new_" + cls.getName() + "();\n";
+                funCode += "\tck_assert(o->" + v.getName() + " == NULL);";
+                functions.put(funName, funCode);
+
+                Classifier c = Generator.classifiers.get(v.getType());
+                if (c != null && !c.isAbstract()) {
+                    funName = "remove" + v.getName() + "WhenSetManually";
+                    funCode = cls.getName() + "*o = new_" + cls.getName() + "();\n";
+                    funCode += "\t" + v.getType() + " *ptr = new_" + v.getType() + "();\n";
+                    funCode += "\to->" + v.getName() + " = ptr;\n";
+                    funCode += "\tck_assert(o->" + v.getName() + " != NULL);\n";
+                    funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) +
+                            "Remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "(o, ptr);\n";
+                    funCode += "\tck_assert(o->" + v.getName() + " == NULL);";
+                    functions.put(funName, funCode);
+                }
+            } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
+
+            } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
+                if (v.getType().equals("char*")) {
+                    funName = "remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "WhenSetManually";
+                    funCode = cls.getName() + "*o = new_" + cls.getName() + "();\n";
+                    funCode += "\tck_assert(o->" + v.getName() + " == NULL);\n";
+                    funCode += "\tchar * str = \"my_str\";\n";
+                    funCode += "\to->" + v.getName() + " = str;\n";
+                    funCode += "\tck_assert(o->" + v.getName() + " != NULL);\n";
+                    funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) +
+                            "Remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "(o, str);\n";
+                    funCode += "\tck_assert(o->" + v.getName() + " == NULL);";
+                    functions.put(funName, funCode);
+                }
+            }
+        }
+        return functions;
+    }
+
     /**
      * Create a test suite for the given Classifier
      *
@@ -75,7 +122,9 @@ public class TestSerializer {
         Map<String, String> ret = new HashMap<String, String>();
         ret.put("metaClassNameTest", metaClassNameTestSerializer(cls));
         ret.put("internalGetKeyTest", internalGetKeyTestSerializer(cls));
-        // test self attributes set/get
+        Map<String, String> selfAttrTest = selfAttributeTestSerializer(cls);
+        for (String fun : selfAttrTest.keySet())
+            ret.put(fun, selfAttrTest.get(fun));
         // test inherited attributes set/get
         return ret;
     }

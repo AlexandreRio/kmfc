@@ -1,5 +1,9 @@
 #[[#include "]]#$name#[[.h"]]#
 
+#foreach ($linkedClass in $classes)
+#[[#include "]]#$linkedClass#[[.h"]]#
+#end
+
 #[[#include ]]#<check.h>
 
 #[[Suite* ]]#$name#[[_suite(void);]]#
