@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,7 +23,13 @@ public class TestSerializer {
         VelocityContext context = new VelocityContext();
         StringWriter result = new StringWriter();
         context.put("name", cls.getName());
-        context.put("classes", Classifier.getLinkedClassifier(cls));
+        List<String> allLinkedClasses = Classifier.getLinkedClassifier(cls);
+        for (String s : cls.getAllSuperClass())
+            if (!s.equals("KMFContainer"))
+                for (String ls : Classifier.getLinkedClassifier(Generator.classifiers.get(s)))
+                    if (!allLinkedClasses.contains(ls))
+                        allLinkedClasses.add(ls);
+        context.put("classes", allLinkedClasses);
         TemplateManager.getInstance().getGen_test_header().merge(context, result);
         return result.toString();
     }
@@ -79,7 +86,7 @@ public class TestSerializer {
     /**
      * TODO use template
      */
-    private static void variableTestSerializer(Classifier cls, Variable v, Map<String, String> functions) {
+    private static void variableTestSerializer(Classifier calledClass, Classifier variableClsass, Variable v, Map<String, String> functions) {
         if (v == null || functions == null)
             return;
 
@@ -90,11 +97,11 @@ public class TestSerializer {
             Classifier c = Generator.classifiers.get(v.getType());
             if (c != null && !c.isAbstract()) {
                 funName = "remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "WhenSetManually";
-                funCode = cls.getName() + "*o = new_" + cls.getName() + "();\n";
+                funCode = calledClass.getName() + "*o = new_" + calledClass.getName() + "();\n";
                 funCode += "\t" + v.getType() + " *ptr = new_" + v.getType() + "();\n";
                 funCode += "\to->" + v.getName() + " = ptr;\n";
                 funCode += "\tck_assert(o->" + v.getName() + " != NULL);\n";
-                funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) +
+                funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(variableClsass.getName()) +
                         "Remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "(o, ptr);\n";
                 funCode += "\tck_assert(o->" + v.getName() + " == NULL);";
                 functions.put(funName, funCode);
@@ -104,9 +111,9 @@ public class TestSerializer {
             Classifier c = Generator.classifiers.get(v.getType());
             if (c != null && !c.isAbstract()) {
                 funName = "remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "AfterAdd";
-                funCode = initObject(cls, "o");
+                funCode = initObject(calledClass, "o");
                 funCode += "\t" + initObject(c, "ptr");
-                funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) +
+                funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(variableClsass.getName()) +
                         "Add" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "(o, ptr);\n";
                 functions.put(funName, funCode);
             }
@@ -114,12 +121,12 @@ public class TestSerializer {
         } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
             if (v.getType().equals("char*")) {
                 funName = "remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "WhenSetManually";
-                funCode = cls.getName() + "*o = new_" + cls.getName() + "();\n";
+                funCode = calledClass.getName() + "*o = new_" + calledClass.getName() + "();\n";
                 funCode += "\tck_assert(o->" + v.getName() + " == NULL);\n";
                 funCode += "\tchar * str = \"my_str\";\n";
                 funCode += "\to->" + v.getName() + " = str;\n";
                 funCode += "\tck_assert(o->" + v.getName() + " != NULL);\n";
-                funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) +
+                funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(variableClsass.getName()) +
                         "Remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "(o, str);\n";
                 funCode += "\tck_assert(o->" + v.getName() + " == NULL);";
                 functions.put(funName, funCode);
@@ -132,12 +139,12 @@ public class TestSerializer {
         Map<String, String> functions = new HashMap<String, String>();
 
         for (Variable v : cls.getVariables()) {
-            variableTestSerializer(cls, v, functions);
+            variableTestSerializer(cls, cls, v, functions);
         }
         for (String s : cls.getAllSuperClass())
             if (!s.equals("KMFContainer"))
                 for (Variable v : Generator.classifiers.get(s).getVariables())
-                    variableTestSerializer(Generator.classifiers.get(s), v, functions);
+                    variableTestSerializer(cls, Generator.classifiers.get(s), v, functions);
         return functions;
     }
 
