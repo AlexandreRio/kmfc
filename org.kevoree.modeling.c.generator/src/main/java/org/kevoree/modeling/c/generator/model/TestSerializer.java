@@ -77,9 +77,7 @@ public class TestSerializer {
     }
 
     /**
-     *
-     * @param cls
-     * @return
+     * TODO use template
      */
     private static void variableTestSerializer(Classifier cls, Variable v, Map<String, String> functions) {
         if (v == null || functions == null)
@@ -107,7 +105,7 @@ public class TestSerializer {
             if (c != null && !c.isAbstract()) {
                 funName = "remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "AfterAdd";
                 funCode = initObject(cls, "o");
-                funCode += initObject(c, "ptr");
+                funCode += "\t" + initObject(c, "ptr");
                 funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(cls.getName()) +
                         "Add" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "(o, ptr);\n";
                 functions.put(funName, funCode);
@@ -139,7 +137,7 @@ public class TestSerializer {
         for (String s : cls.getAllSuperClass())
             if (!s.equals("KMFContainer"))
                 for (Variable v : Generator.classifiers.get(s).getVariables())
-                    variableTestSerializer(cls, v, functions);
+                    variableTestSerializer(Generator.classifiers.get(s), v, functions);
         return functions;
     }
 
