@@ -208,13 +208,15 @@ public abstract class ClassSerializer {
     }
 
     public static void writeHeader(Classifier cls, GenerationContext ctx) throws IOException {
-        String header = generateHeaderFile(cls);
+        String header = TemplateManager.getInstance().getLicense();
+        header += generateHeaderFile(cls);
         FileManager.writeFile(ctx.getGenerationDirectory().getAbsolutePath() + File.separator +
                 cls.getName() + ".h", header, false);
     }
 
     public static void writeSource(Classifier cls, GenerationContext ctx) throws IOException {
-        String source = generateSourceFile(cls);
+        String source = TemplateManager.getInstance().getLicense();
+        source += generateSourceFile(cls);
         FileManager.writeFile(ctx.getGenerationDirectory().getAbsolutePath() + File.separator +
                 cls.getName() + ".c", source, false);
     }

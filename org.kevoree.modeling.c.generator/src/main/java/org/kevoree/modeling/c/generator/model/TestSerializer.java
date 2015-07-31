@@ -43,7 +43,8 @@ public class TestSerializer {
     }
 
     public static void writeHeader(Classifier cls, GenerationContext ctx) throws IOException {
-        String header = generateHeaderFile(cls);
+        String header = TemplateManager.getInstance().getLicense();
+        header += generateHeaderFile(cls);
         FileManager.writeFile(ctx.getGenerationDirectory().getAbsolutePath() + File.separator +
                 cls.getName() + "Test.h", header, false);
     }
@@ -199,7 +200,8 @@ public class TestSerializer {
     }
 
     public static void writeSource(Classifier cls, GenerationContext ctx) throws IOException {
-        String source = generateSourceFile(cls);
+        String source = TemplateManager.getInstance().getLicense();
+        source += generateSourceFile(cls);
         FileManager.writeFile(ctx.getGenerationDirectory().getAbsolutePath() + File.separator +
                 cls.getName() + "Test.c", source, false);
     }
