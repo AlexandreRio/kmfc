@@ -166,6 +166,7 @@ public abstract class ClassSerializer {
         ret += "\t.metaClassName = " + cls.getName() + "_metaClassName,\n";
         ret += "\t.internalGetKey = " + cls.getName() + "_internalGetKey,\n";
         ret += "\t.delete = delete" + cls.getName() + ",\n";
+        //TODO for inherited functions set the fptr properly
         for (Function f : cls.getFunctions()) {
             if (f.getVisibilityType() == Visibility.IN_VT) {
                 ret += "\t." + lowerCaseFirstChar(f.getSignature()) + " = "
