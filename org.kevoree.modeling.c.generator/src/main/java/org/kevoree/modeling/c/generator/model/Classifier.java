@@ -136,7 +136,7 @@ public class Classifier {
             else
                 context.put("iscontained", "ptr->eContainer = this;");
 
-            TemplateManager.getInstance().getGen_method_add().merge(context, result);
+            TemplateManager.getInstance().getGen_add().merge(context, result);
             addBody = result.toString();
         } else {
             if (v.isContained()) { // if it's a container
@@ -144,7 +144,7 @@ public class Classifier {
                 context.put("refname", v.getName());
                 context.put("name", HelperGenerator.genToLowerCaseFirstChar(this.name));
                 context.put("methname", HelperGenerator.genToUpperCaseFirstChar(v.getName()));
-                TemplateManager.getInstance().getGen_method_add_unary_containment().merge(context, result);
+                TemplateManager.getInstance().getGen_add_unary_containment().merge(context, result);
                 addBody = result.toString();
             } else {
                 addBody = "\tthis->" + v.getName() + " = ptr;\n";
@@ -181,7 +181,7 @@ public class Classifier {
             else
                 context.put("iscontained", "");
 
-            TemplateManager.getInstance().getGen_method_remove().merge(context, result);
+            TemplateManager.getInstance().getGen_remove().merge(context, result);
             removeBody = result.toString();
         } else {
             removeBody = "\tthis->" + v.getName() + " = NULL;\n";
@@ -238,7 +238,7 @@ public class Classifier {
             context.put("classname", this.name);
             context.put("vtName", "vt_" + this.name);
             StringWriter result = new StringWriter();
-            TemplateManager.getInstance().getGen_method_new().merge(context, result);
+            TemplateManager.getInstance().getGen_new().merge(context, result);
 
             Function f = new Function(newSignature, returnType, Visibility.IN_HEADER);
             f.setBody(result.toString());
@@ -265,7 +265,7 @@ public class Classifier {
                 else
                     context.put("iscontained", "");
 
-                TemplateManager.getInstance().getGen_delete_ref().merge(context, result);
+                TemplateManager.getInstance().getGen_delete().merge(context, result);
                 deleteBody += result.toString();
             }
         }

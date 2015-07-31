@@ -11,15 +11,15 @@ public class TemplateManager {
     /**
      * Templates with variables.
      */
-    private Template gen_method_add;
-    private Template gen_method_add_unary_containment;
-    private Template gen_method_remove;
+    private Template gen_cmakelists;
+    private Template gen_add;
+    private Template gen_add_unary_containment;
+    private Template gen_remove;
     private Template gen_visitor;
     private Template gen_visitor_ref;
-    private Template gen_delete_ref;
-    private Template gen_method_new;
+    private Template gen_delete;
+    private Template gen_new;
     private Template gen_find_by_id;
-    private Template gen_cmakelists;
     private Template gen_test_runner;
     private Template gen_test_header;
     private Template gen_test_source;
@@ -40,16 +40,15 @@ public class TemplateManager {
         ve.setProperty("file.resource.loader.class", ClasspathResourceLoader.class.getName());
         ve.init();
 
-        //TODO refactor path, template structure and even names!
-        gen_method_add = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "add_method.vm");
-        gen_method_add_unary_containment = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "add_unary_containment.vm");
-        gen_method_remove = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "remove_method.vm");
+        gen_cmakelists = ve.getTemplate(BASE_DIR + "cmake.vm");
+        gen_add = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "add.vm");
+        gen_add_unary_containment = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "add_unary_containment.vm");
+        gen_remove = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "remove.vm");
         gen_visitor = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "visitor.vm");
         gen_visitor_ref = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "visitor_ref.vm");
-        gen_delete_ref = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "delete_ref.vm");
-        gen_method_new = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "new_method.vm");
-        gen_find_by_id = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "findById_method.vm");
-        gen_cmakelists = ve.getTemplate(BASE_DIR + "cmake.vm");
+        gen_delete = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "delete.vm");
+        gen_new = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "new.vm");
+        gen_find_by_id = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "findById.vm");
         gen_test_runner = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "testRunner.vm");
         gen_test_header = ve.getTemplate(BASE_DIR + TEST_DIR + HEADER_DIR + "testHeader.vm");
         gen_test_source = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "testSource.vm");
@@ -66,16 +65,16 @@ public class TemplateManager {
         return self;
     }
 
-    public Template getGen_method_add() {
-        return gen_method_add;
+    public Template getGen_add() {
+        return gen_add;
     }
 
-    public Template getGen_method_add_unary_containment() {
-        return gen_method_add_unary_containment;
+    public Template getGen_add_unary_containment() {
+        return gen_add_unary_containment;
     }
 
-    public Template getGen_method_remove() {
-        return gen_method_remove;
+    public Template getGen_remove() {
+        return gen_remove;
     }
 
     public Template getGen_visitor() {
@@ -86,12 +85,12 @@ public class TemplateManager {
         return gen_visitor_ref;
     }
 
-    public Template getGen_delete_ref() {
-        return gen_delete_ref;
+    public Template getGen_delete() {
+        return gen_delete;
     }
 
-    public Template getGen_method_new() {
-        return gen_method_new;
+    public Template getGen_new() {
+        return gen_new;
     }
 
     public Template getGen_find_by_id() {
