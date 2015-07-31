@@ -300,6 +300,7 @@ public class Classifier {
             if (!v.getName().equals("generated_KMF_ID"))
                 initBody += "\tthis->" + v.getName() + " = " + HelperGenerator.
                         genDefaultValue(v.getType()) + ";\n";
+
         Parameter p = new Parameter(this.name + "*", "this");
         Function initFunction = new Function(initSignature, returnType, Visibility.IN_HEADER);
         initFunction.addParameter(p);
@@ -307,32 +308,26 @@ public class Classifier {
         this.addFunction(initFunction);
     }
 
-    /**
-     * TODO should be easier to produce code based on attributes and not on class name
-     */
     private void createInternalGetKeyFunction() {
-        VelocityContext context = new VelocityContext();
-        StringWriter writer = new StringWriter();
         String internalGetKeySignature = this.name + "_internalGetKey";
         String returnType = "char*";
         Parameter param = new Parameter(this.name + "*", "this", true);
 
         String body;
-        if (this.name.equals("DeployUnit")) {
+        if (this.name.equals("DeployUnit"))
             body = TemplateManager.getInstance().getGetKey_DeployUnit();
-        } else if (this.name.equals("TypeDefinition") && this.containsVariable("version")) {
+        else if (this.name.equals("TypeDefinition") && this.containsVariable("version"))
             body = TemplateManager.getInstance().getGetKey_TypeDefinition();
-        } else if (this.name.equals("Repository")) {
+        else if (this.name.equals("Repository"))
             body = "\treturn this->url;\n";
-        } else if (this.name.equals("NamedElement") ||
-                (this.name.equals("DictionaryValue") && this.containsVariable("name"))) {
+        else if (this.name.equals("NamedElement") ||
+                (this.name.equals("DictionaryValue") && this.containsVariable("name")))
             body = "\treturn this->name;\n";
-        } else if (this.superClass.equals("KMFContainer")) {
+        else if (this.superClass.equals("KMFContainer"))
             body = "\treturn this->generated_KMF_ID;\n";
-        } else { // in all other cases we inherit from NamedElement
+        else  // in all other cases we inherit from NamedElement
             body = "\treturn vt_" + this.superClass + ".internalGetKey((" +
                     this.superClass + "*)this);\n";
-        }
 
         Function internalGetKeyFunction = new Function(internalGetKeySignature, returnType, Visibility.PRIVATE, true);
         internalGetKeyFunction.addParameter(param);
@@ -352,10 +347,10 @@ public class Classifier {
      * Check if the current Classifier contains a Variable with this given or if
      * any super classes contains it.
      *
-     * @see Variable
-     * @see #containsVariable(String)
      * @param name Name of the Variable
      * @return If the produced class will contain this Variable
+     * @see Variable
+     * @see #containsVariable(String)
      */
     public boolean inheritVariable(String name) {
         if (this.containsVariable(name))
