@@ -1,6 +1,5 @@
 package org.kevoree.modeling.c.generator.model;
 
-import org.apache.velocity.VelocityContext;
 import org.kevoree.modeling.c.generator.GenerationContext;
 import org.kevoree.modeling.c.generator.Generator;
 import org.kevoree.modeling.c.generator.TemplateManager;
@@ -10,7 +9,6 @@ import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
 
@@ -61,10 +59,7 @@ public abstract class ClassSerializer {
         ret += "\tVT_" + cls.getSuperClass() + " *super;\n";
         for (String sClass : cls.getAllSuperClass()) {
             if (sClass.equals("KMFContainer")) {
-                VelocityContext context = new VelocityContext();
-                StringWriter result = new StringWriter();
-                TemplateManager.getInstance().getTp_KMFContainer_fptr().merge(context, result);
-                ret += result.toString();
+                ret += TemplateManager.getInstance().getKMFContainer_fptr();
             } else {
                 ret += "\t/*" + sClass + "*/\n";
                 for (Function f : Generator.classifiers.get(sClass).getFunctions()) {
@@ -164,13 +159,6 @@ public abstract class ClassSerializer {
         return ret;
     }
 
-    private static String generateDebug() {
-        VelocityContext context = new VelocityContext();
-        StringWriter result = new StringWriter();
-        TemplateManager.getInstance().getTp_print_debug().merge(context, result);
-        return result.toString();
-    }
-
     private static String generateInitVT(Classifier cls) {
         String ret = "const\n";
         ret += "VT_" + cls.getName() + " vt_" + cls.getName() + " = {\n";
@@ -193,7 +181,7 @@ public abstract class ClassSerializer {
         ret += HelperGenerator.genIncludeLocal(cls.getName());
         ret += "\n";
         ret += generateBodyIncludes(cls);
-        ret += generateDebug();
+        ret += TemplateManager.getInstance().getPrint_debug();
         ret += "\n";
         for (Function f : cls.getFunctions()) {
             if (f.isStatic())

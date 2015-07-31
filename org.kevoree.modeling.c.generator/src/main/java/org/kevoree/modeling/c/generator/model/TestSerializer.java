@@ -60,6 +60,14 @@ public class TestSerializer {
         return code;
     }
 
+    /**
+     * Generate the creation of the object and the initialization of its mandatory attributes.
+     * Mandatory attributes are handwritten and do not depend of any {@link Variable} attributes.
+     *
+     * @param cls         Classifier to test.
+     * @param pointerName Name of the pointer referring to the object.
+     * @return Source code of the initialization.
+     */
     private static String initObject(Classifier cls, String pointerName) {
         String code = cls.getName() + " *" + pointerName + " = new_" + cls.getName() + "();\n";
         /** Set some mandatory attributes */

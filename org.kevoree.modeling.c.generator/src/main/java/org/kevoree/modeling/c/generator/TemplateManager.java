@@ -1,14 +1,17 @@
 package org.kevoree.modeling.c.generator;
 
 import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+
+import java.io.StringWriter;
 
 public class TemplateManager {
 
     private static TemplateManager self;
     protected VelocityEngine ve = new VelocityEngine();
-    /**
+    /*
      * Templates with variables.
      */
     private Template gen_cmakelists;
@@ -26,13 +29,15 @@ public class TemplateManager {
     private Template gen_test_remove_primitive;
     private Template gen_test_remove_unary;
     private Template gen_test_remove_multiple;
-    /**
-     * Templates with no variables.
+    /*
+     * string from static template, i.e. with no variables
+     * or variables determined before parsing any files.
      */
-    private Template tp_getKey_DeployUnit;
-    private Template tp_getKey_TypeDefinition;
-    private Template tp_KMFContainer_fptr;
-    private Template tp_print_debug;
+    private String getKey_DeployUnit;
+    private String getKey_TypeDefinition;
+    private String KMFContainer_fptr;
+    private String print_debug;
+    private String license;
 
     private TemplateManager() {
         String BASE_DIR = "templates/";
@@ -59,10 +64,23 @@ public class TemplateManager {
         gen_test_remove_unary = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "remove/removeUnary.vm");
         gen_test_remove_multiple = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "remove/removeMultiple.vm");
 
-        tp_getKey_DeployUnit = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "internalGetKey_DeployUnit.vm");
-        tp_getKey_TypeDefinition = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "internalGetKey_TypeDefinition.vm");
-        tp_KMFContainer_fptr = ve.getTemplate(BASE_DIR + CODE_DIR + HEADER_DIR + "kmfcontainer_fptr.vm");
-        tp_print_debug = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "print_debug.vm");
+        VelocityContext context = new VelocityContext();
+        StringWriter result = new StringWriter();
+        ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "internalGetKey_DeployUnit.vm").merge(context, result);
+        getKey_DeployUnit = result.toString();
+        result = new StringWriter();
+        ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "internalGetKey_TypeDefinition.vm").merge(context, result);
+        getKey_TypeDefinition = result.toString();
+        result = new StringWriter();
+        ve.getTemplate(BASE_DIR + CODE_DIR + HEADER_DIR + "kmfcontainer_fptr.vm").merge(context, result);
+        KMFContainer_fptr = result.toString();
+        result = new StringWriter();
+        ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "print_debug.vm").merge(context, result);
+        print_debug = result.toString();
+        result = new StringWriter();
+        context.put("project", "KMC");
+        ve.getTemplate(BASE_DIR + "LICENSE.vm").merge(context, result);
+        license = result.toString();
     }
 
     public static TemplateManager getInstance() {
@@ -119,20 +137,24 @@ public class TemplateManager {
         return gen_test_source;
     }
 
-    public Template getTp_getKey_DeployUnit() {
-        return tp_getKey_DeployUnit;
+    public String getGetKey_DeployUnit() {
+        return getKey_DeployUnit;
     }
 
-    public Template getTp_getKey_TypeDefinition() {
-        return tp_getKey_TypeDefinition;
+    public String getGetKey_TypeDefinition() {
+        return getKey_TypeDefinition;
     }
 
-    public Template getTp_KMFContainer_fptr() {
-        return tp_KMFContainer_fptr;
+    public String getKMFContainer_fptr() {
+        return KMFContainer_fptr;
     }
 
-    public Template getTp_print_debug() {
-        return tp_print_debug;
+    public String getPrint_debug() {
+        return print_debug;
+    }
+
+    public String getLicense() {
+        return license;
     }
 
     public Template getGen_test_remove_primitive() {

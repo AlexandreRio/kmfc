@@ -3,6 +3,10 @@ package org.kevoree.modeling.c.generator.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data structure in the intermediate representation of the compiler that represents a Function with its signature
+ * its body, its parameters, its return type and some other attributes.
+ */
 public class Function {
     /**
      * Return type, name and other attributes, like const.

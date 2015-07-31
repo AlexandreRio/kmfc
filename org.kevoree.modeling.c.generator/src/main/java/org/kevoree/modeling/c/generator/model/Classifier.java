@@ -1,6 +1,5 @@
 package org.kevoree.modeling.c.generator.model;
 
-import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
@@ -320,13 +319,9 @@ public class Classifier {
 
         String body;
         if (this.name.equals("DeployUnit")) {
-            Template method = TemplateManager.getInstance().getTp_getKey_DeployUnit();
-            method.merge(context, writer);
-            body = writer.toString();
+            body = TemplateManager.getInstance().getGetKey_DeployUnit();
         } else if (this.name.equals("TypeDefinition") && this.containsVariable("version")) {
-            Template method = TemplateManager.getInstance().getTp_getKey_TypeDefinition();
-            method.merge(context, writer);
-            body = writer.toString();
+            body = TemplateManager.getInstance().getGetKey_TypeDefinition();
         } else if (this.name.equals("Repository")) {
             body = "\treturn this->url;\n";
         } else if (this.name.equals("NamedElement") ||
