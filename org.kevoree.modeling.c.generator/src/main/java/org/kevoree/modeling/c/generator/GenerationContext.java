@@ -4,7 +4,6 @@ import java.io.File;
 
 public class GenerationContext {
 
-    private String root = "";
     private File eCore = null;
     private File generationDirectory = null;
     private File framework = null;
@@ -14,26 +13,20 @@ public class GenerationContext {
     private String versionMicroFramework = "";
     private String version = "";
 
-    public void setRoot(String root) throws Exception {
-        if (!(new File(this.root + root)).isDirectory())
-            throw new Exception("The root directory does not exist.");
-        this.root = root;
-    }
-
     public File getECore() {
         return this.eCore;
     }
 
     public void setECore(String eCore) throws Exception {
-        if (!(new File(this.root + eCore)).exists())
-            throw new Exception("The eCore file is empty.");
-        this.eCore = new File(this.root + eCore);
+        if (!(new File(eCore)).exists())
+            throw new Exception("The eCore file does not exist.");
+        this.eCore = new File(eCore);
     }
 
     public void setFrameworkDirectory(String framework) throws Exception {
-        if (!(new File(this.root + framework)).isDirectory())
+        if (!(new File(framework)).isDirectory())
             throw new Exception("The framework directory does not exist.");
-        this.framework = new File(this.root + framework);
+        this.framework = new File(framework);
     }
 
     public File getFramework() {
@@ -45,7 +38,7 @@ public class GenerationContext {
     }
 
     public void setGenerationDirectory(String output) {
-        this.generationDirectory = new File(this.root + output);
+        this.generationDirectory = new File(output);
         if (!this.generationDirectory.isDirectory())
             this.generationDirectory.mkdir();
     }

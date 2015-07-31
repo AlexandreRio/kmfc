@@ -4,12 +4,11 @@ public class Test {
 
     public static void main(String args[]) throws Exception {
         String root = "/home/ario/IRISA/kmfc/";
-        String eCore = "org.kevoree.modeling.c.generator/src/main/resources/metamodel/kevoree.ecore";
-        String framework = "org.kevoree.modeling.c.generator/src/main/resources/hardcoded/";
-        String output = "kevoree/";
+        String eCore = root + "org.kevoree.modeling.c.generator/src/main/resources/metamodel/kevoree.ecore";
+        String framework = root + "org.kevoree.modeling.c.generator/src/main/resources/hardcoded/";
+        String output = root + "kevoree/";
 
         GenerationContext context = new GenerationContext();
-        context.setRoot(root);
         context.setGenerationDirectory(output);
         context.setECore(eCore);
         context.setFrameworkDirectory(framework);

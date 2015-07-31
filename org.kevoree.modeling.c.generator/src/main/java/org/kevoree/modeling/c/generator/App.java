@@ -2,7 +2,6 @@ package org.kevoree.modeling.c.generator;
 
 import org.apache.commons.cli.*;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -26,15 +25,22 @@ public class App {
                 .withArgName("file")
                 .hasArg()
                 .isRequired()
-                .withDescription("ecore file")
+                .withDescription("eCore file")
                 .withLongOpt("input")
                 .create("i"));
+        options.addOption(OptionBuilder
+                .withArgName("framework")
+                .hasArg()
+                .isRequired()
+                .withDescription("Framework directory")
+                .withLongOpt("framework")
+                .create("f"));
         options.addOption(OptionBuilder
                 .withArgName("directory")
                 .hasArg()
                 .isRequired()
                 .withDescription("Root Generation Directory")
-                .withLongOpt("input")
+                .withLongOpt("root")
                 .create("t"));
 
         options.addOption(OptionBuilder
@@ -46,36 +52,31 @@ public class App {
 
 
         try {
-
             CommandLineParser parser = new GnuParser();
             CommandLine cmd = parser.parse(options, args);
-
 
             //     InputStream ecorefile = new FileInputStream(cmd.getOptionValue("i"));
 
             OutputStream out = System.out;
-            if (cmd.hasOption("o"))
-                out = new FileOutputStream(cmd.getOptionValue("o"));
-            String config = cmd.getOptionValue("c", "app.cfg");
 
 
-            String ecore_file = cmd.getOptionValue("i");
+            String eCore = cmd.getOptionValue("i");
             String path = cmd.getOptionValue("t");
-            Boolean debugmode = Boolean.parseBoolean(cmd.getOptionValue("t"));
+            String framework = cmd.getOptionValue("f");
+            Boolean debugmode = Boolean.parseBoolean(cmd.getOptionValue("d"));
 
 
-            //FIXME
             GenerationContext context = new GenerationContext();
             context.setGenerationDirectory(path);
-            context.setECore(ecore_file);
+            context.setECore(eCore);
+            context.setFrameworkDirectory(framework);
 //            context.setDebug_model(false);
 //            context.setVersion("1.3");
 //            context.setVersionmicroframework("1.3");
 
-
             Generator gen = new Generator(context);
             gen.generateModel();
-
+            gen.generateEnvironment();
         } catch (MissingOptionException e) {
 
             boolean help = false;
