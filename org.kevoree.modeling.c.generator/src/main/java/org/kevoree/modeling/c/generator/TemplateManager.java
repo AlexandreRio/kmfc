@@ -23,6 +23,9 @@ public class TemplateManager {
     private Template gen_test_runner;
     private Template gen_test_header;
     private Template gen_test_source;
+    private Template gen_test_remove_primitive;
+    private Template gen_test_remove_unary;
+    private Template gen_test_remove_multiple;
     /**
      * Templates with no variables.
      */
@@ -52,6 +55,9 @@ public class TemplateManager {
         gen_test_runner = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "testRunner.vm");
         gen_test_header = ve.getTemplate(BASE_DIR + TEST_DIR + HEADER_DIR + "testHeader.vm");
         gen_test_source = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "testSource.vm");
+        gen_test_remove_primitive = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "remove/removePrimitive.vm");
+        gen_test_remove_unary = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "remove/removeUnary.vm");
+        gen_test_remove_multiple = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "remove/removeMultiple.vm");
 
         tp_getKey_DeployUnit = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "internalGetKey_DeployUnit.vm");
         tp_getKey_TypeDefinition = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "internalGetKey_TypeDefinition.vm");
@@ -127,6 +133,18 @@ public class TemplateManager {
 
     public Template getTp_print_debug() {
         return tp_print_debug;
+    }
+
+    public Template getGen_test_remove_primitive() {
+        return gen_test_remove_primitive;
+    }
+
+    public Template getGen_test_remove_unary() {
+        return gen_test_remove_unary;
+    }
+
+    public Template getGen_test_remove_multiple() {
+        return gen_test_remove_multiple;
     }
 
 }

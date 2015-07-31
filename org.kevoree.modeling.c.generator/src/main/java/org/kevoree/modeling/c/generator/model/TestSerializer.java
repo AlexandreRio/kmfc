@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.kevoree.modeling.c.generator.utils.HelperGenerator.genToLowerCaseFirstChar;
+import static org.kevoree.modeling.c.generator.utils.HelperGenerator.genToUpperCaseFirstChar;
+
 /**
  * Serialize all the tests of a Classifier
  */
@@ -89,9 +92,16 @@ public class TestSerializer {
     }
 
     /**
-     * TODO use template
+     * Generate unit test functions for a particular Variable.
+     *
+     * @param calledClass Classifier which contains the variable to test.
+     * @param variableClass Classifier which originally contains the variable, it can be the same as calledClass if
+     *                      there is no inheritance.
+     * @param v Variable to test
+     * @param functions Map used to store the created test function since we need to return both the name of the test
+     *                  function and its source code.
      */
-    private static void variableTestSerializer(Classifier calledClass, Classifier variableClsass, Variable v, Map<String, String> functions) {
+    private static void variableTestSerializer(Classifier calledClass, Classifier variableClass, Variable v, Map<String, String> functions) {
         if (v == null || functions == null)
             return;
 
@@ -101,40 +111,43 @@ public class TestSerializer {
 
             Classifier c = Generator.classifiers.get(v.getType());
             if (c != null && !c.isAbstract()) {
-                funName = "remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "WhenSetManually";
-                funCode = calledClass.getName() + "*o = new_" + calledClass.getName() + "();\n";
-                funCode += "\t" + v.getType() + " *ptr = new_" + v.getType() + "();\n";
-                funCode += "\to->" + v.getName() + " = ptr;\n";
-                funCode += "\tck_assert(o->" + v.getName() + " != NULL);\n";
-                funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(variableClsass.getName()) +
-                        "Remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "(o, ptr);\n";
-                funCode += "\tck_assert(o->" + v.getName() + " == NULL);";
-                functions.put(funName, funCode);
+                funName = "removeUnary" + genToUpperCaseFirstChar(v.getName()) + "WhenSetManually";
+                VelocityContext context = new VelocityContext();
+                StringWriter result = new StringWriter();
+                context.put("class", calledClass.getName());
+                context.put("ref_name", v.getName());
+                context.put("ref_type", v.getType());
+                context.put("lowerCaseVarClass", genToLowerCaseFirstChar(variableClass.getName()));
+                context.put("upperCaseVar", genToUpperCaseFirstChar(v.getName()));
+                TemplateManager.getInstance().getGen_test_remove_unary().merge(context, result);
+                functions.put(funName, result.toString());
             }
 
         } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
             Classifier c = Generator.classifiers.get(v.getType());
             if (c != null && !c.isAbstract()) {
-                funName = "remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "AfterAdd";
-                funCode = initObject(calledClass, "o");
-                funCode += "\t" + initObject(c, "ptr");
-                funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(variableClsass.getName()) +
-                        "Add" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "(o, ptr);\n";
-                functions.put(funName, funCode);
+                funName = "removeMultiple" + genToUpperCaseFirstChar(v.getName()) + "AfterAdd";
+                VelocityContext context = new VelocityContext();
+                StringWriter result = new StringWriter();
+                context.put("initO", initObject(calledClass, "o"));
+                context.put("initPtr", initObject(c, "ptr"));
+                context.put("lowerCaseVarClass", genToLowerCaseFirstChar(variableClass.getName()));
+                context.put("upperCaseVar", genToUpperCaseFirstChar(v.getName()));
+                TemplateManager.getInstance().getGen_test_remove_multiple().merge(context, result);
+                functions.put(funName, result.toString());
             }
 
         } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
             if (v.getType().equals("char*")) {
-                funName = "remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "WhenSetManually";
-                funCode = calledClass.getName() + "*o = new_" + calledClass.getName() + "();\n";
-                funCode += "\tck_assert(o->" + v.getName() + " == NULL);\n";
-                funCode += "\tchar * str = \"my_str\";\n";
-                funCode += "\to->" + v.getName() + " = str;\n";
-                funCode += "\tck_assert(o->" + v.getName() + " != NULL);\n";
-                funCode += "\to->VT->" + HelperGenerator.genToLowerCaseFirstChar(variableClsass.getName()) +
-                        "Remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName()) + "(o, str);\n";
-                funCode += "\tck_assert(o->" + v.getName() + " == NULL);";
-                functions.put(funName, funCode);
+                funName = "removePrimitive" + genToUpperCaseFirstChar(v.getName()) + "WhenSetManually";
+                VelocityContext context = new VelocityContext();
+                StringWriter result = new StringWriter();
+                context.put("class", calledClass.getName());
+                context.put("ref_name", v.getName());
+                context.put("lowerCaseVarClass", genToLowerCaseFirstChar(variableClass.getName()));
+                context.put("upperCaseVar", genToUpperCaseFirstChar(v.getName()));
+                TemplateManager.getInstance().getGen_test_remove_primitive().merge(context, result);
+                functions.put(funName, result.toString());
             }
 
         }

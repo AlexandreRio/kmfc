@@ -6,7 +6,7 @@
 #foreach ($test in $testSuite.keySet())
 START_TEST ($test)
 {
-	$testSuite.get($test)
+$testSuite.get($test)
 }
 END_TEST
 

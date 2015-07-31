@@ -1,0 +1,7 @@
+	$class *o = #[[new_]]#$class();
+	#[[ck_assert(o->]]#$ref_name#[[ == NULL);]]#
+	char *str = "my_str";
+	#[[o->]]#$ref_name = str;
+	#[[ck_assert(o->]]#$ref_name#[[ != NULL);]]#
+	#[[o->VT->]]#$lowerCaseVarClass#[[Remove]]#$upperCaseVar#[[(o, str);]]#
+	#[[ck_assert(o->]]#$ref_name#[[ == NULL);]]#

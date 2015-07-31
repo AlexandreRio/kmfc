@@ -1,0 +1,3 @@
+	$initO
+	$initPtr
+	#[[o->VT->]]#$lowerCaseVarClass#[[Add]]#$upperCaseVar#[[(o, ptr);]]#
