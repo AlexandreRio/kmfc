@@ -24,11 +24,11 @@ public class HelperGenerator {
         return "typedef struct _" + name + " " + name + ";\n";
     }
 
-    public static String genToLowerCaseFirstChar(String name) {
+    public static String lowerCaseFirstChar(String name) {
         return Character.toLowerCase(name.charAt(0)) + name.substring(1);
     }
 
-    public static String genToUpperCaseFirstChar(String name) {
+    public static String upperCaseFirstChar(String name) {
         return Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 

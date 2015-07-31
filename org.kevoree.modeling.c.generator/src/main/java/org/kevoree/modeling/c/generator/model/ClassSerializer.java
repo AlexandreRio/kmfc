@@ -14,7 +14,7 @@ import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.kevoree.modeling.c.generator.utils.HelperGenerator.genToLowerCaseFirstChar;
+import static org.kevoree.modeling.c.generator.utils.HelperGenerator.lowerCaseFirstChar;
 
 public abstract class ClassSerializer {
 
@@ -70,7 +70,7 @@ public abstract class ClassSerializer {
                 for (Function f : Generator.classifiers.get(sClass).getFunctions()) {
                     if (f.getVisibilityType() == Visibility.IN_VT)
                         ret += "\tftpr" + f.getSignature() + " " +
-                                genToLowerCaseFirstChar(f.getSignature()) + ";\n";
+                                lowerCaseFirstChar(f.getSignature()) + ";\n";
                 }
             }
         }
@@ -78,7 +78,7 @@ public abstract class ClassSerializer {
         for (Function f : Generator.classifiers.get(cls.getName()).getFunctions()) {
             if (f.getVisibilityType() == Visibility.IN_VT)
                 ret += "\tftpr" + f.getSignature() + " " +
-                        genToLowerCaseFirstChar(f.getSignature()) + ";\n";
+                        lowerCaseFirstChar(f.getSignature()) + ";\n";
         }
         ret += "} VT_" + cls.getName() + ";\n";
         return ret;
@@ -180,7 +180,7 @@ public abstract class ClassSerializer {
         ret += "\t.delete = delete" + cls.getName() + ",\n";
         for (Function f : cls.getFunctions()) {
             if (f.getVisibilityType() == Visibility.IN_VT) {
-                ret += "\t." + genToLowerCaseFirstChar(f.getSignature()) + " = "
+                ret += "\t." + lowerCaseFirstChar(f.getSignature()) + " = "
                         + f.getSignature() + ",\n";
             }
         }

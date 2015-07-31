@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.kevoree.modeling.c.generator.utils.HelperGenerator.genToLowerCaseFirstChar;
-import static org.kevoree.modeling.c.generator.utils.HelperGenerator.genToUpperCaseFirstChar;
+import static org.kevoree.modeling.c.generator.utils.HelperGenerator.lowerCaseFirstChar;
+import static org.kevoree.modeling.c.generator.utils.HelperGenerator.upperCaseFirstChar;
 
 /**
  * Serialize all the tests of a Classifier
@@ -106,19 +106,18 @@ public class TestSerializer {
             return;
 
         String funName;
-        String funCode;
+        VelocityContext context = new VelocityContext();
+        StringWriter result = new StringWriter();
         if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
 
             Classifier c = Generator.classifiers.get(v.getType());
             if (c != null && !c.isAbstract()) {
-                funName = "removeUnary" + genToUpperCaseFirstChar(v.getName()) + "WhenSetManually";
-                VelocityContext context = new VelocityContext();
-                StringWriter result = new StringWriter();
+                funName = "removeUnary" + upperCaseFirstChar(v.getName()) + "WhenSetManually";
                 context.put("class", calledClass.getName());
                 context.put("ref_name", v.getName());
                 context.put("ref_type", v.getType());
-                context.put("lowerCaseVarClass", genToLowerCaseFirstChar(variableClass.getName()));
-                context.put("upperCaseVar", genToUpperCaseFirstChar(v.getName()));
+                context.put("lowerCaseVarClass", lowerCaseFirstChar(variableClass.getName()));
+                context.put("upperCaseVar", upperCaseFirstChar(v.getName()));
                 TemplateManager.getInstance().getGen_test_remove_unary().merge(context, result);
                 functions.put(funName, result.toString());
             }
@@ -126,26 +125,22 @@ public class TestSerializer {
         } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
             Classifier c = Generator.classifiers.get(v.getType());
             if (c != null && !c.isAbstract()) {
-                funName = "removeMultiple" + genToUpperCaseFirstChar(v.getName()) + "AfterAdd";
-                VelocityContext context = new VelocityContext();
-                StringWriter result = new StringWriter();
+                funName = "removeMultiple" + upperCaseFirstChar(v.getName()) + "AfterAdd";
                 context.put("initO", initObject(calledClass, "o"));
                 context.put("initPtr", initObject(c, "ptr"));
-                context.put("lowerCaseVarClass", genToLowerCaseFirstChar(variableClass.getName()));
-                context.put("upperCaseVar", genToUpperCaseFirstChar(v.getName()));
+                context.put("lowerCaseVarClass", lowerCaseFirstChar(variableClass.getName()));
+                context.put("upperCaseVar", upperCaseFirstChar(v.getName()));
                 TemplateManager.getInstance().getGen_test_remove_multiple().merge(context, result);
                 functions.put(funName, result.toString());
             }
 
         } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
             if (v.getType().equals("char*")) {
-                funName = "removePrimitive" + genToUpperCaseFirstChar(v.getName()) + "WhenSetManually";
-                VelocityContext context = new VelocityContext();
-                StringWriter result = new StringWriter();
+                funName = "removePrimitive" + upperCaseFirstChar(v.getName()) + "WhenSetManually";
                 context.put("class", calledClass.getName());
                 context.put("ref_name", v.getName());
-                context.put("lowerCaseVarClass", genToLowerCaseFirstChar(variableClass.getName()));
-                context.put("upperCaseVar", genToUpperCaseFirstChar(v.getName()));
+                context.put("lowerCaseVarClass", lowerCaseFirstChar(variableClass.getName()));
+                context.put("upperCaseVar", upperCaseFirstChar(v.getName()));
                 TemplateManager.getInstance().getGen_test_remove_primitive().merge(context, result);
                 functions.put(funName, result.toString());
             }

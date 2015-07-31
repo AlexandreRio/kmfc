@@ -113,7 +113,7 @@ public class Classifier {
     }
 
     private void generateAddFunction(Variable v) {
-        String addSignature = this.name + "Add" + HelperGenerator.genToUpperCaseFirstChar(v.getName());
+        String addSignature = this.name + "Add" + HelperGenerator.upperCaseFirstChar(v.getName());
         String returnType = "void";
         Parameter p1 = new Parameter(this.name + "*", "this", true);
         Parameter p2;
@@ -129,7 +129,7 @@ public class Classifier {
             context.put("classname", this.name);
             context.put("refname", v.getName());
             context.put("type", v.getType());
-            context.put("methname", HelperGenerator.genToUpperCaseFirstChar(v.getName()));
+            context.put("methname", HelperGenerator.upperCaseFirstChar(v.getName()));
 
             if (!v.isContained())
                 context.put("iscontained", "");
@@ -142,8 +142,8 @@ public class Classifier {
             if (v.isContained()) { // if it's a container
                 VelocityContext context = new VelocityContext();
                 context.put("refname", v.getName());
-                context.put("name", HelperGenerator.genToLowerCaseFirstChar(this.name));
-                context.put("methname", HelperGenerator.genToUpperCaseFirstChar(v.getName()));
+                context.put("name", HelperGenerator.lowerCaseFirstChar(this.name));
+                context.put("methname", HelperGenerator.upperCaseFirstChar(v.getName()));
                 TemplateManager.getInstance().getGen_add_unary_containment().merge(context, result);
                 addBody = result.toString();
             } else {
@@ -159,7 +159,7 @@ public class Classifier {
     }
 
     private void generateRemoveFunction(Variable v) {
-        String removeSignature = this.name + "Remove" + HelperGenerator.genToUpperCaseFirstChar(v.getName());
+        String removeSignature = this.name + "Remove" + HelperGenerator.upperCaseFirstChar(v.getName());
         String returnType = "void";
         Parameter p1 = new Parameter(this.name + "*", "this", true);
         Parameter p2;
@@ -207,7 +207,7 @@ public class Classifier {
         String findBody;
         context.put("type", this.name);
         context.put("refname", v.getName());
-        context.put("majrefname", HelperGenerator.genToUpperCaseFirstChar(v.getName()));
+        context.put("majrefname", HelperGenerator.upperCaseFirstChar(v.getName()));
         TemplateManager.getInstance().getGen_find_by_id().merge(context, result);
         findBody = result.toString();
 
