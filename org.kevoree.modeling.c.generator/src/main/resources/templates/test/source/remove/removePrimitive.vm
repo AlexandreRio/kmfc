@@ -5,3 +5,5 @@
 	#[[ck_assert(o->]]#$ref_name#[[ != NULL);]]#
 	#[[o->VT->]]#$lowerCaseVarClass#[[Remove]]#$upperCaseVar#[[(o, str);]]#
 	#[[ck_assert(o->]]#$ref_name#[[ == NULL);]]#
+	//o->VT->delete(o);
+	//free(o);
