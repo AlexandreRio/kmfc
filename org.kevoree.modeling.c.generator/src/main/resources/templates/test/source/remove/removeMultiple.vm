@@ -1,3 +1,5 @@
 	$initO
 	$initPtr
 	#[[o->VT->]]#$lowerCaseVarClass#[[Add]]#$upperCaseVar#[[(o, ptr);]]#
+	#[[o->VT->]]#$lowerCaseVarClass#[[Remove]]#$upperCaseVar#[[(o, ptr);]]#
+	#[[ck_assert_int_eq(hashmap_length(o->]]#$ref_name), 0);
