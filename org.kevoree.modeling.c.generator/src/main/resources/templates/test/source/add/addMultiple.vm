@@ -1,0 +1,6 @@
+	$initO
+	$initPtr
+	//poor test
+	#[[ck_assert_int_eq(hashmap_length(o->]]#$ref_name), 0);
+	#[[o->VT->]]#$lowerCaseVarClass#[[Add]]#$upperCaseVar#[[(o, ptr);]]#
+	#[[ck_assert_int_eq(hashmap_length(o->]]#$ref_name), 1);

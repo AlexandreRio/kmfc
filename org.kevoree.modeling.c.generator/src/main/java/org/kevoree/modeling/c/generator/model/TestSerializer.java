@@ -103,12 +103,12 @@ public class TestSerializer {
     /**
      * Generate unit test functions for a particular Variable.
      *
-     * @param calledClass Classifier which contains the variable to test.
+     * @param calledClass   Classifier which contains the variable to test.
      * @param variableClass Classifier which originally contains the variable, it can be the same as calledClass if
      *                      there is no inheritance.
-     * @param v Variable to test
-     * @param functions Map used to store the created test function since we need to return both the name of the test
-     *                  function and its source code.
+     * @param v             Variable to test
+     * @param functions     Map used to store the created test function since we need to return both the name of the test
+     *                      function and its source code.
      */
     private static void variableTestSerializer(Classifier calledClass, Classifier variableClass, Variable v, Map<String, String> functions) {
         if (v == null || functions == null)
@@ -121,36 +121,60 @@ public class TestSerializer {
 
             Classifier c = Generator.classifiers.get(v.getType());
             if (c != null && !c.isAbstract()) {
-                funName = "removeUnary" + upperCaseFirstChar(v.getName()) + "WhenSetManually";
                 context.put("class", calledClass.getName());
                 context.put("ref_name", v.getName());
                 context.put("ref_type", v.getType());
                 context.put("lowerCaseVarClass", lowerCaseFirstChar(variableClass.getName()));
                 context.put("upperCaseVar", upperCaseFirstChar(v.getName()));
+
+                funName = "removeUnary" + upperCaseFirstChar(v.getName()) + "WhenSetManually";
                 TemplateManager.getInstance().getGen_test_remove_unary().merge(context, result);
+                functions.put(funName, result.toString());
+
+                funName = "addUnary" + upperCaseFirstChar(v.getName());
+                result = new StringWriter();
+                TemplateManager.getInstance().getGen_test_add_unary().merge(context, result);
                 functions.put(funName, result.toString());
             }
 
         } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
             Classifier c = Generator.classifiers.get(v.getType());
             if (c != null && !c.isAbstract()) {
-                funName = "removeMultiple" + upperCaseFirstChar(v.getName()) + "AfterAdd";
                 context.put("initO", initObject(calledClass, "o"));
                 context.put("initPtr", initObject(c, "ptr"));
                 context.put("lowerCaseVarClass", lowerCaseFirstChar(variableClass.getName()));
                 context.put("upperCaseVar", upperCaseFirstChar(v.getName()));
+                context.put("ref_name", v.getName());
+
+                funName = "removeMultiple" + upperCaseFirstChar(v.getName()) + "AfterAdd";
                 TemplateManager.getInstance().getGen_test_remove_multiple().merge(context, result);
                 functions.put(funName, result.toString());
+
+                funName = "addMultiple" + upperCaseFirstChar(v.getName());
+                result = new StringWriter();
+                TemplateManager.getInstance().getGen_test_add_multiple().merge(context, result);
+                functions.put(funName, result.toString());
+
+                funName = "find" + upperCaseFirstChar(v.getName());
+                result = new StringWriter();
+//                TemplateManager.getInstance().getGen_test_find().merge(context, result);
+//                functions.put(funName, result.toString());
             }
 
         } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
             if (v.getType().equals("char*")) {
-                funName = "removePrimitive" + upperCaseFirstChar(v.getName()) + "WhenSetManually";
                 context.put("class", calledClass.getName());
                 context.put("ref_name", v.getName());
                 context.put("lowerCaseVarClass", lowerCaseFirstChar(variableClass.getName()));
                 context.put("upperCaseVar", upperCaseFirstChar(v.getName()));
+
+                funName = "removePrimitive" + upperCaseFirstChar(v.getName()) + "WhenSetManually";
                 TemplateManager.getInstance().getGen_test_remove_primitive().merge(context, result);
+                functions.put(funName, result.toString());
+
+                funName = "addPrimitive" + upperCaseFirstChar(v.getName());
+                result = new StringWriter();
+                TemplateManager.getInstance().getGen_test_add_primitive().merge(context, result);
                 functions.put(funName, result.toString());
             }
 

@@ -29,6 +29,9 @@ public class TemplateManager {
     private Template gen_test_remove_primitive;
     private Template gen_test_remove_unary;
     private Template gen_test_remove_multiple;
+    private Template gen_test_add_unary;
+    private Template gen_test_add_multiple;
+    private Template gen_test_add_primitive;
     /*
      * string from static template, i.e. with no variables
      * or variables determined before parsing any files.
@@ -63,6 +66,9 @@ public class TemplateManager {
         gen_test_remove_primitive = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "remove/removePrimitive.vm");
         gen_test_remove_unary = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "remove/removeUnary.vm");
         gen_test_remove_multiple = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "remove/removeMultiple.vm");
+        gen_test_add_unary = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "add/addUnary.vm");
+        gen_test_add_primitive = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "add/addPrimitive.vm");
+        gen_test_add_multiple = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "add/addMultiple.vm");
 
         VelocityContext context = new VelocityContext();
         StringWriter result = new StringWriter();
@@ -169,4 +175,15 @@ public class TemplateManager {
         return gen_test_remove_multiple;
     }
 
+    public Template getGen_test_add_unary() {
+        return gen_test_add_unary;
+    }
+
+    public Template getGen_test_add_primitive() {
+        return gen_test_add_primitive;
+    }
+
+    public Template getGen_test_add_multiple() {
+        return gen_test_add_multiple;
+    }
 }

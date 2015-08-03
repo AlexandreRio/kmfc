@@ -1,0 +1,6 @@
+	$class *o = #[[new_]]#$class();
+	$ref_type *ptr = #[[new_]]#$ref_type();
+	#[[ck_assert(o->]]#$ref_name#[[ == NULL);]]#
+	#[[o->VT->]]#$lowerCaseVarClass#[[Add]]#$upperCaseVar#[[(o, ptr);]]#
+	#[[ck_assert(o->]]#$ref_name#[[ != NULL);]]#
+	#[[ck_assert(o->]]#$ref_name == ptr);
