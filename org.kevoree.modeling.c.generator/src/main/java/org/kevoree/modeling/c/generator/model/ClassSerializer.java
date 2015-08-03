@@ -146,7 +146,8 @@ public abstract class ClassSerializer {
         ret += "\n";
         ret += generateAttributes(cls);
         ret += "\n";
-        ret += "extern const VT_" + cls.getName() + " vt_" + cls.getName() + ";\n";
+//        ret += "extern const VT_" + cls.getName() + " vt_" + cls.getName() + ";\n";
+        ret += "extern VT_" + cls.getName() + " vt_" + cls.getName() + ";\n";
         ret += "\n";
         ret += HelperGenerator.genENDIF();
         return ret;
@@ -160,13 +161,13 @@ public abstract class ClassSerializer {
     }
 
     private static String generateInitVT(Classifier cls) {
-        String ret = "const\n";
+//        String ret = "const\n";
+        String ret = "";
         ret += "VT_" + cls.getName() + " vt_" + cls.getName() + " = {\n";
         ret += "\t.super = &vt_" + cls.getSuperClass() + ",\n";
         ret += "\t.metaClassName = " + cls.getName() + "_metaClassName,\n";
         ret += "\t.internalGetKey = " + cls.getName() + "_internalGetKey,\n";
         ret += "\t.delete = delete" + cls.getName() + ",\n";
-        //TODO for inherited functions set the fptr properly
         for (Function f : cls.getFunctions()) {
             if (f.getVisibilityType() == Visibility.IN_VT) {
                 ret += "\t." + lowerCaseFirstChar(f.getSignature()) + " = "
@@ -177,7 +178,31 @@ public abstract class ClassSerializer {
         return ret;
     }
 
+    private static void setFunctionPointerToInheritedFunctions(Classifier cls) {
+        Function initFunction = null;
+        for (Function f : cls.getFunctions())
+            if (f.getSignature().equals("init" + cls.getName()))
+                initFunction = f;
+        if (initFunction == null)
+            return;
+        String ret = initFunction.getBody();
+        String current = cls.getSuperClass();
+        Classifier curClass;
+        String prefix = "";
+        while (!current.equals("KMFContainer")) {
+            curClass = Generator.classifiers.get(current);
+            prefix += "super->";
+            for (Function f : curClass.getFunctions()) {
+                if (f.getVisibilityType() == Visibility.IN_VT)
+                    ret += "\tthis->VT->" + lowerCaseFirstChar((f.getSignature())) + " = this->VT->"
+                            + prefix + lowerCaseFirstChar(f.getSignature()) + ";\n";
+            }
+            current = curClass.getSuperClass();
+        }
+        initFunction.setBody(ret);
+    }
     private static String generateSourceFile(Classifier cls) {
+        setFunctionPointerToInheritedFunctions(cls);
         String ret = "";
         ret += HelperGenerator.genIncludeLocal(cls.getName());
         ret += "\n";

@@ -286,6 +286,11 @@ public class Classifier {
         this.addFunction(metaClassFunction);
     }
 
+    /**
+     * Warning: the body of the function is updated after the first loop
+     *
+     * @see ClassSerializer#setFunctionPointerToInheritedFunctions(Classifier)
+     */
     private void createInitFunction() {
         String initSignature = "init" + this.name;
         String returnType = "void";
