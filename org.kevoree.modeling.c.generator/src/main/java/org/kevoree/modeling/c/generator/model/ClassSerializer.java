@@ -146,7 +146,6 @@ public abstract class ClassSerializer {
         ret += "\n";
         ret += generateAttributes(cls);
         ret += "\n";
-//        ret += "extern const VT_" + cls.getName() + " vt_" + cls.getName() + ";\n";
         ret += "extern VT_" + cls.getName() + " vt_" + cls.getName() + ";\n";
         ret += "\n";
         ret += HelperGenerator.genENDIF();
@@ -161,7 +160,6 @@ public abstract class ClassSerializer {
     }
 
     private static String generateInitVT(Classifier cls) {
-//        String ret = "const\n";
         String ret = "";
         ret += "VT_" + cls.getName() + " vt_" + cls.getName() + " = {\n";
         ret += "\t.super = &vt_" + cls.getSuperClass() + ",\n";
