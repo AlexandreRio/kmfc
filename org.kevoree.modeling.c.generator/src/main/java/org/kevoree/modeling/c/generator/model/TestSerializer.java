@@ -144,6 +144,7 @@ public class TestSerializer {
                 context.put("initPtr", initObject(c, "ptr"));
                 context.put("lowerCaseVarClass", lowerCaseFirstChar(variableClass.getName()));
                 context.put("upperCaseVar", upperCaseFirstChar(v.getName()));
+                context.put("ref_type", c.getName());
                 context.put("ref_name", v.getName());
 
                 funName = "removeMultiple" + upperCaseFirstChar(v.getName()) + "AfterAdd";
@@ -157,8 +158,8 @@ public class TestSerializer {
 
                 funName = "find" + upperCaseFirstChar(v.getName());
                 result = new StringWriter();
-//                TemplateManager.getInstance().getGen_test_find().merge(context, result);
-//                functions.put(funName, result.toString());
+                TemplateManager.getInstance().getGen_test_find().merge(context, result);
+                functions.put(funName, result.toString());
             }
 
         } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {

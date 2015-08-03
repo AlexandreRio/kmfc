@@ -196,7 +196,7 @@ public class Classifier {
     }
 
     private void generateFindFunction(Variable v) {
-        String findSignature = this.name + "Find" + v.getName() + "ByID";
+        String findSignature = this.name + "Find" + HelperGenerator.upperCaseFirstChar(v.getName()) + "ByID";
         String returnType = v.getType() + "*";
         Parameter p1 = new Parameter(this.name + "*", "this", true);
         Parameter p2 = new Parameter("char*", "id");

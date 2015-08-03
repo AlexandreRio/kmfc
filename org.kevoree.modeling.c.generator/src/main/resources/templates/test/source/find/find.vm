@@ -1,0 +1,5 @@
+	$initO
+	$initPtr
+	#[[o->VT->]]#$lowerCaseVarClass#[[Add]]#$upperCaseVar#[[(o, ptr);]]#
+	$ref_type #[[*get = o->VT->]]#$lowerCaseVarClass#[[Find]]#$upperCaseVar#[[ByID(o, ptr->VT->internalGetKey(ptr));]]#
+	ck_assert_ptr_eq(ptr, get);
