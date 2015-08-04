@@ -146,6 +146,10 @@ public abstract class ClassSerializer {
         ret += "\n";
         ret += generateAttributes(cls);
         ret += "\n";
+        ret += "//! Virtual table\n";
+        ret += "/*!\n The constant pointers are set in the struct initialization.\n" +
+                " Inherited ones are set by the init function called by the constructor\n " +
+                "new_" + cls.getName() + "() \n*/\n";
         ret += "extern VT_" + cls.getName() + " vt_" + cls.getName() + ";\n";
         ret += "\n";
         ret += HelperGenerator.genENDIF();
