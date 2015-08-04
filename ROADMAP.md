@@ -14,7 +14,7 @@
 - [x] Use an intermediate representation
 - [x] Generate CMakeLists.txt file
 - [x] Produce setter and getter Unit Testing
-- [ ] Add Doxygen style comments to generated code
+- [x] Add Doxygen style comments to generated code
 
 - [ ] Implement visitor design pattern
 - [ ] Implement serialization

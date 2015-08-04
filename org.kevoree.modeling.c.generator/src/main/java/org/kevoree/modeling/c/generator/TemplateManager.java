@@ -42,11 +42,13 @@ public class TemplateManager {
     private String KMFContainer_fptr;
     private String print_debug;
     private String license;
+    private String header_comment;
 
     private TemplateManager() {
         String BASE_DIR = "templates/";
         String CODE_DIR = "code/";
         String TEST_DIR = "test/";
+        String COMMENTS_DIR = "comments/";
         String SOURCE_DIR = "source/";
         String HEADER_DIR = "header/";
         ve.setProperty("file.resource.loader.class", ClasspathResourceLoader.class.getName());
@@ -76,19 +78,28 @@ public class TemplateManager {
         StringWriter result = new StringWriter();
         ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "internalGetKey_DeployUnit.vm").merge(context, result);
         getKey_DeployUnit = result.toString();
+
         result = new StringWriter();
         ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "internalGetKey_TypeDefinition.vm").merge(context, result);
         getKey_TypeDefinition = result.toString();
+
         result = new StringWriter();
         ve.getTemplate(BASE_DIR + CODE_DIR + HEADER_DIR + "kmfcontainer_fptr.vm").merge(context, result);
         KMFContainer_fptr = result.toString();
+
         result = new StringWriter();
         ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "print_debug.vm").merge(context, result);
         print_debug = result.toString();
+
+        result = new StringWriter();
+        ve.getTemplate(BASE_DIR + COMMENTS_DIR + "header.vm").merge(context, result);
+        header_comment = result.toString();
+
         result = new StringWriter();
         context.put("project", "KMC");
         ve.getTemplate(BASE_DIR + "LICENSE.vm").merge(context, result);
         license = result.toString();
+
     }
 
     public static TemplateManager getInstance() {
@@ -163,6 +174,10 @@ public class TemplateManager {
 
     public String getLicense() {
         return license;
+    }
+
+    public String getHeader_comment() {
+        return header_comment;
     }
 
     public Template getGen_test_remove_primitive() {
