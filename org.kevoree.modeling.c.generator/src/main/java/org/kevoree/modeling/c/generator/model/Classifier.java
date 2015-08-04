@@ -71,11 +71,14 @@ public class Classifier {
     private void createAttributes(EClass cls) {
         for (EAttribute attr : cls.getEAttributes()) {
             String t;
-            if (attr.getName().equals("generated_KMF_ID"))
+            boolean generatedVariable = false;
+            if (attr.getName().equals("generated_KMF_ID")) {
+                generatedVariable = true;
                 t = "char";
-            else
+            } else {
                 t = ConverterDataTypes.getInstance().check_type(attr.getEAttributeType().getName());
-            this.addVariable(new Variable(attr.getName(), t, Variable.LinkType.PRIMITIVE, false));
+            }
+            this.addVariable(new Variable(attr.getName(), t, Variable.LinkType.PRIMITIVE, false, generatedVariable));
         }
 
         for (EReference ref : cls.getEReferences()) {
@@ -85,7 +88,7 @@ public class Classifier {
                 lt = Variable.LinkType.MULTIPLE_LINK;
 
             String t = ConverterDataTypes.getInstance().check_type(ref.getEReferenceType().getName());
-            this.addVariable(new Variable(ref.getName(), t, lt, ref.isContainment()));
+            this.addVariable(new Variable(ref.getName(), t, lt, ref.isContainment(), false));
         }
 
         if (cls.getESuperTypes().size() == 1)
@@ -99,7 +102,7 @@ public class Classifier {
             this.addSuperType(ec.getName());
 
         if (this.name.equals("NamedElement"))
-            this.addVariable(new Variable("internalKey", "char*", Variable.LinkType.PRIMITIVE, false));
+            this.addVariable(new Variable("internalKey", "char*", Variable.LinkType.PRIMITIVE, false, true));
     }
 
     private void createFunction() {
@@ -219,8 +222,7 @@ public class Classifier {
 
     private void createAttributesManipulationFunctions() {
         for (Variable v : this.getVariables()) {
-            /** TODO add field on {@link Variable} to avoid ad hoc */
-            if (!v.getName().equals("generated_KMF_ID") && !v.getName().equals("internalKey")) {
+            if (!v.isGenerated()) {
                 this.generateAddFunction(v);
                 this.generateRemoveFunction(v);
                 if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK)
