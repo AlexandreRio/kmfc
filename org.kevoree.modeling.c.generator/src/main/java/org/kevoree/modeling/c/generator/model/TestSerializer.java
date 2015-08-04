@@ -200,12 +200,14 @@ public class TestSerializer {
         Map<String, String> functions = new HashMap<String, String>();
 
         for (Variable v : cls.getVariables()) {
-            variableTestSerializer(cls, cls, v, functions);
+            if (!v.getName().equals("generated_KMF_ID") && !v.getName().equals("internalKey"))
+                variableTestSerializer(cls, cls, v, functions);
         }
         for (String s : cls.getAllSuperClass())
             if (!s.equals("KMFContainer"))
                 for (Variable v : Generator.classifiers.get(s).getVariables())
-                    variableTestSerializer(cls, Generator.classifiers.get(s), v, functions);
+                    if (!v.getName().equals("generated_KMF_ID") && !v.getName().equals("internalKey"))
+                        variableTestSerializer(cls, Generator.classifiers.get(s), v, functions);
         return functions;
     }
 

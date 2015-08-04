@@ -1,19 +1,13 @@
-#include "DictionaryValue.h"
-#include "Dictionary.h"
+#include "MessagePortType.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 
 int main(void)
 {
-	Dictionary *o = new_Dictionary();
-
-	DictionaryValue *ptr = new_DictionaryValue();
-
-	//poor test
-	o->VT->dictionaryAddValues(o, ptr);
-	o->VT->delete(o);
-	free(o);
-	ptr->VT->delete(ptr);
-	free(ptr);
+//	MessagePortType *o = new_MessagePortType();
+//	char *str = "my_str";
+//	o->VT->namedElementAddInternalKey(o, str);
+//	o->VT->delete(o);
+//	free(o);
 }

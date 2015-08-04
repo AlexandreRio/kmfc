@@ -4,7 +4,7 @@ public class Test {
 
     public static void main(String args[]) throws Exception {
         String root = "/home/ario/IRISA/kmfc/";
-        String eCore = root + "org.kevoree.modeling.c.generator/src/main/resources/metamodel/kevoree.ecore";
+        String eCore = root + "org.kevoree.modeling.c.generator/src/main/resources/metamodel/kevoree_latest.ecore";
         String framework = root + "org.kevoree.modeling.c.generator/src/main/resources/hardcoded/";
         String output = root + "kevoree/";
 

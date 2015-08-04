@@ -220,7 +220,7 @@ public class Classifier {
     private void createAttributesManipulationFunctions() {
         for (Variable v : this.getVariables()) {
             /** TODO add field on {@link Variable} to avoid ad hoc */
-            if (!v.getName().equals("generated_KMF_ID")) {
+            if (!v.getName().equals("generated_KMF_ID") && !v.getName().equals("internalKey")) {
                 this.generateAddFunction(v);
                 this.generateRemoveFunction(v);
                 if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK)
@@ -267,7 +267,9 @@ public class Classifier {
                 TemplateManager.getInstance().getGen_delete().merge(context, result);
                 deleteBody += result.toString();
 
-                if (this.name.equals("DeployUnit") || this.name.equals("TypeDefinition"))
+                /** this is the same condition as in {@link #createInternalGetKeyFunction} */
+                if (this.name.equals("DeployUnit") ||
+                        (this.name.equals("TypeDefinition") && this.containsVariable("version")))
                     deleteBody += "\tif (this->internalKey != NULL)\n\t\tfree(this->internalKey);\n";
             }
         }
