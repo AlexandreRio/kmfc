@@ -1,19 +1,17 @@
 #include "ContainerRoot.h"
 #include "Group.h"
-#include "MessagePortType.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 
 int main(void)
 {
-    ContainerRoot *r = new_ContainerRoot();
-    printf("root %s\n", r->VT->internalGetKey(r));
-    Group *g = new_Group();
-    printf("group %s\n", g->VT->internalGetKey(g));
-    g->name = "my_name";
-    printf("group %s\n", g->VT->internalGetKey(g));
+	ContainerRoot *o = new_ContainerRoot();
 
-    MessagePortType *m = new_MessagePortType();
-    printf("msgPT %s\n", m->VT->internalGetKey(m));
+	Group *ptr = new_Group();
+	ptr->name = "some_name";
+
+	o->VT->containerRootAddGroups(o, ptr);
+	o->VT->delete(o);
+	free(o);
 }
