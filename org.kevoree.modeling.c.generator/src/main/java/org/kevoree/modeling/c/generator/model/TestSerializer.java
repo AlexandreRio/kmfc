@@ -57,8 +57,10 @@ public class TestSerializer {
      * @return C Unit test code.
      */
     private static String metaClassNameTestSerializer(Classifier cls) {
-        String code = cls.getName() + " *o = new_" + cls.getName() + "();\n";
-        code += "\tck_assert_str_eq(o->VT->metaClassName(o), \"" + cls.getName() + "\");";
+        String code = "\t" + cls.getName() + " *o = new_" + cls.getName() + "();\n";
+        code += "\tck_assert_str_eq(o->VT->metaClassName(o), \"" + cls.getName() + "\");\n";
+        code += "\to->VT->delete(o);\n";
+        code += "\tfree(o);";
         return code;
     }
 
@@ -97,7 +99,9 @@ public class TestSerializer {
     private static String internalGetKeyTestSerializer(Classifier cls) {
         String code = initObject(cls, "o");
         code += "\tif (o->VT->internalGetKey(o) == NULL)\n\t\tck_abort();\n";
-        code += "\tck_assert_str_ne(o->VT->internalGetKey(o), \"\");";
+        code += "\tck_assert_str_ne(o->VT->internalGetKey(o), \"\");\n";
+        code += "\to->VT->delete(o);\n";
+        code += "\tfree(o);";
         return code;
     }
 
@@ -148,9 +152,18 @@ public class TestSerializer {
                 context.put("ref_type", c.getName());
                 context.put("ref_name", v.getName());
 
+
+                context.put("free", "ptr->VT->delete(ptr);free(ptr);\n");
+
                 funName = "removeMultiple" + upperCaseFirstChar(v.getName()) + "AfterAdd";
                 TemplateManager.getInstance().getGen_test_remove_multiple().merge(context, result);
                 functions.put(funName, result.toString());
+
+                if (v.isContained()) {
+                    context.put("free", "");
+                } else {
+                    context.put("free", "ptr->VT->delete(ptr);free(ptr);\n");
+                }
 
                 funName = "addMultiple" + upperCaseFirstChar(v.getName());
                 result = new StringWriter();

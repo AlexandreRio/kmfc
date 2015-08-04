@@ -266,6 +266,9 @@ public class Classifier {
 
                 TemplateManager.getInstance().getGen_delete().merge(context, result);
                 deleteBody += result.toString();
+
+                if (this.name.equals("DeployUnit") || this.name.equals("TypeDefinition"))
+                    deleteBody += "\tif (this->internalKey != NULL)\n\t\tfree(this->internalKey);\n";
             }
         }
 
