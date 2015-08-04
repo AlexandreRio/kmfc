@@ -15,6 +15,7 @@
 - [x] Generate CMakeLists.txt file
 - [x] Produce setter and getter Unit Testing
 - [x] Add Doxygen style comments to generated code
+- [x] Check for memory leak issue
 
 - [ ] Implement visitor design pattern
 - [ ] Implement serialization

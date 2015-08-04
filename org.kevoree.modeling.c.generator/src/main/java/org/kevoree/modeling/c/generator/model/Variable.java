@@ -1,10 +1,32 @@
 package org.kevoree.modeling.c.generator.model;
 
 public class Variable {
+    /**
+     * Name of the variable
+     */
     private String name;
+    /**
+     * Primitive type or pointer type. Example: "int" or "Class*"
+     * <p>
+     * Set {@link #linkType} accordingly
+     */
     private String type;
+    /**
+     * Type of variable.
+     *
+     * @see org.kevoree.modeling.c.generator.model.Variable.LinkType
+     */
     private LinkType linkType;
+    /**
+     * If the variable is contained, see the model specification for further details.
+     */
     private boolean isContained;
+    /**
+     * If the variable value depends only on other variables.
+     *
+     * If true this will disable getter/setter and test generation for this
+     * variable.
+     */
     private boolean isGenerated;
 
     public Variable(String name, String type, LinkType linkType, boolean isContained, boolean isGenerated) {
