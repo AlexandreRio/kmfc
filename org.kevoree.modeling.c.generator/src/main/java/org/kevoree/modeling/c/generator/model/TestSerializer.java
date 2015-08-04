@@ -22,7 +22,6 @@ import static org.kevoree.modeling.c.generator.utils.HelperGenerator.upperCaseFi
  */
 public class TestSerializer {
 
-    //TODO refactor, remove useless include
     private static String generateHeaderFile(Classifier cls) {
         String header = "";
         header += HelperGenerator.genIFDEF(cls.getName() + "_Test");
