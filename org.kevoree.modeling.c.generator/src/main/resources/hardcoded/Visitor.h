@@ -21,13 +21,12 @@ typedef enum _Type
 	REFERENCE
 } Type;
 
-typedef void (*fptrVisitAction)(char*, Type, void*); /* (char* _path, Type type, void* value) */
-typedef void *(*fptrVisitActionRef)(char*, void*); /* (char* _path, char *value) */
+typedef struct _visitor {
+  int (*visit)(struct _visitor*, char*, void*);
+  int (*destroy)(struct _visitor*);
+  void* impl;
+} Visitor;
 
-void Visitor_visitModelContainer(hashmap_map *m, int length, fptrVisitAction action);
-void Visitor_visitPaths(hashmap_map *m, char *container, char *path, fptrVisitAction action, fptrVisitActionRef secondAction);
-void Visitor_visitModelRefs(hashmap_map *m, int length, char* ref, char *path, fptrVisitAction action);
-void Visitor_visitPathRefs(hashmap_map *m, char *container, char *path, fptrVisitAction action, fptrVisitActionRef secondAction, char *parent);
-void Visitor_visitContainer(map_t container, char *containerName, char *parent, fptrVisitAction action, fptrVisitActionRef secondAction, bool visitPaths);
+Visitor * visitor_new(void*, int (*)(Visitor*, char*, void*));
 
 #endif /* H_VISITOR */
