@@ -161,7 +161,7 @@ public class TestSerializer {
                 if (v.isContained()) {
                     context.put("free", "");
                 } else {
-                    context.put("free", "ptr->VT->delete(ptr);free(ptr);\n");
+                    context.put("free", "ptr->VT->delete(ptr);\nfree(ptr);\n");
                 }
 
                 funName = "addMultiple" + upperCaseFirstChar(v.getName());
