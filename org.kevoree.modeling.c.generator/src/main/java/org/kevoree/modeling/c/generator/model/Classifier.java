@@ -112,6 +112,7 @@ public class Classifier {
         this.createNewFunction();
         this.createDeleteFunction();
         this.createAttributesManipulationFunctions();
+        this.createAcceptFunction();
     }
 
     private void generateAddFunction(Variable v) {
@@ -218,6 +219,21 @@ public class Classifier {
         findFunction.addParameter(p2);
         findFunction.setBody(findBody);
         this.addFunction(findFunction);
+    }
+
+    private void createAcceptFunction() {
+        String serialSignature = "accept";
+        String returnType = "int";
+        Parameter p1 = new Parameter(this.name + "*", "this", true);
+        Parameter p2 = new Parameter("Visitor*", "visitor", false);
+
+        String serialBody = "return \"{ " + this.name + " }\";\n";
+
+        Function f = new Function(serialSignature, returnType, Visibility.IN_VT, true, false);
+        f.addParameter(p1);
+        f.addParameter(p2);
+        f.setBody(serialBody);
+        //this.addFunction(f);
     }
 
     private void createAttributesManipulationFunctions() {

@@ -63,17 +63,23 @@ public abstract class ClassSerializer {
             } else {
                 ret += "\t/*" + sClass + "*/\n";
                 for (Function f : Generator.classifiers.get(sClass).getFunctions()) {
-                    if (f.getVisibilityType() == Visibility.IN_VT)
+                    if (f.getVisibilityType() == Visibility.IN_VT && f.isTypeDef())
                         ret += "\tftpr" + f.getSignature() + " " +
                                 lowerCaseFirstChar(f.getSignature()) + ";\n";
+                    else if (f.getVisibilityType() == Visibility.IN_VT && !f.isTypeDef()) {
+
+                    }
                 }
             }
         }
         ret += "\t/*" + cls.getName() + "*/\n";
         for (Function f : Generator.classifiers.get(cls.getName()).getFunctions()) {
-            if (f.getVisibilityType() == Visibility.IN_VT)
+            if (f.getVisibilityType() == Visibility.IN_VT && f.isTypeDef())
                 ret += "\tftpr" + f.getSignature() + " " +
                         lowerCaseFirstChar(f.getSignature()) + ";\n";
+            else if (f.getVisibilityType() == Visibility.IN_VT && !f.isTypeDef()) {
+
+            }
         }
         ret += "} VT_" + cls.getName() + ";\n";
         return ret;
@@ -117,19 +123,21 @@ public abstract class ClassSerializer {
     private static String generateTypeDefFptr(Classifier cls) {
         String ret = "";
         for (Function f : cls.getFunctions()) {
-            ret += "typedef " + f.getReturnType() + " (*ftpr" + f.getSignature() + ")(";
-            Iterator<Parameter> iv = f.getParameters().iterator();
-            if (iv.hasNext()) {
-                Parameter p = iv.next();
-                ret += p.getType();
-            } else {
-                ret += "void";
+            if (f.isTypeDef()) {
+                ret += "typedef " + f.getReturnType() + " (*ftpr" + f.getSignature() + ")(";
+                Iterator<Parameter> iv = f.getParameters().iterator();
+                if (iv.hasNext()) {
+                    Parameter p = iv.next();
+                    ret += p.getType();
+                } else {
+                    ret += "void";
+                }
+                while (iv.hasNext()) {
+                    Parameter p = iv.next();
+                    ret += ", " + p.getType();
+                }
+                ret += ");\n";
             }
-            while (iv.hasNext()) {
-                Parameter p = iv.next();
-                ret += ", " + p.getType();
-            }
-            ret += ");\n";
         }
         return ret;
     }
