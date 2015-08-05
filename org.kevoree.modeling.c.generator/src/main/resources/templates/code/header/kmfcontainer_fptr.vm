@@ -2,6 +2,6 @@
 	fptrKMFMetaClassName metaClassName;
 	fptrKMFInternalGetKey internalGetKey;
 	fptrKMFGetPath getPath;
-	fptrVisit visit;
+	fptrAccept accept;
 	fptrFindByPath findByPath;
 	fptrDelete delete;]]#

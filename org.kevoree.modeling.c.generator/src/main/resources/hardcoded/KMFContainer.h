@@ -12,7 +12,7 @@ typedef struct _KMFContainer KMFContainer;
 typedef char* (*fptrKMFMetaClassName)(void*);
 typedef char* (*fptrKMFInternalGetKey)(void*);
 typedef char* (*fptrKMFGetPath)(void*);
-typedef void (*fptrVisit)(void*, char*, fptrVisitAction, fptrVisitActionRef, bool);
+typedef int (*fptrAccept)(void*, Visitor*);
 typedef void* (*fptrFindByPath)(void*, char*);
 typedef void (*fptrDelete)(void*);
 
@@ -24,7 +24,7 @@ typedef struct _VT_KMFContainer {
 	fptrKMFMetaClassName metaClassName;
 	fptrKMFInternalGetKey internalGetKey;
 	fptrKMFGetPath getPath;
-	fptrVisit visit;
+	fptrAccept accept;
 	fptrFindByPath findByPath;
 	fptrDelete delete;
 } VT_KMFContainer;

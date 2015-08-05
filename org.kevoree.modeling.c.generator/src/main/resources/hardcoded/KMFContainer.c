@@ -77,21 +77,11 @@ deleteContainerContents(map_t container)
 	}
 }
 
-static void
-KMFContainer_visit(KMFContainer * const this, char *parent, fptrVisitAction action, fptrVisitActionRef secondAction, bool visitPaths)
-{
-	char class[100];
-	sprintf(class, "org.kevoree.%s", this->VT->metaClassName(this));
-	action("eClass", STRING, class);
-	action(NULL, COLON, NULL);
-}
-
 const VT_KMFContainer vt_KMFContainer = {
 		.super = NULL,
 		.metaClassName = NULL,
 		.internalGetKey = NULL,
 		.getPath = KMFContainer_get_path,
-		.visit = KMFContainer_visit,
 		.findByPath = NULL,
 		.delete = delete_KMFContainer
 };
