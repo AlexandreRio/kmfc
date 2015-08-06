@@ -11,7 +11,7 @@ static int _ContainerRoot(VisitorJSON * this, ContainerRoot* o)
 
 static int _visit(Visitor* this, char* meta, void* visited)
 {
-  if (strcmp(meta, "ContainerRoot"))
+  if (strcmp(meta, "ContainerRoot") == 0)
   {
     return _ContainerRoot(this->impl, (ContainerRoot*)visited);
   } else
