@@ -1,4 +1,4 @@
-#h include "KMFContainer.h"
+#include "KMFContainer.h"
 #include "Visitor.h"
 
 #include <stddef.h>
@@ -7,14 +7,16 @@
 #include <string.h>
 #include <stdlib.h>
 
-static void _destroy(Visitor* this) {
+static void _destroy(Visitor* this)
+{
   if (NULL != this) {
     free(this);
     this = NULL;
   }
 }
 
-Visitor * visitor_new(void* impl, int (*visit)( Visitor*, char*, void*)) {
+Visitor * visitor_new(void* impl, int (*visit)( Visitor*, char*, void*))
+{
   Visitor * this;
   this = (Visitor *) calloc(1, sizeof(*this));
   this->visit = visit;
