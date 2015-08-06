@@ -4,23 +4,6 @@
 #include "hashmap.h"
 #include <stdbool.h>
 
-typedef enum _Type
-{
-	INTEGER,
-	STRING,
-	BOOL,
-	BRACKET,
-	CLOSEBRACKET,
-	SQBRACKET,
-	CLOSESQBRACKET,
-	CLOSEBRACKETCOLON,
-	CLOSESQBRACKETCOLON,
-	COLON,
-	STRREF,
-	RETURN,
-	REFERENCE
-} Type;
-
 typedef struct _visitor {
 
   /**

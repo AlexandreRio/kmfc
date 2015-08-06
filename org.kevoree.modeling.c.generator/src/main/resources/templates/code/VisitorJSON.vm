@@ -2,12 +2,13 @@
 #include "ContainerRoot.h"
 
 
-
-static int _ContainerRoot(VisitorJSON * this, ContainerRoot* o)
+#foreach ($class in $classList)
+#[[static int _]]#$class.getName()#[[(VisitorJSON * this,]]# $class.getName() * o)
 {
   printf("Class is: %s\n", o->VT->internalGetKey(o));
   return 32; // yay magic number again
 }
+#end
 
 static int _visit(Visitor* this, char* meta, void* visited)
 {
