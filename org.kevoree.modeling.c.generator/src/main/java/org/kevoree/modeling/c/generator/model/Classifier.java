@@ -227,7 +227,8 @@ public class Classifier {
         Parameter p1 = new Parameter(this.name + "*", "this", true);
         Parameter p2 = new Parameter("Visitor*", "visitor", false);
 
-        String serialBody = "return \"{ " + this.name + " }\";\n";
+        String serialBody = "\treturn visitor->visit(visitor, \"" + this.name + "\", this);\n";
+        //String serialBody = "return \"{ " + this.name + " }\";\n";
 
         Function f = new Function(serialSignature, returnType, Visibility.IN_VT, true, false);
         f.addParameter(p1);
