@@ -1,10 +1,4 @@
-/**
- * Author: fco.ja.ac@gmail.com
- * Date: 10/05/2015
- * Time: 19:25
- */
-
-#include "KMFContainer.h"
+#h include "KMFContainer.h"
 #include "Visitor.h"
 
 #include <stddef.h>
