@@ -20,11 +20,12 @@ typedef struct _VT_KMFContainer {
 	void *super;
 	/*
 	 * KMFContainer_VT
+	 * TODO should use the template
 	 */
 	fptrKMFMetaClassName metaClassName;
 	fptrKMFInternalGetKey internalGetKey;
 	fptrKMFGetPath getPath;
-	fptrAccept accept;
+	int (*fptrAccept)(void*, Visitor*);
 	fptrFindByPath findByPath;
 	fptrDelete delete;
 } VT_KMFContainer;

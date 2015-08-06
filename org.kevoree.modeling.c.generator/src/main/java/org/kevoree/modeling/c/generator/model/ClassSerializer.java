@@ -178,8 +178,9 @@ public abstract class ClassSerializer {
         ret += "\t.metaClassName = " + cls.getName() + "_metaClassName,\n";
         ret += "\t.internalGetKey = " + cls.getName() + "_internalGetKey,\n";
         ret += "\t.delete = delete" + cls.getName() + ",\n";
+        ret += "\t.fptrAccept = accept,\n";
         for (Function f : cls.getFunctions()) {
-            if (f.getVisibilityType() == Visibility.IN_VT) {
+            if (f.getVisibilityType() == Visibility.IN_VT && f.isTypeDef()) {
                 ret += "\t." + lowerCaseFirstChar(f.getSignature()) + " = "
                         + f.getSignature() + ",\n";
             }
@@ -203,7 +204,7 @@ public abstract class ClassSerializer {
             curClass = Generator.classifiers.get(current);
             prefix += "super->";
             for (Function f : curClass.getFunctions()) {
-                if (f.getVisibilityType() == Visibility.IN_VT)
+                if (f.getVisibilityType() == Visibility.IN_VT && f.isTypeDef())
                     ret += "\tthis->VT->" + lowerCaseFirstChar((f.getSignature())) + " = this->VT->"
                             + prefix + lowerCaseFirstChar(f.getSignature()) + ";\n";
             }

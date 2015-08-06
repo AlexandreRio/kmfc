@@ -233,7 +233,7 @@ public class Classifier {
         f.addParameter(p1);
         f.addParameter(p2);
         f.setBody(serialBody);
-        //this.addFunction(f);
+        this.addFunction(f);
     }
 
     private void createAttributesManipulationFunctions() {
