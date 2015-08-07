@@ -1,0 +1,9 @@
+	#[[if (this->]]#$ref#[[ != NULL)]]#
+	{
+		#[[hashmap_map* m = (hashmap_map*) this->]]#$ref#[[;]]#
+		for (int i=0; i<m->table_size; i++)
+		{
+			$type#[[* g = (]]#$type#[[*) (m->data[i].data);]]#
+			g->VT->fptrAccept(g, visitor);
+		}
+	}
