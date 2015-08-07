@@ -1,3 +1,4 @@
+	#[[printf("\"]]#$ref#[[\" : [\n"]]#);
 	#[[if (this->]]#$ref#[[ != NULL)]]#
 	{
 		#[[hashmap_map* m = (hashmap_map*) this->]]#$ref#[[;]]#
@@ -5,5 +6,8 @@
 		{
 			$type#[[* g = (]]#$type#[[*) (m->data[i].data);]]#
 			g->VT->fptrAccept(g, visitor);
+			if (i!=(m->table_size-1))
+				printf(",\n");
 		}
 	}
+	printf("],\n");

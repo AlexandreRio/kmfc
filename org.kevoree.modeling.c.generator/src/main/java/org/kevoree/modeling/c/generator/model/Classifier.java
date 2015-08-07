@@ -221,6 +221,7 @@ public class Classifier {
         this.addFunction(findFunction);
     }
 
+    //TODO rename accept to toString since it's no longer a real Visitor design
     private void createAcceptFunction() {
         String serialSignature = "accept";
         String returnType = "int";
@@ -229,8 +230,13 @@ public class Classifier {
 
         String serialBody = "";
         for (Variable v : this.getVariables()) {
+            //TODO, primitives first, factorize if (this->s != NULL)
             if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
-
+                serialBody += "if (this->" + v.getName() + " != NULL) {\n";
+                serialBody += "\tprintf(\"" + v.getName() + " : {\\n\");\n";
+                serialBody += "\tthis->" + v.getName() + "->VT->fptrAccept(this->" + v.getName() + ", visitor);\n";
+                serialBody += "\tprintf(\"},\");\n";
+                serialBody += "}\n";
             } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
                 VelocityContext context = new VelocityContext();
                 StringWriter result = new StringWriter();
@@ -238,6 +244,9 @@ public class Classifier {
                 context.put("type", v.getType());
                 TemplateManager.getInstance().getGen_accept_multiple().merge(context, result);
                 serialBody += result.toString();
+                //TODO if last element don't print a comma
+            } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
+                serialBody += "if (this->" + v.getName() + "!= NULL) {";
             }
         }
         serialBody += "\treturn visitor->visit(visitor, \"" + this.name + "\", this);\n";
