@@ -16,10 +16,9 @@ int main(void)
   g2->name = "other_group";
   o->VT->containerRootAddGroups(o, g2);
 
-  VisitorJSON* visitor = visitor_json_new();
-  //visitor->visitor->visit(visitor, o->VT->metaClassName(o), o);
-  o->VT->fptrAccept(o, visitor);
-  visitor->destroy(visitor);
+  VisitorJSON* visitorJSON = visitor_json_new();
+  o->VT->fptrAccept(o, visitorJSON->visitor);
+  visitorJSON->destroy(visitorJSON);
   o->VT->delete(o);
   free(o);
 }
