@@ -227,8 +227,20 @@ public class Classifier {
         Parameter p1 = new Parameter(this.name + "*", "this", true);
         Parameter p2 = new Parameter("Visitor*", "visitor", false);
 
-        String serialBody = "\treturn visitor->visit(visitor, \"" + this.name + "\", this);\n";
-        //String serialBody = "return \"{ " + this.name + " }\";\n";
+        String serialBody = "";
+        for (Variable v : this.getVariables()) {
+            if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
+
+            } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
+                VelocityContext context = new VelocityContext();
+                StringWriter result = new StringWriter();
+                context.put("ref", v.getName());
+                context.put("type", v.getType());
+                TemplateManager.getInstance().getGen_accept_multiple().merge(context, result);
+                serialBody += result.toString();
+            }
+        }
+        serialBody += "\treturn visitor->visit(visitor, \"" + this.name + "\", this);\n";
 
         Function f = new Function(serialSignature, returnType, Visibility.IN_VT, true, false);
         f.addParameter(p1);
