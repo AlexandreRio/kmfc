@@ -1,0 +1,6 @@
+	#[[if (this->]]#$ref#[[ != NULL)]]#
+	{
+		printf("\"%s\" : {\n", #[[this->]]#$ref);
+		#[[this->]]#$ref#[[->VT->fptrToJSON(this->]]#$ref#[[);]]#
+		printf("},\n");
+	}

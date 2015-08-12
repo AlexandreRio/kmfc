@@ -225,28 +225,29 @@ public class Classifier {
         String serialSignature = "toJSON";
         String returnType = "int";
         Parameter p1 = new Parameter(this.name + "*", "this", true);
-        //Parameter p2 = new Parameter("Visitor*", "visitor", false);
 
         String serialBody = "printf(\"{\\n\");\n";
+        serialBody += "printf(\"eClass:%s,\\n\", this->VT->metaClassName(this));\n";
         for (Variable v : this.getVariables()) {
             //TODO, primitives first, factorize if (this->s != NULL)
-            if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
-                serialBody += "if (this->" + v.getName() + " != NULL) {\n";
-                serialBody += "\tprintf(\"" + v.getName() + " : {\\n\");\n";
-                serialBody += "\tthis->" + v.getName() + "->VT->fptrToJSON(this->" + v.getName() + ");\n";
-                serialBody += "\tprintf(\"},\");\n";
-                serialBody += "}\n";
+            if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
+                serialBody += "if (this->" + v.getName() + "!= NULL)\n";
+                serialBody += "\tprintf(\"" + v.getName() + " : %s,\\n\", this->" + v.getName() + ");\n";
+            } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
+                //serialBody += "\tthis->" + v.getName() + "->VT->fptrToJSON(this->" + v.getName() + ");\n";
+                VelocityContext context = new VelocityContext();
+                StringWriter result = new StringWriter();
+                context.put("ref", v.getName());
+                TemplateManager.getInstance().getGen_toJSON_unary().merge(context, result);
+                serialBody += result.toString();
             } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
                 VelocityContext context = new VelocityContext();
                 StringWriter result = new StringWriter();
                 context.put("ref", v.getName());
                 context.put("type", v.getType());
-                TemplateManager.getInstance().getGen_accept_multiple().merge(context, result);
+                TemplateManager.getInstance().getGen_toJSON_multiple().merge(context, result);
                 serialBody += result.toString();
                 //TODO if last element don't print a comma
-            } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
-                serialBody += "if (this->" + v.getName() + "!= NULL)\n";
-                serialBody += "\tprintf(\"" + v.getName() + " : %s,\\n\", this->" + v.getName() + ");\n";
             }
         }
         serialBody += "printf(\"}\\n\");\n";
@@ -254,7 +255,6 @@ public class Classifier {
 
         Function f = new Function(serialSignature, returnType, Visibility.IN_VT, true, false);
         f.addParameter(p1);
-        //f.addParameter(p2);
         f.setBody(serialBody);
         this.addFunction(f);
     }

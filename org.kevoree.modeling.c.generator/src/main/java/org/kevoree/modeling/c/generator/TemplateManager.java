@@ -23,7 +23,8 @@ public class TemplateManager {
     private Template gen_delete;
     private Template gen_new;
     private Template gen_find_by_id;
-    private Template gen_accept_multiple;
+    private Template gen_toJSON_multiple;
+    private Template gen_toJSON_unary;
     private Template gen_test_runner;
     private Template gen_test_header;
     private Template gen_test_source;
@@ -64,7 +65,8 @@ public class TemplateManager {
         gen_delete = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "delete.vm");
         gen_new = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "new.vm");
         gen_find_by_id = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "findById.vm");
-        gen_accept_multiple = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "accept_multiple.vm");
+        gen_toJSON_multiple = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_multiple.vm");
+        gen_toJSON_unary = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_unary.vm");
 
         gen_test_runner = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "testRunner.vm");
         gen_test_header = ve.getTemplate(BASE_DIR + TEST_DIR + HEADER_DIR + "testHeader.vm");
@@ -143,8 +145,12 @@ public class TemplateManager {
         return gen_find_by_id;
     }
 
-    public Template getGen_accept_multiple() {
-        return gen_accept_multiple;
+    public Template getGen_toJSON_multiple() {
+        return gen_toJSON_multiple;
+    }
+
+    public Template getGen_toJSON_unary() {
+        return gen_toJSON_unary;
     }
 
     public Template getGen_cmakelists() {
