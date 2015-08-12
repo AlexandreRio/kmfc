@@ -223,12 +223,12 @@ public class Classifier {
     }
 
     /**
-     * Produce a JSON String for the given Varialbe
+     * Produce a JSON String for the given Variable.
      *
-     * @param v
+     * @param v Variable to output.
      * @param hasNextVariable if the Variable is followed by another Variable we have
      *                        to print a comma at the end.
-     * @return JSON output
+     * @return JSON output.
      */
     private String toJSONVariable(Variable v, boolean hasNextVariable) {
         VelocityContext context = new VelocityContext();
