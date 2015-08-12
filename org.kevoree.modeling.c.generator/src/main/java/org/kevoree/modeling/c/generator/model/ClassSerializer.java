@@ -178,7 +178,7 @@ public abstract class ClassSerializer {
         ret += "\t.metaClassName = " + cls.getName() + "_metaClassName,\n";
         ret += "\t.internalGetKey = " + cls.getName() + "_internalGetKey,\n";
         ret += "\t.delete = delete" + cls.getName() + ",\n";
-        ret += "\t.fptrAccept = accept,\n";
+        ret += "\t.fptrToJSON = toJSON,\n";
         for (Function f : cls.getFunctions()) {
             if (f.getVisibilityType() == Visibility.IN_VT && f.isTypeDef()) {
                 ret += "\t." + lowerCaseFirstChar(f.getSignature()) + " = "

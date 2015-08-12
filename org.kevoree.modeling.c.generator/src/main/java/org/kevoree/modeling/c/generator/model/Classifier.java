@@ -112,7 +112,7 @@ public class Classifier {
         this.createNewFunction();
         this.createDeleteFunction();
         this.createAttributesManipulationFunctions();
-        this.createAcceptFunction();
+        this.createToJSONFunction();
     }
 
     private void generateAddFunction(Variable v) {
@@ -221,20 +221,19 @@ public class Classifier {
         this.addFunction(findFunction);
     }
 
-    //TODO rename accept to toString since it's no longer a real Visitor design
-    private void createAcceptFunction() {
-        String serialSignature = "accept";
+    private void createToJSONFunction() {
+        String serialSignature = "toJSON";
         String returnType = "int";
         Parameter p1 = new Parameter(this.name + "*", "this", true);
-        Parameter p2 = new Parameter("Visitor*", "visitor", false);
+        //Parameter p2 = new Parameter("Visitor*", "visitor", false);
 
-        String serialBody = "";
+        String serialBody = "printf(\"{\\n\");\n";
         for (Variable v : this.getVariables()) {
             //TODO, primitives first, factorize if (this->s != NULL)
             if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
                 serialBody += "if (this->" + v.getName() + " != NULL) {\n";
                 serialBody += "\tprintf(\"" + v.getName() + " : {\\n\");\n";
-                serialBody += "\tthis->" + v.getName() + "->VT->fptrAccept(this->" + v.getName() + ", visitor);\n";
+                serialBody += "\tthis->" + v.getName() + "->VT->fptrToJSON(this->" + v.getName() + ");\n";
                 serialBody += "\tprintf(\"},\");\n";
                 serialBody += "}\n";
             } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
@@ -246,14 +245,16 @@ public class Classifier {
                 serialBody += result.toString();
                 //TODO if last element don't print a comma
             } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
-                serialBody += "if (this->" + v.getName() + "!= NULL) {";
+                serialBody += "if (this->" + v.getName() + "!= NULL)\n";
+                serialBody += "\tprintf(\"" + v.getName() + " : %s,\\n\", this->" + v.getName() + ");\n";
             }
         }
-        serialBody += "\treturn visitor->visit(visitor, \"" + this.name + "\", this);\n";
+        serialBody += "printf(\"}\\n\");\n";
+        serialBody += "\treturn;\n";// visitor->visit(visitor, \"" + this.name + "\", this);\n";
 
         Function f = new Function(serialSignature, returnType, Visibility.IN_VT, true, false);
         f.addParameter(p1);
-        f.addParameter(p2);
+        //f.addParameter(p2);
         f.setBody(serialBody);
         this.addFunction(f);
     }

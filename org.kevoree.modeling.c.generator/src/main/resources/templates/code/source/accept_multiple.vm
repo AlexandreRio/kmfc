@@ -5,7 +5,7 @@
 		for (int i=0; i<m->table_size; i++)
 		{
 			$type#[[* g = (]]#$type#[[*) (m->data[i].data);]]#
-			g->VT->fptrAccept(g, visitor);
+			g->VT->fptrToJSON(g);
 			if (i!=(m->table_size-1))
 				printf(",\n");
 		}

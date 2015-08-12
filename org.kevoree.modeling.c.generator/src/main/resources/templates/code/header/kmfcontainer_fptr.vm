@@ -2,6 +2,6 @@
 	fptrKMFMetaClassName metaClassName;
 	fptrKMFInternalGetKey internalGetKey;
 	fptrKMFGetPath getPath;
-	int (*fptrAccept)(void*, Visitor*);
+	int (*fptrToJSON)(void*);
 	fptrFindByPath findByPath;
 	fptrDelete delete;]]#
