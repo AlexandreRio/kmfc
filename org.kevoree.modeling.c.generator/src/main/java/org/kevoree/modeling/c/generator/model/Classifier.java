@@ -69,6 +69,58 @@ public class Classifier {
         return ret;
     }
 
+    /**
+     * Produce a JSON String for the given Variable.
+     *
+     * @param v               Variable to output.
+     * @param hasNextVariable if the Variable is followed by another Variable we have
+     *                        to print a comma at the end.
+     * @return JSON output.
+     */
+    private static String toJSONVariable(Variable v, boolean hasNextVariable) {
+        VelocityContext context = new VelocityContext();
+        StringWriter result = new StringWriter();
+        context.put("ref", v.getName());
+        context.put("printComma", hasNextVariable);
+
+        if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
+            TemplateManager.getInstance().getGen_toJSON_primitive().merge(context, result);
+        } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
+            TemplateManager.getInstance().getGen_toJSON_unary().merge(context, result);
+        } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
+            context.put("type", v.getType());
+            TemplateManager.getInstance().getGen_toJSON_multiple().merge(context, result);
+        }
+
+        return result.toString();
+    }
+
+    public static void createToJSONFunction(Classifier cls) {
+        String serialSignature = "toJSON";
+        String returnType = "int";
+        Parameter p = new Parameter(cls.getName() + "*", "this", true);
+        List<Variable> allVars = new ArrayList<Variable>(cls.getVariables());
+
+        for (String parent : cls.getAllSuperClass())
+            if (!parent.equals("KMFContainer"))
+                allVars.addAll(Generator.classifiers.get(parent).getVariables());
+
+        String serialBody = "\tprintf(\"{\\n\");\n";
+        serialBody += "\tprintf(\"\\\"eClass\\\":\\\"%s\\\",\\n\", this->VT->metaClassName(this));\n";
+        Iterator<Variable> it = allVars.iterator();
+        while (it.hasNext()) {
+            Variable v = it.next();
+            serialBody += toJSONVariable(v, it.hasNext());
+        }
+        serialBody += "\tprintf(\"}\\n\");\n";
+        serialBody += "\treturn;\n";
+
+        Function f = new Function(serialSignature, returnType, Visibility.IN_VT, true, false);
+        f.addParameter(p);
+        f.setBody(serialBody);
+        cls.addFunction(f);
+    }
+
     private void createAttributes(EClass cls) {
         for (EAttribute attr : cls.getEAttributes()) {
             String t;
@@ -113,7 +165,6 @@ public class Classifier {
         this.createNewFunction();
         this.createDeleteFunction();
         this.createAttributesManipulationFunctions();
-        this.createToJSONFunction();
     }
 
     private void generateAddFunction(Variable v) {
@@ -220,53 +271,6 @@ public class Classifier {
         findFunction.addParameter(p2);
         findFunction.setBody(findBody);
         this.addFunction(findFunction);
-    }
-
-    /**
-     * Produce a JSON String for the given Variable.
-     *
-     * @param v Variable to output.
-     * @param hasNextVariable if the Variable is followed by another Variable we have
-     *                        to print a comma at the end.
-     * @return JSON output.
-     */
-    private String toJSONVariable(Variable v, boolean hasNextVariable) {
-        VelocityContext context = new VelocityContext();
-        StringWriter result = new StringWriter();
-        context.put("ref", v.getName());
-        context.put("printComma", hasNextVariable);
-
-        if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
-            TemplateManager.getInstance().getGen_toJSON_primitive().merge(context, result);
-        } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
-            TemplateManager.getInstance().getGen_toJSON_unary().merge(context, result);
-        } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
-            context.put("type", v.getType());
-            TemplateManager.getInstance().getGen_toJSON_multiple().merge(context, result);
-        }
-
-        return result.toString();
-    }
-
-    private void createToJSONFunction() {
-        String serialSignature = "toJSON";
-        String returnType = "int";
-        Parameter p = new Parameter(this.name + "*", "this", true);
-
-        String serialBody = "\tprintf(\"{\\n\");\n";
-        serialBody += "\tprintf(\"\\\"eClass\\\":\\\"%s\\\",\\n\", this->VT->metaClassName(this));\n";
-        Iterator<Variable> it = this.getVariables().iterator();
-        while (it.hasNext()) {
-            Variable v = it.next();
-            serialBody += toJSONVariable(v, it.hasNext());
-        }
-        serialBody += "\tprintf(\"}\\n\");\n";
-        serialBody += "\treturn;\n";
-
-        Function f = new Function(serialSignature, returnType, Visibility.IN_VT, true, false);
-        f.addParameter(p);
-        f.setBody(serialBody);
-        this.addFunction(f);
     }
 
     private void createAttributesManipulationFunctions() {

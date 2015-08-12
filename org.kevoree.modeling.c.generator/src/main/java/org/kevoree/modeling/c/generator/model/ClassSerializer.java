@@ -9,6 +9,7 @@ import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -166,7 +167,12 @@ public abstract class ClassSerializer {
 
     private static String generateBodyIncludes(Classifier cls) {
         String ret = "";
-        for (String s : Classifier.getLinkedClassifier(cls))
+        List<String> linkedClass = new ArrayList<String>(Classifier.getLinkedClassifier(cls));
+        for (String s : cls.getAllSuperClass())
+            if (!s.equals("KMFContainer"))
+                linkedClass.addAll(Classifier.getLinkedClassifier(Generator.classifiers.get(s)));
+
+        for (String s : linkedClass)
             ret += HelperGenerator.genIncludeLocal(s);
         return ret;
     }
@@ -214,6 +220,8 @@ public abstract class ClassSerializer {
     }
     private static String generateSourceFile(Classifier cls) {
         setFunctionPointerToInheritedFunctions(cls);
+        Classifier.createToJSONFunction(cls);
+
         String ret = "";
         ret += HelperGenerator.genIncludeLocal(cls.getName());
         ret += "\n";
