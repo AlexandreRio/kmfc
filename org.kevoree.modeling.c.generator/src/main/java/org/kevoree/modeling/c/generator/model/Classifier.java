@@ -12,6 +12,7 @@ import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Classifier {
@@ -221,6 +222,42 @@ public class Classifier {
         this.addFunction(findFunction);
     }
 
+    /**
+     * Produce a JSON String for the given Varialbe
+     *
+     * @param v
+     * @param hasNextVariable if the Variable is followed by another Variable we have
+     *                        to print a comma at the end.
+     * @return JSON output
+     */
+    private String toJSONVariable(Variable v, boolean hasNextVariable) {
+        String serialBody = "";
+        if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
+            VelocityContext context = new VelocityContext();
+            StringWriter result = new StringWriter();
+            context.put("ref", v.getName());
+            context.put("printComma", hasNextVariable);
+            TemplateManager.getInstance().getGen_toJSON_primitive().merge(context, result);
+            serialBody += result.toString();
+        } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
+            VelocityContext context = new VelocityContext();
+            StringWriter result = new StringWriter();
+            context.put("ref", v.getName());
+            context.put("printComma", hasNextVariable);
+            TemplateManager.getInstance().getGen_toJSON_unary().merge(context, result);
+            serialBody += result.toString();
+        } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
+            VelocityContext context = new VelocityContext();
+            StringWriter result = new StringWriter();
+            context.put("ref", v.getName());
+            context.put("type", v.getType());
+            context.put("printComma", hasNextVariable);
+            TemplateManager.getInstance().getGen_toJSON_multiple().merge(context, result);
+            serialBody += result.toString();
+        }
+        return serialBody;
+    }
+
     private void createToJSONFunction() {
         String serialSignature = "toJSON";
         String returnType = "int";
@@ -228,28 +265,10 @@ public class Classifier {
 
         String serialBody = "\tprintf(\"{\\n\");\n";
         serialBody += "\tprintf(\"\\\"eClass\\\":\\\"%s\\\",\\n\", this->VT->metaClassName(this));\n";
-        for (Variable v : this.getVariables()) {
-            if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
-                VelocityContext context = new VelocityContext();
-                StringWriter result = new StringWriter();
-                context.put("ref", v.getName());
-                TemplateManager.getInstance().getGen_toJSON_primitive().merge(context, result);
-                serialBody += result.toString();
-            } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
-                VelocityContext context = new VelocityContext();
-                StringWriter result = new StringWriter();
-                context.put("ref", v.getName());
-                TemplateManager.getInstance().getGen_toJSON_unary().merge(context, result);
-                serialBody += result.toString();
-            } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
-                VelocityContext context = new VelocityContext();
-                StringWriter result = new StringWriter();
-                context.put("ref", v.getName());
-                context.put("type", v.getType());
-                TemplateManager.getInstance().getGen_toJSON_multiple().merge(context, result);
-                serialBody += result.toString();
-                //TODO if last element don't print a comma
-            }
+        Iterator<Variable> it = this.getVariables().iterator();
+        while (it.hasNext()) {
+            Variable v = it.next();
+            serialBody += toJSONVariable(v, it.hasNext());
         }
         serialBody += "\tprintf(\"}\\n\");\n";
         serialBody += "\treturn;\n";

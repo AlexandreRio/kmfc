@@ -2,5 +2,5 @@
 	{
 		printf("\"%s\" : {\n", #[[this->]]#$ref);
 		#[[this->]]#$ref#[[->VT->fptrToJSON(this->]]#$ref#[[);]]#
-		printf("},\n");
+		printf("}#if ($printComma),#end\n");
 	}

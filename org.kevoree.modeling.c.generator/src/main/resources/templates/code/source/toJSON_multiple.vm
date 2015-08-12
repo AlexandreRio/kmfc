@@ -10,4 +10,4 @@
 				printf(",\n");
 		}
 	}
-	printf("],\n");
+	printf("]#if ($printComma),#end\n");
