@@ -231,31 +231,21 @@ public class Classifier {
      * @return JSON output
      */
     private String toJSONVariable(Variable v, boolean hasNextVariable) {
-        String serialBody = "";
+        VelocityContext context = new VelocityContext();
+        StringWriter result = new StringWriter();
+        context.put("ref", v.getName());
+        context.put("printComma", hasNextVariable);
+
         if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
-            VelocityContext context = new VelocityContext();
-            StringWriter result = new StringWriter();
-            context.put("ref", v.getName());
-            context.put("printComma", hasNextVariable);
             TemplateManager.getInstance().getGen_toJSON_primitive().merge(context, result);
-            serialBody += result.toString();
         } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
-            VelocityContext context = new VelocityContext();
-            StringWriter result = new StringWriter();
-            context.put("ref", v.getName());
-            context.put("printComma", hasNextVariable);
             TemplateManager.getInstance().getGen_toJSON_unary().merge(context, result);
-            serialBody += result.toString();
         } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
-            VelocityContext context = new VelocityContext();
-            StringWriter result = new StringWriter();
-            context.put("ref", v.getName());
             context.put("type", v.getType());
-            context.put("printComma", hasNextVariable);
             TemplateManager.getInstance().getGen_toJSON_multiple().merge(context, result);
-            serialBody += result.toString();
         }
-        return serialBody;
+
+        return result.toString();
     }
 
     private void createToJSONFunction() {
