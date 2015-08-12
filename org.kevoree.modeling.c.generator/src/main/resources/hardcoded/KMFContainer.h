@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-#include "Visitor.h"
 #include "hashmap.h"
 
 typedef struct _VT_KMFContainer VT_KMFContainer;
@@ -12,7 +11,7 @@ typedef struct _KMFContainer KMFContainer;
 typedef char* (*fptrKMFMetaClassName)(void*);
 typedef char* (*fptrKMFInternalGetKey)(void*);
 typedef char* (*fptrKMFGetPath)(void*);
-typedef void (*fptrVisit)(void*, char*, fptrVisitAction, fptrVisitActionRef, bool);
+typedef int (*fptrToJSON)(void*);
 typedef void* (*fptrFindByPath)(void*, char*);
 typedef void (*fptrDelete)(void*);
 
@@ -20,11 +19,12 @@ typedef struct _VT_KMFContainer {
 	void *super;
 	/*
 	 * KMFContainer_VT
+	 * TODO should use the template
 	 */
 	fptrKMFMetaClassName metaClassName;
 	fptrKMFInternalGetKey internalGetKey;
 	fptrKMFGetPath getPath;
-	fptrVisit visit;
+	int (*fptrToJSON)(void*);
 	fptrFindByPath findByPath;
 	fptrDelete delete;
 } VT_KMFContainer;

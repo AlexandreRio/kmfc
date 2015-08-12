@@ -9,6 +9,7 @@ import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -63,17 +64,23 @@ public abstract class ClassSerializer {
             } else {
                 ret += "\t/*" + sClass + "*/\n";
                 for (Function f : Generator.classifiers.get(sClass).getFunctions()) {
-                    if (f.getVisibilityType() == Visibility.IN_VT)
+                    if (f.getVisibilityType() == Visibility.IN_VT && f.isTypeDef())
                         ret += "\tftpr" + f.getSignature() + " " +
                                 lowerCaseFirstChar(f.getSignature()) + ";\n";
+                    else if (f.getVisibilityType() == Visibility.IN_VT && !f.isTypeDef()) {
+
+                    }
                 }
             }
         }
         ret += "\t/*" + cls.getName() + "*/\n";
         for (Function f : Generator.classifiers.get(cls.getName()).getFunctions()) {
-            if (f.getVisibilityType() == Visibility.IN_VT)
+            if (f.getVisibilityType() == Visibility.IN_VT && f.isTypeDef())
                 ret += "\tftpr" + f.getSignature() + " " +
                         lowerCaseFirstChar(f.getSignature()) + ";\n";
+            else if (f.getVisibilityType() == Visibility.IN_VT && !f.isTypeDef()) {
+
+            }
         }
         ret += "} VT_" + cls.getName() + ";\n";
         return ret;
@@ -117,19 +124,21 @@ public abstract class ClassSerializer {
     private static String generateTypeDefFptr(Classifier cls) {
         String ret = "";
         for (Function f : cls.getFunctions()) {
-            ret += "typedef " + f.getReturnType() + " (*ftpr" + f.getSignature() + ")(";
-            Iterator<Parameter> iv = f.getParameters().iterator();
-            if (iv.hasNext()) {
-                Parameter p = iv.next();
-                ret += p.getType();
-            } else {
-                ret += "void";
+            if (f.isTypeDef()) {
+                ret += "typedef " + f.getReturnType() + " (*ftpr" + f.getSignature() + ")(";
+                Iterator<Parameter> iv = f.getParameters().iterator();
+                if (iv.hasNext()) {
+                    Parameter p = iv.next();
+                    ret += p.getType();
+                } else {
+                    ret += "void";
+                }
+                while (iv.hasNext()) {
+                    Parameter p = iv.next();
+                    ret += ", " + p.getType();
+                }
+                ret += ");\n";
             }
-            while (iv.hasNext()) {
-                Parameter p = iv.next();
-                ret += ", " + p.getType();
-            }
-            ret += ");\n";
         }
         return ret;
     }
@@ -158,7 +167,12 @@ public abstract class ClassSerializer {
 
     private static String generateBodyIncludes(Classifier cls) {
         String ret = "";
-        for (String s : Classifier.getLinkedClassifier(cls))
+        List<String> linkedClass = new ArrayList<String>(Classifier.getLinkedClassifier(cls));
+        for (String s : cls.getAllSuperClass())
+            if (!s.equals("KMFContainer"))
+                linkedClass.addAll(Classifier.getLinkedClassifier(Generator.classifiers.get(s)));
+
+        for (String s : linkedClass)
             ret += HelperGenerator.genIncludeLocal(s);
         return ret;
     }
@@ -170,8 +184,9 @@ public abstract class ClassSerializer {
         ret += "\t.metaClassName = " + cls.getName() + "_metaClassName,\n";
         ret += "\t.internalGetKey = " + cls.getName() + "_internalGetKey,\n";
         ret += "\t.delete = delete" + cls.getName() + ",\n";
+        ret += "\t.fptrToJSON = toJSON,\n";
         for (Function f : cls.getFunctions()) {
-            if (f.getVisibilityType() == Visibility.IN_VT) {
+            if (f.getVisibilityType() == Visibility.IN_VT && f.isTypeDef()) {
                 ret += "\t." + lowerCaseFirstChar(f.getSignature()) + " = "
                         + f.getSignature() + ",\n";
             }
@@ -195,7 +210,7 @@ public abstract class ClassSerializer {
             curClass = Generator.classifiers.get(current);
             prefix += "super->";
             for (Function f : curClass.getFunctions()) {
-                if (f.getVisibilityType() == Visibility.IN_VT)
+                if (f.getVisibilityType() == Visibility.IN_VT && f.isTypeDef())
                     ret += "\tthis->VT->" + lowerCaseFirstChar((f.getSignature())) + " = this->VT->"
                             + prefix + lowerCaseFirstChar(f.getSignature()) + ";\n";
             }
@@ -205,6 +220,8 @@ public abstract class ClassSerializer {
     }
     private static String generateSourceFile(Classifier cls) {
         setFunctionPointerToInheritedFunctions(cls);
+        Classifier.createToJSONFunction(cls);
+
         String ret = "";
         ret += HelperGenerator.genIncludeLocal(cls.getName());
         ret += "\n";
