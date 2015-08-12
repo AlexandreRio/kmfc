@@ -227,11 +227,14 @@ public class Classifier {
         Parameter p = new Parameter(this.name + "*", "this", true);
 
         String serialBody = "\tprintf(\"{\\n\");\n";
-        serialBody += "\tprintf(\"eClass:%s,\\n\", this->VT->metaClassName(this));\n";
+        serialBody += "\tprintf(\"\\\"eClass\\\":\\\"%s\\\",\\n\", this->VT->metaClassName(this));\n";
         for (Variable v : this.getVariables()) {
             if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
-                serialBody += "\tif (this->" + v.getName() + "!= NULL)\n";
-                serialBody += "\t\tprintf(\"" + v.getName() + " : %s,\\n\", this->" + v.getName() + ");\n";
+                VelocityContext context = new VelocityContext();
+                StringWriter result = new StringWriter();
+                context.put("ref", v.getName());
+                TemplateManager.getInstance().getGen_toJSON_primitive().merge(context, result);
+                serialBody += result.toString();
             } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
                 VelocityContext context = new VelocityContext();
                 StringWriter result = new StringWriter();

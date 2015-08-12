@@ -1,6 +1,5 @@
 #include "ContainerRoot.h"
 #include "Group.h"
-#include "VisitorJSON.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -16,10 +15,7 @@ int main(void)
   g2->name = "other_group";
   o->VT->containerRootAddGroups(o, g2);
 
-  //VisitorJSON* visitorJSON = visitor_json_new();
-  //o->VT->fptrAccept(o, visitorJSON->visitor);
   o->VT->fptrToJSON(o);
-  //visitorJSON->destroy(visitorJSON);
   o->VT->delete(o);
   free(o);
 }
