@@ -224,17 +224,15 @@ public class Classifier {
     private void createToJSONFunction() {
         String serialSignature = "toJSON";
         String returnType = "int";
-        Parameter p1 = new Parameter(this.name + "*", "this", true);
+        Parameter p = new Parameter(this.name + "*", "this", true);
 
-        String serialBody = "printf(\"{\\n\");\n";
-        serialBody += "printf(\"eClass:%s,\\n\", this->VT->metaClassName(this));\n";
+        String serialBody = "\tprintf(\"{\\n\");\n";
+        serialBody += "\tprintf(\"eClass:%s,\\n\", this->VT->metaClassName(this));\n";
         for (Variable v : this.getVariables()) {
-            //TODO, primitives first, factorize if (this->s != NULL)
             if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
-                serialBody += "if (this->" + v.getName() + "!= NULL)\n";
-                serialBody += "\tprintf(\"" + v.getName() + " : %s,\\n\", this->" + v.getName() + ");\n";
+                serialBody += "\tif (this->" + v.getName() + "!= NULL)\n";
+                serialBody += "\t\tprintf(\"" + v.getName() + " : %s,\\n\", this->" + v.getName() + ");\n";
             } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
-                //serialBody += "\tthis->" + v.getName() + "->VT->fptrToJSON(this->" + v.getName() + ");\n";
                 VelocityContext context = new VelocityContext();
                 StringWriter result = new StringWriter();
                 context.put("ref", v.getName());
@@ -250,11 +248,11 @@ public class Classifier {
                 //TODO if last element don't print a comma
             }
         }
-        serialBody += "printf(\"}\\n\");\n";
-        serialBody += "\treturn;\n";// visitor->visit(visitor, \"" + this.name + "\", this);\n";
+        serialBody += "\tprintf(\"}\\n\");\n";
+        serialBody += "\treturn;\n";
 
         Function f = new Function(serialSignature, returnType, Visibility.IN_VT, true, false);
-        f.addParameter(p1);
+        f.addParameter(p);
         f.setBody(serialBody);
         this.addFunction(f);
     }
