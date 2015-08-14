@@ -23,9 +23,11 @@ public class TemplateManager {
     private Template gen_delete;
     private Template gen_new;
     private Template gen_find_by_id;
+
     private Template gen_toJSON_multiple;
     private Template gen_toJSON_unary;
     private Template gen_toJSON_primitive;
+
     private Template gen_test_runner;
     private Template gen_test_header;
     private Template gen_test_source;
@@ -43,6 +45,7 @@ public class TemplateManager {
     private String getKey_DeployUnit;
     private String getKey_TypeDefinition;
     private String KMFContainer_fptr;
+    private String KMFContainer;
     private String print_debug;
     private String license;
     private String header_comment;
@@ -66,6 +69,7 @@ public class TemplateManager {
         gen_delete = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "delete.vm");
         gen_new = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "new.vm");
         gen_find_by_id = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "findById.vm");
+
         gen_toJSON_multiple = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_multiple.vm");
         gen_toJSON_unary = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_unary.vm");
         gen_toJSON_primitive = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_primitive.vm");
@@ -93,6 +97,11 @@ public class TemplateManager {
         result = new StringWriter();
         ve.getTemplate(BASE_DIR + CODE_DIR + HEADER_DIR + "kmfcontainer_fptr.vm").merge(context, result);
         KMFContainer_fptr = result.toString();
+
+        result = new StringWriter();
+        context.put("kmfcontainer_fptr", KMFContainer_fptr);
+        ve.getTemplate(BASE_DIR + CODE_DIR + HEADER_DIR + "kmfcontainer.vm").merge(context, result);
+        KMFContainer = result.toString();
 
         result = new StringWriter();
         ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "print_debug.vm").merge(context, result);
@@ -185,6 +194,10 @@ public class TemplateManager {
 
     public String getKMFContainer_fptr() {
         return KMFContainer_fptr;
+    }
+
+    public String getKMFContainer() {
+        return KMFContainer;
     }
 
     public String getPrint_debug() {

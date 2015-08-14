@@ -1,9 +1,9 @@
-#ifndef __KMF4C_H
+#[[#ifndef __KMF4C_H
 #define __KMF4C_H
 
 #include <stdbool.h>
 
-#include "hashmap.h"
+    #include "hashmap.h"]]#
 
 typedef struct _VT_KMFContainer VT_KMFContainer;
 typedef struct _KMFContainer KMFContainer;
@@ -17,16 +17,7 @@ typedef void (*fptrDelete)(void*);
 
 typedef struct _VT_KMFContainer {
 	void *super;
-	/*
-	 * KMFContainer_VT
-	 * TODO should use the template
-	 */
-	fptrKMFMetaClassName metaClassName;
-	fptrKMFInternalGetKey internalGetKey;
-	fptrKMFGetPath getPath;
-	int (*fptrToJSON)(void*);
-	fptrFindByPath findByPath;
-	fptrDelete delete;
+	${kmfcontainer_fptr}
 } VT_KMFContainer;
 
 typedef struct _KMFContainer {

@@ -131,6 +131,11 @@ public class Generator {
                 "CMakeLists.txt", result.toString(), false);
     }
 
+    private void generateKMFContainer() throws IOException {
+        FileManager.writeFile(this.context.getGenerationDirectory().getAbsolutePath() + File.separator +
+                "KMFContainer.h", TemplateManager.getInstance().getKMFContainer(), false);
+    }
+
     private void generateTests() throws IOException {
         Map<String, Classifier> concreteClass = new HashMap<String, Classifier>();
         //generate test suites
@@ -155,6 +160,7 @@ public class Generator {
         try {
             this.copyFramework();
             this.generateCMakeLists();
+            this.generateKMFContainer();
             this.generateTests();
         } catch (IOException e) {
             System.err.println("Error while generating environment: " + e.getMessage());
