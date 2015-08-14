@@ -17,7 +17,7 @@
 - [x] Add Doxygen style comments to generated code
 - [x] Check for memory leak issue
 
-- [ ] Implement visitor design pattern
-- [ ] Implement serialization
+- [x] Implement visitor design pattern
+- [x] Implement serialization
 - [ ] Implement deserialization
 - [ ] Implement comparison
