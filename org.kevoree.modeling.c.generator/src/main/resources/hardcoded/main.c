@@ -1,4 +1,5 @@
 #include "ContainerRoot.h"
+#include "Group.h"
 
 #include "json.h"
 #include "jsonparse.h"
@@ -6,15 +7,66 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void parse(struct jsonparse_state *state, char type)
+void parseCRoot(struct jsonparse_state *state, ContainerRoot *o, char* attr);
+
+typedef enum TYPE {
+  ContainerRoot_Type,
+  Group_Type
+} TYPE;
+
+
+ContainerRoot* parse(struct jsonparse_state *state, char type)
+{
+  TYPE current = ContainerRoot_Type;
+  char str[200];
+  ContainerRoot* o = new_ContainerRoot();
+
+  type = jsonparse_next(state);
+  jsonparse_copy_value(state, str, sizeof str);
+  if (type == JSON_TYPE_PAIR_NAME)
+  {
+    type = jsonparse_next(state); // should be JSON_TYPE_PAIR
+    parseCRoot(state, o, str);
+    //printf("type: %c str: %s\n", type, str);
+    // we look for an attribute named "str" in the TYPE struct
+  }
+  //printf("type: %c str: %s\n", type, str);
+
+  return o;
+}
+
+void parseCRoot(struct jsonparse_state *state, ContainerRoot *o, char* attr)
 {
   char str[200];
-
-  while (type != JSON_TYPE_ERROR)
+  char type;
+  if (strcmp(attr, "eClass") == 0)
+  {
+  } else if (strcmp(attr, "generated_KMF_ID") == 0) 
   {
     type = jsonparse_next(state);
+    if (type != JSON_TYPE_STRING)
+      exit(EXIT_FAILURE);
     jsonparse_copy_value(state, str, sizeof str);
-    printf("%s\n", str);
+
+    strcpy(o->generated_KMF_ID, str);
+  } else if (strcmp(attr, "nodes") == 0)
+  {
+    type = jsonparse_next(state);
+    if (type != JSON_TYPE_ARRAY)
+      exit(EXIT_FAILURE);
+
+    while((type = jsonparse_next(state)) != ']')
+    {
+      if (type == JSON_TYPE_OBJECT)
+      {
+        Group* g = new_Group();
+        // eather loop over the attribute or delegate to the other parser
+        parseGroup(state, g, "");
+      }
+
+
+    }
+    //type = jsonparse_next(state); // should be JSON_TYPE_PAIR
   }
 }
 
@@ -48,11 +100,9 @@ int main(void)
   struct jsonparse_state state;
   jsonparse_setup(&state, model, size+1);
 
-  parse(&state, jsonparse_next(&state));
+  ContainerRoot *o = parse(&state, jsonparse_next(&state));
 
-  ContainerRoot *o = new_ContainerRoot();
-
-  //o->VT->fptrToJSON(o);
+  o->VT->fptrToJSON(o);
   o->VT->delete(o);
   free(model);
   free(o);
