@@ -14,18 +14,7 @@ import java.util.List;
 public class ConverterDataTypes {
 
     static ConverterDataTypes singleton = null;
-
-
-    public static ConverterDataTypes getInstance() {
-        if (singleton == null) {
-            singleton = new ConverterDataTypes();
-        }
-        return singleton;
-    }
-
-
     public List<String> cpp_reserve = new ArrayList<String>();
-
     public HashMap dataTypes = new HashMap<String, String>();
 
     public ConverterDataTypes() {
@@ -74,6 +63,13 @@ public class ConverterDataTypes {
 
     }
 
+    public static ConverterDataTypes getInstance() {
+        if (singleton == null) {
+            singleton = new ConverterDataTypes();
+        }
+        return singleton;
+    }
+
     public String check_type(String t) {
         if (dataTypes.containsKey(t)) {
             return dataTypes.get(t).toString();
@@ -83,6 +79,12 @@ public class ConverterDataTypes {
 
     }
 
+    public boolean isPrimitive(String type) {
+        if (type.equals("int") || type.equals("bool")) {
+            return true;
+        }
+        return false;
+    }
 
     public String check_class_name(String name) {
         if (cpp_reserve.contains(name)) {

@@ -26,7 +26,8 @@ public class TemplateManager {
 
     private Template gen_toJSON_multiple;
     private Template gen_toJSON_unary;
-    private Template gen_toJSON_primitive;
+    private Template gen_toJSON_primitive_as_str;
+    private Template gen_toJSON_primitive_bool;
 
     private Template gen_test_runner;
     private Template gen_test_header;
@@ -72,7 +73,8 @@ public class TemplateManager {
 
         gen_toJSON_multiple = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_multiple.vm");
         gen_toJSON_unary = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_unary.vm");
-        gen_toJSON_primitive = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_primitive.vm");
+        gen_toJSON_primitive_as_str = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_primitive_as_str.vm");
+        gen_toJSON_primitive_bool = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_primitive_bool.vm");
 
         gen_test_runner = ve.getTemplate(BASE_DIR + TEST_DIR + SOURCE_DIR + "testRunner.vm");
         gen_test_header = ve.getTemplate(BASE_DIR + TEST_DIR + HEADER_DIR + "testHeader.vm");
@@ -164,8 +166,12 @@ public class TemplateManager {
         return gen_toJSON_unary;
     }
 
-    public Template getGen_toJSON_primitive() {
-        return gen_toJSON_primitive;
+    public Template getGen_toJSON_primitive_as_str() {
+        return gen_toJSON_primitive_as_str;
+    }
+
+    public Template getGen_toJSON_primitive_bool() {
+        return gen_toJSON_primitive_bool;
     }
 
     public Template getGen_cmakelists() {

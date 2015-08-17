@@ -83,8 +83,10 @@ public class Classifier {
         context.put("ref", v.getName());
         context.put("printComma", hasNextVariable);
 
-        if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
-            TemplateManager.getInstance().getGen_toJSON_primitive().merge(context, result);
+        if (v.getLinkType() == Variable.LinkType.PRIMITIVE && ConverterDataTypes.getInstance().isPrimitive(v.getType())) {
+            TemplateManager.getInstance().getGen_toJSON_primitive_bool().merge(context, result);
+        } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE && !ConverterDataTypes.getInstance().isPrimitive(v.getType())) {
+            TemplateManager.getInstance().getGen_toJSON_primitive_as_str().merge(context, result);
         } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
             TemplateManager.getInstance().getGen_toJSON_unary().merge(context, result);
         } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
@@ -172,7 +174,7 @@ public class Classifier {
         String returnType = "void";
         Parameter p1 = new Parameter(this.name + "*", "this", true);
         Parameter p2;
-        if (v.getType().equals("char*"))
+        if (v.getType().equals("char*") || ConverterDataTypes.getInstance().isPrimitive(v.getType()))
             p2 = new Parameter(v.getType(), "ptr");
         else
             p2 = new Parameter(v.getType() + "*", "ptr");
@@ -218,7 +220,7 @@ public class Classifier {
         String returnType = "void";
         Parameter p1 = new Parameter(this.name + "*", "this", true);
         Parameter p2;
-        if (v.getType().equals("char*"))
+        if (v.getType().equals("char*") || ConverterDataTypes.getInstance().isPrimitive(v.getType()))
             p2 = new Parameter(v.getType(), "ptr");
         else
             p2 = new Parameter(v.getType() + "*", "ptr");
