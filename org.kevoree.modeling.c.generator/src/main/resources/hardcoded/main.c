@@ -8,22 +8,48 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void parseCRoot(struct jsonparse_state *state, ContainerRoot *o);
 
 typedef enum TYPE {
   ContainerRoot_Type,
-  Group_Type
+  Group_Type,
+  ContainerNode_Type
 } TYPE;
 
 struct at {
   char* attr_name;
-  void* fptr;
+  void* fptr; // fptr to parse result from json
+  //why not void* fptr to set result on the object, like groupAddSubNodes(void* o, type)
 };
 
 struct ClassType {
   TYPE type;
   struct at* attributes;
 };
+
+// something like (json state, where to put the result, 
+void parserFunct()
+{}
+
+void parseCRoot(struct jsonparse_state *state, ContainerRoot *o);
+void parseObject(struct jsonparse_state *state, void* o, TYPE type);
+
+const struct ClassType Classes[3] = {
+  {
+    .type = ContainerRoot_Type,
+    .attributes = {{"name", parserFunct}, {"groups", parserFunct}}
+  },
+  {
+    .type = Group_Type,
+    .attributes = {{"name", parserFunct}, {"started", parserFunct}, {"subNodes", parserFunct}},
+  }
+};
+
+const struct ClassType getClass(char* name)
+{
+
+}
+
+//struct ClassType Classes[0] = {.type = ContainerRoot_Type};
 
 char attr[200];
 
