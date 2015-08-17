@@ -1,4 +1,5 @@
 #include "ContainerRoot.h"
+#include "ContainerNode.h"
 #include "Group.h"
 
 #include "json.h"
@@ -9,27 +10,38 @@
 
 void parseCRoot(struct jsonparse_state *state, ContainerRoot *o);
 
-//typedef enum TYPE {
-//  ContainerRoot_Type,
-//  Group_Type
-//} TYPE;
+typedef enum TYPE {
+  ContainerRoot_Type,
+  Group_Type
+} TYPE;
+
+struct at {
+  char* attr_name;
+  void* fptr;
+};
+
+struct ClassType {
+  TYPE type;
+  struct at* attributes;
+};
 
 char attr[200];
 
 ContainerRoot* parse(struct jsonparse_state *state, char type)
 {
-  char str[200];
   ContainerRoot* o = new_ContainerRoot();
 
   type = jsonparse_next(state);
-  jsonparse_copy_value(state, str, sizeof str);
   if (type == JSON_TYPE_PAIR_NAME)
   {
-    printf("parsing Croot\n");
     parseCRoot(state, o);
   }
 
   return o;
+}
+
+void parseObject(struct jsonparse_state *state, void* o, TYPE type)
+{
 }
 
 void parseGroup(struct jsonparse_state *state, Group *g)
@@ -41,22 +53,45 @@ void parseGroup(struct jsonparse_state *state, Group *g)
     printf("Group loop attr: %s type: %c\n", attr, type);
     if (strcmp(attr, "name") == 0 && type == JSON_TYPE_PAIR_NAME)
     {
+      // -----------------------------------------------------------------------
       type = jsonparse_next(state);
       type = jsonparse_next(state);
       jsonparse_copy_value(state, attr, sizeof attr);
+      // -----------------------------------------------------------------------
+
+      // -----------------------------------------------------------------------
       g->VT->namedElementAddName((NamedElement*) g, attr);
+      // -----------------------------------------------------------------------
     } else if (strcmp(attr, "started") == 0 && type == JSON_TYPE_PAIR_NAME)
     {
+      // -----------------------------------------------------------------------
       type = jsonparse_next(state);
       type = jsonparse_next(state);
-
       jsonparse_copy_value(state, attr, sizeof attr);
+      // -----------------------------------------------------------------------
+
+      // -----------------------------------------------------------------------
       bool b = true;
       if (strcmp(attr, "false") == 0)
-      {
         b = false;
-      }
+      // -----------------------------------------------------------------------
+
+      // -----------------------------------------------------------------------
       g->VT->instanceAddStarted((Instance*) g, b);
+      // -----------------------------------------------------------------------
+    } else if (strcmp(attr, "subNodes") == 0 && type == JSON_TYPE_ARRAY)
+    {
+      // -----------------------------------------------------------------------
+      while((type = jsonparse_next(state)) != ']')
+      {
+        if (type == JSON_TYPE_OBJECT)
+        {
+          ContainerNode *ptr = new_ContainerNode();
+          //parseContainerNode(state, ptr);
+          g->VT->groupAddSubNodes(g, ptr);
+        }
+      }
+      // -----------------------------------------------------------------------
     }
   }
 }
@@ -77,24 +112,27 @@ void parseCRoot(struct jsonparse_state *state, ContainerRoot *o)
     {
     } else if (strcmp(attr, "generated_KMF_ID") == 0 && type == JSON_TYPE_PAIR_NAME) 
     {
+      // -----------------------------------------------------------------------
       type = jsonparse_next(state);
       type = jsonparse_next(state);
       if (type != JSON_TYPE_STRING)
         exit(EXIT_FAILURE);
       jsonparse_copy_value(state, attr, sizeof attr);
+      // -----------------------------------------------------------------------
 
       //strcpy(o->generated_KMF_ID, attr);
     } else if (strcmp(attr, "groups") == 0 && type == JSON_TYPE_ARRAY)
     {
+      // -----------------------------------------------------------------------
       while((type = jsonparse_next(state)) != ']')
       {
         if (type == JSON_TYPE_OBJECT)
         {
           Group* g = new_Group();
-          printf("parsing Group\n");
           parseGroup(state, g);
           o->VT->containerRootAddGroups(o, g);
         }
+        // -----------------------------------------------------------------------
 
 
       }
