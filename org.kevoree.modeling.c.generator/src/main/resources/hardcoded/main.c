@@ -7,17 +7,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void parseCRoot(struct jsonparse_state *state, ContainerRoot *o, char* attr);
+void parseCRoot(struct jsonparse_state *state, ContainerRoot *o);
 
-typedef enum TYPE {
-  ContainerRoot_Type,
-  Group_Type
-} TYPE;
+//typedef enum TYPE {
+//  ContainerRoot_Type,
+//  Group_Type
+//} TYPE;
 
+char attr[200];
 
 ContainerRoot* parse(struct jsonparse_state *state, char type)
 {
-  TYPE current = ContainerRoot_Type;
   char str[200];
   ContainerRoot* o = new_ContainerRoot();
 
@@ -25,48 +25,81 @@ ContainerRoot* parse(struct jsonparse_state *state, char type)
   jsonparse_copy_value(state, str, sizeof str);
   if (type == JSON_TYPE_PAIR_NAME)
   {
-    type = jsonparse_next(state); // should be JSON_TYPE_PAIR
-    parseCRoot(state, o, str);
-    //printf("type: %c str: %s\n", type, str);
-    // we look for an attribute named "str" in the TYPE struct
+    printf("parsing Croot\n");
+    parseCRoot(state, o);
   }
-  //printf("type: %c str: %s\n", type, str);
 
   return o;
 }
 
-void parseCRoot(struct jsonparse_state *state, ContainerRoot *o, char* attr)
+void parseGroup(struct jsonparse_state *state, Group *g)
 {
-  char str[200];
-  char type;
-  if (strcmp(attr, "eClass") == 0)
+  char type = JSON_TYPE_OBJECT;
+  while((type = jsonparse_next(state)) != '}')
   {
-  } else if (strcmp(attr, "generated_KMF_ID") == 0) 
-  {
-    type = jsonparse_next(state);
-    if (type != JSON_TYPE_STRING)
-      exit(EXIT_FAILURE);
-    jsonparse_copy_value(state, str, sizeof str);
-
-    strcpy(o->generated_KMF_ID, str);
-  } else if (strcmp(attr, "nodes") == 0)
-  {
-    type = jsonparse_next(state);
-    if (type != JSON_TYPE_ARRAY)
-      exit(EXIT_FAILURE);
-
-    while((type = jsonparse_next(state)) != ']')
+    jsonparse_copy_value(state, attr, sizeof attr);
+    printf("Group loop attr: %s type: %c\n", attr, type);
+    if (strcmp(attr, "name") == 0 && type == JSON_TYPE_PAIR_NAME)
     {
-      if (type == JSON_TYPE_OBJECT)
+      type = jsonparse_next(state);
+      type = jsonparse_next(state);
+      jsonparse_copy_value(state, attr, sizeof attr);
+      g->VT->namedElementAddName((NamedElement*) g, attr);
+    } else if (strcmp(attr, "started") == 0 && type == JSON_TYPE_PAIR_NAME)
+    {
+      type = jsonparse_next(state);
+      type = jsonparse_next(state);
+
+      jsonparse_copy_value(state, attr, sizeof attr);
+      bool b = true;
+      if (strcmp(attr, "false") == 0)
       {
-        Group* g = new_Group();
-        // eather loop over the attribute or delegate to the other parser
-        parseGroup(state, g, "");
+        b = false;
       }
-
-
+      g->VT->instanceAddStarted((Instance*) g, b);
     }
-    //type = jsonparse_next(state); // should be JSON_TYPE_PAIR
+  }
+}
+
+void parseCRoot(struct jsonparse_state *state, ContainerRoot *o)
+{
+  char type = JSON_TYPE_PAIR_NAME;
+  type = jsonparse_next(state);
+  jsonparse_copy_value(state, attr, sizeof attr);
+
+  while (type != JSON_TYPE_ERROR)
+  {
+    type = jsonparse_next(state);
+    jsonparse_copy_value(state, attr, sizeof attr);
+    //printf("type: %c attr: %s\n", type, attr);
+
+    if (strcmp(attr, "eClass") == 0)
+    {
+    } else if (strcmp(attr, "generated_KMF_ID") == 0 && type == JSON_TYPE_PAIR_NAME) 
+    {
+      type = jsonparse_next(state);
+      type = jsonparse_next(state);
+      if (type != JSON_TYPE_STRING)
+        exit(EXIT_FAILURE);
+      jsonparse_copy_value(state, attr, sizeof attr);
+
+      //strcpy(o->generated_KMF_ID, attr);
+    } else if (strcmp(attr, "groups") == 0 && type == JSON_TYPE_ARRAY)
+    {
+      while((type = jsonparse_next(state)) != ']')
+      {
+        if (type == JSON_TYPE_OBJECT)
+        {
+          Group* g = new_Group();
+          printf("parsing Group\n");
+          parseGroup(state, g);
+          o->VT->containerRootAddGroups(o, g);
+        }
+
+
+      }
+      //type = jsonparse_next(state); // should be JSON_TYPE_PAIR
+    }
   }
 }
 
@@ -102,7 +135,10 @@ int main(void)
 
   ContainerRoot *o = parse(&state, jsonparse_next(&state));
 
+  printf("-------------------\n");
   o->VT->fptrToJSON(o);
+  printf("-------------------\n");
+
   o->VT->delete(o);
   free(model);
   free(o);
