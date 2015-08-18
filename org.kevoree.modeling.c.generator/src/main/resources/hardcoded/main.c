@@ -13,16 +13,17 @@
 #define ContainerRoot_Type_SIZE 2
 
 typedef char* (*fptrParseStr)(struct jsonparse_state*);
+typedef void (*fptrParser)(struct jsonparse_state*, void*);
 
 typedef enum TYPE {
-  ContainerRoot_Type = 0,
+  ContainerRoot_Type = 0, //FIXME values just for debug purposes
   Group_Type = 1,
   ContainerNode_Type = 2
 } TYPE;
 
 struct at {
   char* attr_name;
-  fptrParseStr* fptr; // fptr to parse result from json
+  fptrParser* parser; // fptr to parse result from json
   //why not void* fptr to set result on the object, like groupAddSubNodes(void* o, type)
 };
 
@@ -32,17 +33,14 @@ struct ClassType {
   struct at* attributes;
 };
 
-// something like (json state, where to put the result, 
-void parserFunct()
-{}
 
 void parseCRoot(struct jsonparse_state *state, ContainerRoot *o);
 void parseObject(struct jsonparse_state *state, void* o, TYPE type);
-char* parseStr(struct jsonparse_state *state);
+void parseStr(struct jsonparse_state *state, void* result);
 
 const struct at ContainerRoot_Attr[ContainerRoot_Type_SIZE] = {
   {"generated_KMF_ID", parseStr},
-  {"oe", parseStr}
+  {"groups", parseObject}
 };
 
 const struct ClassType Classes[NB_CLASSES] = {
@@ -53,7 +51,7 @@ const struct ClassType Classes[NB_CLASSES] = {
   },
   {
     .type = Group_Type,
-    .attributes = {{"name", parserFunct}, {"started", parserFunct}, {"subNodes", parserFunct}},
+    .attributes = NULL,
     .nb_attributes = 3
   },
   {
@@ -84,7 +82,7 @@ const struct ClassType getClass(TYPE type)
   exit(EXIT_FAILURE);
 }
 
-fptrParseStr getParseFunc(struct ClassType ctype, char* name)
+fptrParser getParseFunc(struct ClassType ctype, char* name)
 {
   for (int i=0; i<ctype.nb_attributes; i++)
   {
@@ -92,7 +90,7 @@ fptrParseStr getParseFunc(struct ClassType ctype, char* name)
     //printf("comparing %s and %s\n", a.attr_name, name);
     if (strcmp(a.attr_name, name) == 0)
     {
-      return a.fptr;
+      return a.parser;
     }
   }
   return NULL;
@@ -100,12 +98,15 @@ fptrParseStr getParseFunc(struct ClassType ctype, char* name)
 
 char attr[200];
 
-char* parseStr(struct jsonparse_state *state)
+void parseStr(struct jsonparse_state *state, void* result)
 {
   char type;
   while((type = jsonparse_next(state)) != JSON_TYPE_STRING) {}
   jsonparse_copy_value(state, attr, sizeof attr);
-  return attr;
+  printf("result is %s\n", attr);
+  result = attr;
+  printf("result is %s\n", result);
+  //return attr;
 }
 
 void parseObject(struct jsonparse_state *state, void* o, TYPE class_type)
@@ -128,7 +129,8 @@ void parseObject(struct jsonparse_state *state, void* o, TYPE class_type)
       //printf("getter returned %p\n", get);
       if (get != NULL)
       {
-        char* res = getParseFunc(ctype, attr)(state);
+        char* res;
+        getParseFunc(ctype, attr)(state, &res);
         printf("result from function pointer is %s\n", res);
       }
 
