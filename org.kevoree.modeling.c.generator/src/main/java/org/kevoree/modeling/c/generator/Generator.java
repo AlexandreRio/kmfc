@@ -12,6 +12,7 @@ import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
 import org.kevoree.modeling.c.generator.model.ClassSerializer;
 import org.kevoree.modeling.c.generator.model.Classifier;
 import org.kevoree.modeling.c.generator.model.TestSerializer;
+import org.kevoree.modeling.c.generator.model.Variable;
 import org.kevoree.modeling.c.generator.utils.CheckerConstraint;
 import org.kevoree.modeling.c.generator.utils.FileManager;
 import org.kevoree.modeling.c.generator.utils.HelperGenerator;
@@ -94,10 +95,10 @@ public class Generator {
 
     /**
      * Generate a CMakeLists.txt file based on the meta-model and the hardcoded framework.
-     *
+     * <p>
      * Source file are stored in sourceList along with framework files, except main files.
      * For every main files in the framework an executable is created.
-     *
+     * <p>
      * To be considered as a main file it has to be named main*.c
      *
      * @throws IOException
@@ -151,6 +152,68 @@ public class Generator {
                 "kevoree.h", ret, false);
     }
 
+    private void generateDeserializer() throws IOException {
+        String ret = "";
+        int nbClass = Generator.classifiers.size();
+        ret += "#define NB_CLASSES " + nbClass + "\n\n";
+
+        for (Classifier c : Generator.classifiers.values()) {
+            int nbVar = c.getVariables().size();
+            for (String s : c.getAllSuperClass())
+                if (!s.equals("KMFContainer"))
+                    nbVar += Generator.classifiers.get(s).getVariables().size();
+            ret += "#define " + c.getName() + "_NB_ATTR " + nbVar + "\n";
+        }
+
+        ret += "\n";
+        ret += "typedef enum TYPE {\n";
+        for (String s : Generator.classifiers.keySet())
+            ret += "\t" + s.toUpperCase() + "_TYPE,\n";
+        ret += "};\n";
+
+        for (Classifier c : Generator.classifiers.values()) {
+            List<Variable> allVars = new LinkedList<Variable>(c.getVariables());
+            ret += "const struct at " + c.getName() + "_Attr[" + c.getName() + "_NB_ATTR] = {\n";
+            for (String parent : c.getAllSuperClass())
+                if (!parent.equals("KMFContainer"))
+                    allVars.addAll(Generator.classifiers.get(parent).getVariables());
+
+            for (Variable v : allVars) {
+                String parser = "";
+                String type = "";
+                if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
+                    parser = "parseArray";
+                    type = v.getType() + "_TYPE";
+                } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
+                    parser = "parseObject";
+                    type = v.getType() + "_TYPE";
+                } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
+                    if (v.getType().equals("char*"))
+                        parser = "parseStr";
+                    else
+                        parser = "parseBool";
+                    type = "PRIMITIVE_TYPE";
+                }
+
+                ret += "{\"" + v.getName() + "\", " + parser + ", " + c.getName().toUpperCase() + "_TYPE, " + type + "},\n";
+            }
+            ret += "};\n\n";
+        }
+
+        ret += "const struct ClassType Classes[NB_CLASSES] = {\n";
+        for (Classifier c : Generator.classifiers.values()) {
+            ret += "\t{\n";
+            ret += "\t\t.type = " + c.getName() + "_TYPE,\n";
+            ret += "\t\t.attributes = &" + c.getName() + "_Attr,\n";
+            ret += "\t\t.nb_attributes = " + c.getName() + "_NB_ATTR,\n";
+            ret += "\t},\n";
+        }
+        ret += "};\n";
+
+        FileManager.writeFile(this.context.getGenerationDirectory().getAbsolutePath() + File.separator +
+                "jsondeserializer.temp", ret, false);
+    }
+
     private void generateTests() throws IOException {
         Map<String, Classifier> concreteClass = new HashMap<String, Classifier>();
         //generate test suites
@@ -177,7 +240,7 @@ public class Generator {
             this.generateCMakeLists();
             this.generateKMFContainer();
             this.generateKevoreeBigHeader();
-            //this.generateDeserializer();
+            this.generateDeserializer();
             this.generateTests();
         } catch (IOException e) {
             System.err.println("Error while generating environment: " + e.getMessage());
