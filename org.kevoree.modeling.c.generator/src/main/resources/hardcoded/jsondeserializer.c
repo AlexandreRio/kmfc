@@ -6,16 +6,21 @@ void ContainerRootSetKMF_ID(struct jsonparse_state* state, void* o, TYPE obj_typ
 void doNothing(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type);
 
 const struct at ContainerRoot_Attr[ContainerRoot_Type_SIZE] = {
-  {"generated_KMF_ID", ContainerRootSetKMF_ID, ContainerRoot_Type, Primitive_Type},
-  {"eClass", doNothing, ContainerRoot_Type, Primitive_Type},
-  {"groups", parseArray, ContainerRoot_Type, Group_Type}
+  {"generated_KMF_ID", ContainerRootSetKMF_ID, ContainerRoot_Type, Primitive_Type}     ,
+  {"eClass"          , doNothing             , ContainerRoot_Type, Primitive_Type}     ,
+  {"groups"          , parseArray            , ContainerRoot_Type, Group_Type}         ,
+  {"nodes"           , parseArray            , ContainerRoot_Type, ContainerNode_Type} ,
+  {"typeDefinitions" , parseArray            , ContainerRoot_Type, TypeDefinition_Type},
+  {"repositories"    , parseArray            , ContainerRoot_Type, Repository_Type}    ,
+  {"dataTypes"       , parseArray            , ContainerRoot_Type, TypedElement_Type}  ,
+  {"libraries"       , parseArray            , ContainerRoot_Type, TypeLibrary_Type}
 };
 
 const struct ClassType Classes[NB_CLASSES] = {
   {
     .type = ContainerRoot_Type,
     .attributes = &ContainerRoot_Attr,
-    .nb_attributes = 3
+    .nb_attributes = ContainerRoot_Type_SIZE 
   },
   {
     .type = Group_Type,
@@ -27,6 +32,20 @@ const struct ClassType Classes[NB_CLASSES] = {
   }
 };
 
+//Constuctor for abstact type,it
+void* new_TypeDefinition()
+{
+}
+
+const fptrConstruct construct[NB_CLASSES] = {
+  [ContainerRoot_Type] = new_ContainerRoot,
+  [Group_Type] = new_Group,
+  [ContainerNode_Type] = new_ContainerNode,
+  [Repository_Type] = new_Repository,
+  [TypeLibrary_Type] = new_TypeLibrary,
+  [TypedElement_Type] = new_TypedElement,
+  [TypeDefinition_Type] = new_TypeDefinition
+};
 
 const struct ClassType getClass(TYPE type)
 {
@@ -42,7 +61,6 @@ struct at getAttr(struct ClassType ctype, char* name)
   for (int i=0; i<ctype.nb_attributes; i++)
   {
     a = ctype.attributes[i];
-    //printf("comparing %s and %s\n", a.attr_name, name);
     if (strcmp(a.attr_name, name) == 0)
     {
       return a;
@@ -65,19 +83,28 @@ void doNothing(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_t
 
 void ContainerRootSetKMF_ID(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
-  printf("In %d and need to set %d type attribute\n", obj_type, ptr_type);
   char* param = parseStr(state);
-  ContainerRoot* ptr = (ContainerRoot*)o;
-  strcpy(ptr->generated_KMF_ID, param);
-  printf("new generated_KMF_ID value is %s\n", ptr->generated_KMF_ID);
+  //FIXME ask paco to know how to deal with this
+  if (strlen(attr) < 9)
+    strcpy(((ContainerRoot*)o)->generated_KMF_ID, param);
 }
 
 void parseArray(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr_type)
 {
-  printf("In %d and need to create %d instance\n", obj_type, ptr_type);
-  //while((type = jsonparse_next(state)) != ']')
-  //{
-  //}
+  char type = JSON_TYPE_ARRAY;
+  while((type = jsonparse_next(state)) != ']')
+  {
+    if (type == JSON_TYPE_OBJECT)
+    {
+      if (ptr_type == Group_Type)
+      {
+        void* o = construct[ptr_type]();
+        printf("new object is at %p\n", o);
+      }
+      printf("In %d and need to create %d instance\n", obj_type, ptr_type);
+
+    }
+  }
 }
 
 /**
@@ -100,11 +127,8 @@ void parseObject(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr
       jsonparse_copy_value(state, attr, sizeof attr);
       printf("In %d, need to parse: %s of type %c\n", obj_type, attr, type);
 
-      //FIXME this can be removed when the generation is complete
       struct at get = getAttr(ctype, attr);
       get.setter(state, o, obj_type, get.ptr_type);
-
     }
   }
 }
-

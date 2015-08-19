@@ -7,8 +7,8 @@
 
 #include <stdlib.h>
 
-#define NB_CLASSES 3
-#define ContainerRoot_Type_SIZE 2
+#define NB_CLASSES 8
+#define ContainerRoot_Type_SIZE 8
 
 char* parseStr(struct jsonparse_state *state);
 
@@ -17,6 +17,10 @@ typedef enum TYPE {
   ContainerRoot_Type = 0, //FIXME values just for debug purposes
   Group_Type = 1,
   ContainerNode_Type = 2,
+  TypeDefinition_Type = 4,
+  Repository_Type = 5,
+  TypeLibrary_Type = 6,
+  TypedElement_Type = 7,
   Primitive_Type = 3 // beause null is not accepted
 } TYPE;
 
@@ -39,6 +43,8 @@ const struct ClassType getClass(TYPE type);
 
 //typedef char* (*fptrParseStr)(struct jsonparse_state*);
 //typedef void (*fptrParser)(struct jsonparse_state*, fptrSetter*);
+
+typedef void* (*fptrConstruct)();
 
 fptrSetter getSetterFunc(struct ClassType ctype, char* name);
 
