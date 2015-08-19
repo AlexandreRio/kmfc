@@ -1,151 +1,9 @@
-#include "ContainerRoot.h"
-#include "ContainerNode.h"
-#include "Group.h"
-
 #include "json.h"
 #include "jsonparse.h"
+#include "jsondeserializer.h"
 
 #include <stdlib.h>
 #include <stdio.h>
-
-
-#define NB_CLASSES 3
-#define ContainerRoot_Type_SIZE 2
-
-typedef char* (*fptrParseStr)(struct jsonparse_state*);
-typedef void (*fptrParser)(struct jsonparse_state*, void*);
-
-typedef enum TYPE {
-  ContainerRoot_Type = 0, //FIXME values just for debug purposes
-  Group_Type = 1,
-  ContainerNode_Type = 2
-} TYPE;
-
-struct at {
-  char* attr_name;
-  fptrParser* parser; // fptr to parse result from json
-  //why not void* fptr to set result on the object, like groupAddSubNodes(void* o, type)
-};
-
-struct ClassType {
-  TYPE type;
-  int nb_attributes;
-  struct at* attributes;
-};
-
-
-void parseCRoot(struct jsonparse_state *state, ContainerRoot *o);
-void parseObject(struct jsonparse_state *state, void* o, TYPE type);
-void parseStr(struct jsonparse_state *state, void* result);
-
-const struct at ContainerRoot_Attr[ContainerRoot_Type_SIZE] = {
-  {"generated_KMF_ID", parseStr},
-  {"groups", parseObject}
-};
-
-const struct ClassType Classes[NB_CLASSES] = {
-  {
-    .type = ContainerRoot_Type,
-    .attributes = &ContainerRoot_Attr,
-    .nb_attributes = 2
-  },
-  {
-    .type = Group_Type,
-    .attributes = NULL,
-    .nb_attributes = 3
-  },
-  {
-    .type = ContainerNode_Type,
-  }
-};
-
-//int main(void)
-//{
-//  for (int i=0; i<NB_CLASSES; i++)
-//  {
-//    struct ClassType ct = Classes[i];
-//    printf("Class: %d has %d attributes\n", ct.type, ct.nb_attributes);
-//    struct at* attr = ct.attributes;
-//    for (int j=0; j<ct.nb_attributes; j++)
-//    {
-//      struct at a = ct.attributes[j];
-//      printf("%d is %s and point to %p\n", j, a.attr_name, a.fptr);
-//    }
-//  }
-//}
-//
-const struct ClassType getClass(TYPE type)
-{
-  for (int i=0; i<NB_CLASSES; i++)
-    if (Classes[i].type == type)
-      return Classes[i];
-  exit(EXIT_FAILURE);
-}
-
-fptrParser getParseFunc(struct ClassType ctype, char* name)
-{
-  for (int i=0; i<ctype.nb_attributes; i++)
-  {
-    struct at a = ctype.attributes[i];
-    //printf("comparing %s and %s\n", a.attr_name, name);
-    if (strcmp(a.attr_name, name) == 0)
-    {
-      return a.parser;
-    }
-  }
-  return NULL;
-}
-
-char attr[200];
-
-void parseStr(struct jsonparse_state *state, void* result)
-{
-  char type;
-  while((type = jsonparse_next(state)) != JSON_TYPE_STRING) {}
-  jsonparse_copy_value(state, attr, sizeof attr);
-  printf("result is %s\n", attr);
-  result = attr;
-  printf("result is %s\n", result);
-  //return attr;
-}
-
-void parseObject(struct jsonparse_state *state, void* o, TYPE class_type)
-{
-  char type = JSON_TYPE_PAIR_NAME;
-  struct ClassType ctype = getClass(class_type);
-  //printf("struct : %s\n", &ctype.attributes[0].attr_name);
-
-  while (type != '}')
-  {
-    type = jsonparse_next(state);
-    if (type == JSON_TYPE_PAIR_NAME)
-    {
-      jsonparse_copy_value(state, attr, sizeof attr);
-      printf("In %d, need to parse: %s of type %c\n", class_type, attr, type);
-      //if (strcmp(attr, "name") == 0)
-      //  parseStr(state);
-      //printf("parser is %p\n", parseStr);
-      fptrParseStr get = getParseFunc(ctype, attr);
-      //printf("getter returned %p\n", get);
-      if (get != NULL)
-      {
-        char* res;
-        getParseFunc(ctype, attr)(state, &res);
-        printf("result from function pointer is %s\n", res);
-      }
-
-      //TODO remove this when the generation is complete, we have
-      // possible null value only because I didn't write every attributes
-      // by hand
-      //if (parseFunc != NULL)
-      //{
-      //  parseFunc(state);
-      //}
-
-    }
-  }
-}
-
 
 int main(void)
 {
@@ -179,11 +37,11 @@ int main(void)
 
   //ContainerRoot *o = parse(&state, jsonparse_next(&state));
   ContainerRoot* o = new_ContainerRoot();
-  parseObject(&state, o, ContainerRoot_Type);
+  parseObject(&state, o, ContainerRoot_Type, ContainerRoot_Type);
 
-  //printf("-------------------\n");
-  //o->VT->fptrToJSON(o);
-  //printf("-------------------\n");
+  printf("-------------------\n");
+  o->VT->fptrToJSON(o);
+  printf("-------------------\n");
 
   o->VT->delete(o);
   free(model);
@@ -191,3 +49,19 @@ int main(void)
 
   return EXIT_SUCCESS;
 }
+
+//int main(void)
+//{
+//  for (int i=0; i<NB_CLASSES; i++)
+//  {
+//    struct ClassType ct = Classes[i];
+//    printf("Class: %d has %d attributes\n", ct.type, ct.nb_attributes);
+//    struct at* attr = ct.attributes;
+//    for (int j=0; j<ct.nb_attributes; j++)
+//    {
+//      struct at a = ct.attributes[j];
+//      printf("%d is %s and point to %p\n", j, a.attr_name, a.fptr);
+//    }
+//  }
+//}
+//
