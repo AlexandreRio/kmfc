@@ -16,6 +16,7 @@
 - [x] Produce setter and getter Unit Testing
 - [x] Add Doxygen style comments to generated code
 - [x] Check for memory leak issue
+- [x] Add kevoree.h which include all structure headers
 
 - [x] Implement visitor design pattern
 - [x] Implement serialization

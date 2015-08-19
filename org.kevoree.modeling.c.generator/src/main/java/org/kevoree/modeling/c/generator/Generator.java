@@ -14,6 +14,7 @@ import org.kevoree.modeling.c.generator.model.Classifier;
 import org.kevoree.modeling.c.generator.model.TestSerializer;
 import org.kevoree.modeling.c.generator.utils.CheckerConstraint;
 import org.kevoree.modeling.c.generator.utils.FileManager;
+import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -109,6 +110,7 @@ public class Generator {
         String testList = "";
         List<String> mainFile = new ArrayList<String>();
 
+        //TODO isn't the key the same?
         for (Classifier c : Generator.classifiers.values()) {
             sourceList += c.getName() + ".c ";
             if (!c.isAbstract())
@@ -136,6 +138,19 @@ public class Generator {
                 "KMFContainer.h", TemplateManager.getInstance().getKMFContainer(), false);
     }
 
+    private void generateKevoreeBigHeader() throws IOException {
+        String ret = "";
+        ret += HelperGenerator.genIFDEF("kevoree");
+        ret += "\n";
+        for (String s : Generator.classifiers.keySet())
+            ret += HelperGenerator.genIncludeLocal(s);
+        ret += "\n";
+        ret += HelperGenerator.genENDIF();
+
+        FileManager.writeFile(this.context.getGenerationDirectory().getAbsolutePath() + File.separator +
+                "kevoree.h", ret, false);
+    }
+
     private void generateTests() throws IOException {
         Map<String, Classifier> concreteClass = new HashMap<String, Classifier>();
         //generate test suites
@@ -161,6 +176,8 @@ public class Generator {
             this.copyFramework();
             this.generateCMakeLists();
             this.generateKMFContainer();
+            this.generateKevoreeBigHeader();
+            //this.generateDeserializer();
             this.generateTests();
         } catch (IOException e) {
             System.err.println("Error while generating environment: " + e.getMessage());
