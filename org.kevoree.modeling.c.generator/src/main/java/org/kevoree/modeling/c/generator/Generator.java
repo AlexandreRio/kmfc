@@ -169,7 +169,7 @@ public class Generator {
         ret += "typedef enum TYPE {\n";
         for (String s : Generator.classifiers.keySet())
             ret += "\t" + s.toUpperCase() + "_TYPE,\n";
-        ret += "};\n";
+        ret += "} TYPE;\n\n";
 
         for (Classifier c : Generator.classifiers.values()) {
             List<Variable> allVars = new LinkedList<Variable>(c.getVariables());
@@ -183,12 +183,13 @@ public class Generator {
                 String type = "";
                 if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
                     parser = "parseArray";
-                    type = v.getType() + "_TYPE";
+                    type = v.getType().toUpperCase() + "_TYPE";
                 } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
                     parser = "parseObject";
-                    type = v.getType() + "_TYPE";
+                    type = v.getType().toUpperCase() + "_TYPE";
                 } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
-                    if (v.getType().equals("char*"))
+                    System.out.println("type: " + v.getType());
+                    if (v.getType().contains("char"))
                         parser = "parseStr";
                     else
                         parser = "parseBool";
