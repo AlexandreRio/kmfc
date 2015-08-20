@@ -152,13 +152,22 @@ public class Generator {
                 "kevoree.h", ret, false);
     }
 
+    //TODO use template files
     private void generateDeserializer() throws IOException {
         String ret = "";
+        ret += HelperGenerator.genIFDEF("jsondeserializer");
+        ret += "\n";
+        ret += HelperGenerator.genIncludeLocal("kevoree");
+        ret += HelperGenerator.genIncludeLocal("json");
+        ret += HelperGenerator.genIncludeLocal("jsonparse");
+        ret += "\n";
+        ret += HelperGenerator.genInclude("stdlib");
+        ret += "\n";
         int nbClass = Generator.classifiers.size();
         ret += "#define NB_CLASSES " + nbClass + "\n\n";
 
         for (Classifier c : Generator.classifiers.values()) {
-            int nbVar = c.getVariables().size();
+            int nbVar = c.getVariables().size() + 1; // plus eClass attribute
             for (String s : c.getAllSuperClass())
                 if (!s.equals("KMFContainer"))
                     nbVar += Generator.classifiers.get(s).getVariables().size();
@@ -169,6 +178,7 @@ public class Generator {
         ret += "typedef enum TYPE {\n";
         for (String s : Generator.classifiers.keySet())
             ret += "\t" + s.toUpperCase() + "_TYPE,\n";
+        ret += "\tPRIMITIVE_TYPE\n";
         ret += "} TYPE;\n\n";
 
         for (Classifier c : Generator.classifiers.values()) {
@@ -178,6 +188,7 @@ public class Generator {
                 if (!parent.equals("KMFContainer"))
                     allVars.addAll(Generator.classifiers.get(parent).getVariables());
 
+            ret += "{\"eClass\", doNothing, PRIMITIVE_TYPE, PRIMITIVE_TYPE},\n";
             for (Variable v : allVars) {
                 String parser = "";
                 String type = "";
@@ -204,12 +215,13 @@ public class Generator {
         ret += "const struct ClassType Classes[NB_CLASSES] = {\n";
         for (Classifier c : Generator.classifiers.values()) {
             ret += "\t{\n";
-            ret += "\t\t.type = " + c.getName() + "_TYPE,\n";
+            ret += "\t\t.type = " + c.getName().toUpperCase() + "_TYPE,\n";
             ret += "\t\t.attributes = &" + c.getName() + "_Attr,\n";
             ret += "\t\t.nb_attributes = " + c.getName() + "_NB_ATTR,\n";
             ret += "\t},\n";
         }
         ret += "};\n";
+        ret += HelperGenerator.genENDIF();
 
         FileManager.writeFile(this.context.getGenerationDirectory().getAbsolutePath() + File.separator +
                 "jsondeserializer.temp", ret, false);
