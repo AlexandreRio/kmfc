@@ -37,7 +37,7 @@ int main(void)
 
   //ContainerRoot *o = parse(&state, jsonparse_next(&state));
   ContainerRoot* o = new_ContainerRoot();
-  parseObject(&state, o, ContainerRoot_Type, ContainerRoot_Type);
+  parseObject(&state, o, CONTAINERROOT_TYPE, CONTAINERROOT_TYPE);
 
   printf("-------------------\n");
   o->VT->fptrToJSON(o);
