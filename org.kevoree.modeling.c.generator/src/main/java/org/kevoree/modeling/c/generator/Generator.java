@@ -181,6 +181,31 @@ public class Generator {
         ret += "\tPRIMITIVE_TYPE\n";
         ret += "} TYPE;\n\n";
 
+        // generate setter functions
+        for (Classifier c : Generator.classifiers.values()) {
+            List<Variable> allVars = new LinkedList<Variable>(c.getVariables());
+            for (String parent : c.getAllSuperClass())
+                if (!parent.equals("KMFContainer"))
+                    allVars.addAll(Generator.classifiers.get(parent).getVariables());
+
+            for (Variable v : allVars) {
+                ret += "void " + c.getName() + "Set" + v.getName() +
+                        "(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)\n";
+                ret += "{\n";
+                if (v.getType().equals("char")) {
+                    ret += "\tchar* param = parseStr(state);\n";
+                    ret += "\tvoid* dest = ((" + c.getName() + "*)o)->" + v.getName() + ";\n";
+                    ret += "\tif (strlen(param) < 9)\n";
+                    ret += "\t\tstrcpy(dest, param);\n";
+                } else if (v.getType().equals("char*")) {
+                    ret += "\tchar* param = parseStr(state);\n";
+                    ret += "((" + c.getName() + "*)o)->" + v.getName() + " = param;\n";
+                }
+                ret += "}\n\n";
+            }
+        }
+
+
         for (Classifier c : Generator.classifiers.values()) {
             List<Variable> allVars = new LinkedList<Variable>(c.getVariables());
             ret += "const struct at " + c.getName() + "_Attr[" + c.getName() + "_NB_ATTR] = {\n";
@@ -190,20 +215,19 @@ public class Generator {
 
             ret += "{\"eClass\", doNothing, PRIMITIVE_TYPE, PRIMITIVE_TYPE},\n";
             for (Variable v : allVars) {
-                String parser = "";
+                String parser = c.getName() + "Set" + v.getName();
                 String type = "";
                 if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
                     parser = "parseArray";
                     type = v.getType().toUpperCase() + "_TYPE";
                 } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
-                    parser = "parseObject";
+//                    parser = "parseObject";
                     type = v.getType().toUpperCase() + "_TYPE";
                 } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
-                    System.out.println("type: " + v.getType());
-                    if (v.getType().contains("char"))
-                        parser = "parseStr";
-                    else
-                        parser = "parseBool";
+                    //if (v.getType().contains("char"))
+                    //    parser = "parseStr";
+                    //else
+                    //    parser = "parseBool";
                     type = "PRIMITIVE_TYPE";
                 }
 
@@ -220,6 +244,18 @@ public class Generator {
             ret += "\t\t.nb_attributes = " + c.getName() + "_NB_ATTR,\n";
             ret += "\t},\n";
         }
+        ret += "};\n";
+        ret += "\n";
+
+        // FIXME temp method, should it fact try to determine the actual type
+        for (Classifier c : Generator.classifiers.values())
+            if (c.isAbstract())
+                ret += "void* new_" + c.getName() + "()\n{}\n\n";
+
+        ret += "\n";
+        ret += "const fptrConstruct construct[NB_CLASSES] = {\n";
+        for (Classifier c : Generator.classifiers.values()) // see for abstract classes
+            ret += "\t[" + c.getName().toUpperCase() + "_TYPE] = new_" + c.getName() + ",\n";
         ret += "};\n";
         ret += HelperGenerator.genENDIF();
 
