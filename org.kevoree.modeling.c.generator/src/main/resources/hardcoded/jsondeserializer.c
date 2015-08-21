@@ -5,7 +5,6 @@ char attr[200];
 void ContainerRootSetKMF_ID(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type);
 void doNothing(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type);
 
-
 void DictionarySetgenerated_KMF_ID(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
 	char* param = parseStr(state);
@@ -13,7 +12,6 @@ void DictionarySetgenerated_KMF_ID(struct jsonparse_state* state, void* o, TYPE 
 	if (strlen(param) < 9)
 		strcpy(dest, param);
 }
-
 void DictionarySetvalues(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
 }
@@ -46,10 +44,12 @@ void GroupSetstarted(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE
 
 void GroupSettypeDefinition(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void GroupSetdictionary(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void GroupSetfragmentDictionary(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -87,7 +87,6 @@ void MessagePortTypeSetfactoryBean(struct jsonparse_state* state, void* o, TYPE 
 void MessagePortTypeSetbean(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
 	char* param = parseStr(state);
-	printf("new value is %s\n", param);
 ((MessagePortType*)o)->bean = param;
 }
 
@@ -97,10 +96,12 @@ void MessagePortTypeSetabstract(struct jsonparse_state* state, void* o, TYPE obj
 
 void MessagePortTypeSetdeployUnit(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void MessagePortTypeSetdictionaryType(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void MessagePortTypeSetsuperTypes(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -141,10 +142,12 @@ void InstanceSetstarted(struct jsonparse_state* state, void* o, TYPE obj_type, T
 
 void InstanceSettypeDefinition(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void InstanceSetdictionary(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void InstanceSetfragmentDictionary(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -169,6 +172,7 @@ void PortSetbindings(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE
 
 void PortSetportTypeRef(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void PortSetname(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -229,10 +233,12 @@ void ServicePortTypeSetabstract(struct jsonparse_state* state, void* o, TYPE obj
 
 void ServicePortTypeSetdeployUnit(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ServicePortTypeSetdictionaryType(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ServicePortTypeSetsuperTypes(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -269,10 +275,12 @@ void MBindingSetgenerated_KMF_ID(struct jsonparse_state* state, void* o, TYPE ob
 
 void MBindingSetport(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void MBindingSethub(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void DeployUnitSetgroupName(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -327,6 +335,7 @@ void OperationSetparameters(struct jsonparse_state* state, void* o, TYPE obj_typ
 
 void OperationSetreturnType(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void OperationSetname(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -368,7 +377,6 @@ void TypeDefinitionSetfactoryBean(struct jsonparse_state* state, void* o, TYPE o
 void TypeDefinitionSetbean(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
 	char* param = parseStr(state);
-	printf("param: %s\n", param);
 ((TypeDefinition*)o)->bean = param;
 }
 
@@ -378,10 +386,12 @@ void TypeDefinitionSetabstract(struct jsonparse_state* state, void* o, TYPE obj_
 
 void TypeDefinitionSetdeployUnit(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void TypeDefinitionSetdictionaryType(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void TypeDefinitionSetsuperTypes(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -436,6 +446,7 @@ void ComponentInstanceSetrequired(struct jsonparse_state* state, void* o, TYPE o
 
 void ComponentInstanceSet_namespace(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ComponentInstanceSetname(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -462,10 +473,12 @@ void ComponentInstanceSetstarted(struct jsonparse_state* state, void* o, TYPE ob
 
 void ComponentInstanceSettypeDefinition(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ComponentInstanceSetdictionary(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ComponentInstanceSetfragmentDictionary(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -482,6 +495,7 @@ void ContainerNodeSethosts(struct jsonparse_state* state, void* o, TYPE obj_type
 
 void ContainerNodeSethost(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ContainerNodeSetgroups(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -516,10 +530,12 @@ void ContainerNodeSetstarted(struct jsonparse_state* state, void* o, TYPE obj_ty
 
 void ContainerNodeSettypeDefinition(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ContainerNodeSetdictionary(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ContainerNodeSetfragmentDictionary(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -540,10 +556,12 @@ void NodeNetworkSetlink(struct jsonparse_state* state, void* o, TYPE obj_type, T
 
 void NodeNetworkSetinitBy(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void NodeNetworkSettarget(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ComponentTypeSetrequired(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -590,10 +608,12 @@ void ComponentTypeSetabstract(struct jsonparse_state* state, void* o, TYPE obj_t
 
 void ComponentTypeSetdeployUnit(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ComponentTypeSetdictionaryType(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ComponentTypeSetsuperTypes(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -644,10 +664,12 @@ void ChannelSetstarted(struct jsonparse_state* state, void* o, TYPE obj_type, TY
 
 void ChannelSettypeDefinition(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ChannelSetdictionary(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ChannelSetfragmentDictionary(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -716,6 +738,7 @@ void PortTypeRefSetnoDependency(struct jsonparse_state* state, void* o, TYPE obj
 
 void PortTypeRefSetref(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void PortTypeRefSetmappings(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -826,10 +849,12 @@ void GroupTypeSetabstract(struct jsonparse_state* state, void* o, TYPE obj_type,
 
 void GroupTypeSetdeployUnit(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void GroupTypeSetdictionaryType(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void GroupTypeSetsuperTypes(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -872,10 +897,12 @@ void NodeTypeSetabstract(struct jsonparse_state* state, void* o, TYPE obj_type, 
 
 void NodeTypeSetdeployUnit(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void NodeTypeSetdictionaryType(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void NodeTypeSetsuperTypes(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -936,6 +963,7 @@ void ParameterSetorder(struct jsonparse_state* state, void* o, TYPE obj_type, TY
 
 void ParameterSettype(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ParameterSetname(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -1048,10 +1076,12 @@ void ChannelTypeSetabstract(struct jsonparse_state* state, void* o, TYPE obj_typ
 
 void ChannelTypeSetdeployUnit(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ChannelTypeSetdictionaryType(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void ChannelTypeSetsuperTypes(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
@@ -1098,15 +1128,18 @@ void PortTypeSetabstract(struct jsonparse_state* state, void* o, TYPE obj_type, 
 
 void PortTypeSetdeployUnit(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void PortTypeSetdictionaryType(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+parseObject(state, o, ptr_type, ptr_type);
 }
 
 void PortTypeSetsuperTypes(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
 {
 }
+
 
 const struct at Dictionary_Attr[Dictionary_NB_ATTR] = {
 {"eClass", doNothing, PRIMITIVE_TYPE, PRIMITIVE_TYPE},

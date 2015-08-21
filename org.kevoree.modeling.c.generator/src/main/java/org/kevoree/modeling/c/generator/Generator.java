@@ -203,6 +203,8 @@ public class Generator {
                 } else if (v.getType().equals("char*")) {
                     ret += "\tchar* param = parseStr(state);\n";
                     ret += "((" + c.getName() + "*)o)->" + v.getName() + " = param;\n";
+                } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
+                    ret += "parseObject(state, o, ptr_type, ptr_type);\n";
                 }
                 ret += "}\n\n";
             }
