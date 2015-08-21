@@ -176,8 +176,11 @@ public class Generator {
 
         ret += "\n";
         ret += "typedef enum TYPE {\n";
-        for (String s : Generator.classifiers.keySet())
-            ret += "\t" + s.toUpperCase() + "_TYPE,\n";
+        int i = 0;
+        for (String s : Generator.classifiers.keySet()) {
+            ret += "\t" + s.toUpperCase() + "_TYPE = " + i + ",\n";
+            i++;
+        }
         ret += "\tPRIMITIVE_TYPE\n";
         ret += "} TYPE;\n\n";
 

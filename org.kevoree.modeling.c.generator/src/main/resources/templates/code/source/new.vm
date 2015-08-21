@@ -1,4 +1,5 @@
 	${classname}* pObj = NULL;
+	printf("Creating a new instance of ${classname}.\n");
 	/* Allocating memory */
 	pObj = malloc(sizeof(${classname}));
 
