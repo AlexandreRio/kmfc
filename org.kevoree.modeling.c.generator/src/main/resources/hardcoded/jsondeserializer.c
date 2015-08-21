@@ -1746,6 +1746,7 @@ void doNothing(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_t
 
 void parseArray(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr_type)
 {
+  printf("In class %d looking to parse array of %d\n", obj_type, ptr_type);
   char type = JSON_TYPE_ARRAY;
   while((type = jsonparse_next(state)) != ']')
   {
@@ -1776,20 +1777,20 @@ void parseObject(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr
   char type = JSON_TYPE_PAIR_NAME;
   struct ClassType ctype = getClass(obj_type);
   //
-  //printf("struct : %s\n", &ctype.attributes[0].attr_name);
 
   while (type != '}')
   {
     type = jsonparse_next(state);
     if (type == JSON_TYPE_PAIR_NAME)
     {
+      printf("In object %d\n", obj_type);
       //type = jsonparse_next(state);
       jsonparse_copy_value(state, attr, sizeof attr);
       struct at get = getAttr(ctype, attr);
       //printf("In %d, need to parse: %s of type %c and ptr_type:%d struct name is %s\n", obj_type, attr, type, get.ptr_type, get.attr_name);
 
       if (strcmp(get.attr_name, attr) == 0)
-	get.setter(state, o, obj_type, get.ptr_type);
+	get.setter(state, o, ptr_type, get.ptr_type);
     }
   }
 }
