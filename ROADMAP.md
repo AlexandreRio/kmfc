@@ -21,4 +21,5 @@
 - [x] Implement visitor design pattern
 - [x] Implement serialization
 - [ ] Implement deserialization
+- [ ] Implement a deserialization that instanciate only the current node
 - [ ] Implement comparison
