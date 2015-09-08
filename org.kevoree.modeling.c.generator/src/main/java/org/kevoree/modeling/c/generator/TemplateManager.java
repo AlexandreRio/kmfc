@@ -44,6 +44,8 @@ public class TemplateManager {
      * or variables determined before parsing any files.
      */
     private String getKey_DeployUnit;
+    private String jsondeserial_header;
+    private String jsondeserial_source;
     private String getKey_TypeDefinition;
     private String KMFContainer_fptr;
     private String KMFContainer;
@@ -91,6 +93,14 @@ public class TemplateManager {
         StringWriter result = new StringWriter();
         ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "internalGetKey_DeployUnit.vm").merge(context, result);
         getKey_DeployUnit = result.toString();
+
+        result = new StringWriter();
+        ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "jsondeserial.vm").merge(context, result);
+        jsondeserial_source = result.toString();
+
+        result = new StringWriter();
+        ve.getTemplate(BASE_DIR + CODE_DIR + HEADER_DIR + "jsondeserial.vm").merge(context, result);
+        jsondeserial_header = result.toString();
 
         result = new StringWriter();
         ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "internalGetKey_TypeDefinition.vm").merge(context, result);
@@ -212,6 +222,14 @@ public class TemplateManager {
 
     public String getLicense() {
         return license;
+    }
+
+    public String getJsondeserial_header() {
+        return jsondeserial_header;
+    }
+
+    public String getJsondeserial_source() {
+        return jsondeserial_source;
     }
 
     public String getHeader_comment() {

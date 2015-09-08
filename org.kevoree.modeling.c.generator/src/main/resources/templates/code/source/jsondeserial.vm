@@ -1,0 +1,95 @@
+const struct ClassType getClass(TYPE type)
+{
+	for (int i=0; i<NB_CLASSES; i++)
+		if (Classes[i].type == type)
+			return Classes[i];
+	exit(EXIT_FAILURE);
+}
+
+struct at getAttr(struct ClassType ctype, char* name)
+{
+	struct at a;
+	printf("In class %d looking for %s\n", ctype.type, name);
+	for (int i=0; i<ctype.nb_attributes; i++)
+	{
+		a = ctype.attributes[i];
+		if (strcmp(a.attr_name, name) == 0)
+		{
+			return a;
+		}
+	}
+	printf("\tNothing matched for %s\n", name);
+	return a;
+}
+
+char* parseStr(struct jsonparse_state *state)
+{
+	char type;
+	while((type = jsonparse_next(state)) != JSON_TYPE_STRING)
+	{
+		printf("moving on\n");
+	}
+	jsonparse_copy_value(state, attr, sizeof attr);
+	printf("found str %s\n", attr);
+	return attr;
+}
+
+void doNothing(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)
+{
+}
+
+void parseArray(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr_type)
+{
+	printf("In class %d looking to parse array of %d\n", obj_type, ptr_type);
+	char type = JSON_TYPE_ARRAY;
+	while((type = jsonparse_next(state)) != ']')
+	{
+		if (type == JSON_TYPE_OBJECT)
+		{
+			//printf("In %d and need to create %d instance\n", obj_type, ptr_type);
+			void* ptr = construct[ptr_type]();
+			printf("new object is at %p\n", ptr);
+			parseObject(state, ptr, ptr_type, ptr_type);
+
+			if (obj_type == CONTAINERROOT_TYPE && ptr_type == GROUP_TYPE)
+			{
+				((ContainerRoot*)ptr)->VT->fptrToJSON(ptr);
+				((ContainerRoot*)o)->VT->containerRootAddGroups(o, ptr);
+			}
+
+		}
+	}
+}
+
+void parseRef(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr_type)
+{
+}
+
+/**
+ *
+ * param o: object to set the value on
+ *
+ */
+void parseObject(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr_type)
+{
+	char type = JSON_TYPE_PAIR_NAME;
+	struct ClassType ctype = getClass(obj_type);
+	//
+
+	while (type != '}')
+	{
+		type = jsonparse_next(state);
+		if (type == JSON_TYPE_PAIR_NAME)
+		{
+			printf("In object %d\n", obj_type);
+			//type = jsonparse_next(state);
+			jsonparse_copy_value(state, attr, sizeof attr);
+			struct at get = getAttr(ctype, attr);
+			//printf("In %d, need to parse: %s of type %c and ptr_type:%d struct name is %s\n", obj_type, attr, type, get.ptr_type, get.attr_name);
+
+			if (strcmp(get.attr_name, attr) == 0)
+				get.setter(state, o, ptr_type, get.ptr_type);
+		}
+	}
+}
+

@@ -26,7 +26,7 @@ public class Deserializer {
         ret += HelperGenerator.genIncludeLocal("json");
         ret += HelperGenerator.genIncludeLocal("jsonparse");
         ret += "\n";
-        ret += HelperGenerator.genInclude("stdlib");
+        ret += HelperGenerator.genInclude("stdlib.h");
         ret += "\n";
 
         int nbClass = Generator.classifiers.size();
@@ -50,12 +50,22 @@ public class Deserializer {
         ret += "\tPRIMITIVE_TYPE\n";
         ret += "} TYPE;\n\n";
 
+        ret += TemplateManager.getInstance().getJsondeserial_header();
+
+        ret += HelperGenerator.genENDIF();
         FileManager.writeFile(context.getGenerationDirectory().getAbsolutePath() + File.separator +
-                "jsondeserializer.h.temp", ret, false);
+                "jsondeserializer.h", ret, false);
     }
 
     private static void generateSource(GenerationContext context) throws IOException {
         String ret = "";
+
+        ret += HelperGenerator.genIncludeLocal("jsondeserializer");
+
+        ret += "\nchar attr[200];\n" +
+                "void ContainerRootSetKMF_ID(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type);\n" +
+                "void doNothing(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type);\n";
+
         // generate setter functions
         for (Classifier c : Generator.classifiers.values()) {
             List<Variable> allVars = new LinkedList<Variable>(c.getVariables());
@@ -135,9 +145,10 @@ public class Deserializer {
         for (Classifier c : Generator.classifiers.values()) // see for abstract classes
             ret += "\t[" + c.getName().toUpperCase() + "_TYPE] = new_" + c.getName() + ",\n";
         ret += "};\n";
-        ret += HelperGenerator.genENDIF();
+
+        ret += TemplateManager.getInstance().getJsondeserial_source();
 
         FileManager.writeFile(context.getGenerationDirectory().getAbsolutePath() + File.separator +
-                "jsondeserializer.c.temp", ret, false);
+                "jsondeserializer.c", ret, false);
     }
 }
