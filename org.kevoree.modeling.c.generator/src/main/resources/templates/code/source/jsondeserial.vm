@@ -61,10 +61,6 @@ void parseArray(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr_
 	}
 }
 
-void parseRef(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr_type)
-{
-}
-
 /**
  *
  * param o: object to set the value on

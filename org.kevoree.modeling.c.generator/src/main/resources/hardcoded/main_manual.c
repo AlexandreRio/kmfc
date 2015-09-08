@@ -1,29 +1,28 @@
 #include "ContainerRoot.h"
 #include "Group.h"
 
+#include "hashmap.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 
+struct ref {
+  char* id;
+  void* whereToWrite;
+};
+
+char* getIdFromRef(any_t ref)
+{
+  struct ref *refS = (struct ref*) ref;
+  return refS->id;
+}
+
 int main(void)
 {
-  ContainerRoot* o = new_ContainerRoot();
-
-  Group* g1 = new_Group();
-  g1->name = "some_group_name";
-  o->VT->containerRootAddGroups(o, g1);
-
-  Group* g2 = new_Group();
-  g2->name = "other_group";
-  o->VT->containerRootAddGroups(o, g2);
-
-  /** reusing code */
-  hashmap_map* m = (hashmap_map*) o->groups;
-  for (int i=0; i<m->table_size; i++)
-  {
-    Group* data = (Group*) (m->data[i].data);
-    printf("%s: %s\n", data->VT->metaClassName(data), data->VT->internalGetKey(data));
-  }
+  map_t ref_map = hashmap_new(getIdFromRef);
 
 
-  printf("size: %d", hashmap_length(o->groups));
+  // create some ref struct and try to get them in the map
+  //
+  // also try to write in the memory location
 }

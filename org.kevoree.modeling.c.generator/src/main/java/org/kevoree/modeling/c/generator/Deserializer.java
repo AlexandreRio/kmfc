@@ -86,13 +86,15 @@ public class Deserializer {
                     ret += "\tchar* param = parseStr(state);\n";
                     ret += "((" + c.getName() + "*)o)->" + v.getName() + " = param;\n";
                 } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
+                    System.out.println("In " + c.getName() + " unaryLink of type " + v.getType());
+                    ret += "printf(\"storing ref: %s\\n\", parseStr(state));\n";
+                    ret += "printf(\"var: %p\\n\", &((" + c.getName() + "*)o)->" + v.getName() + ");\n";
+                    //ret +=
                     //store the reference
-                    ret += "//parseObject(state, o, ptr_type, ptr_type);\n";
                 }
                 ret += "}\n\n";
             }
         }
-
 
         for (Classifier c : Generator.classifiers.values()) {
             List<Variable> allVars = new LinkedList<Variable>(c.getVariables());
@@ -109,7 +111,7 @@ public class Deserializer {
                     parser = "parseArray";
                     type = v.getType().toUpperCase() + "_TYPE";
                 } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
-//                    parser = "parseObject";
+                    //parser = "parseRef";
                     type = v.getType().toUpperCase() + "_TYPE";
                 } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
                     //if (v.getType().contains("char"))
