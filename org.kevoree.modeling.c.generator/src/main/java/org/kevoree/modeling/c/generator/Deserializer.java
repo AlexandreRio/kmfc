@@ -63,6 +63,19 @@ public class Deserializer {
         ret += HelperGenerator.genIncludeLocal("jsondeserializer");
 
         ret += "\nchar attr[200];\n" +
+                "map_t ref_map;\n" +
+                "\n" +
+                "typedef struct _ref {\n" +
+                "  char* id;\n" +
+                "  void** whereToWrite;\n" +
+                "} ref;\n" +
+                "\n" +
+                "\n" +
+                "char* getIdFromRef(any_t ref_t)\n" +
+                "{\n" +
+                "  ref *refS = (ref*) ref_t;\n" +
+                "  return refS->id;\n" +
+                "}\n\n" +
                 "void ContainerRootSetKMF_ID(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type);\n" +
                 "void doNothing(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type);\n";
 
@@ -89,6 +102,12 @@ public class Deserializer {
                     System.out.println("In " + c.getName() + " unaryLink of type " + v.getType());
                     ret += "printf(\"storing ref: %s\\n\", parseStr(state));\n";
                     ret += "printf(\"var: %p\\n\", &((" + c.getName() + "*)o)->" + v.getName() + ");\n";
+                    ret += "ref* r = malloc(sizeof(ref));\n";
+                    ret += "char* str = parseStr(state);\n";
+                    ret += "r->id = malloc(strlen(str));\n";
+                    ret += "r->id = str;\n";
+                    ret += "r->whereToWrite = &((" + c.getName() + "*)o)->" + v.getName() + ";\n";
+                    ret += "hashmap_put(ref_map, r->id, r);\n";
                     //ret +=
                     //store the reference
                 }

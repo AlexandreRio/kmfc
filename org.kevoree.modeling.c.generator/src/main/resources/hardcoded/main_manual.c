@@ -2,6 +2,7 @@
 #include "Dictionary.h"
 #include "Group.h"
 
+#include "jsondeserializer.h"
 #include "hashmap.h"
 
 #include <stdlib.h>
@@ -12,15 +13,12 @@ typedef struct _ref {
   void** whereToWrite;
 } ref;
 
-union references {
-  TypeDefinition* def;
-};
 
-char* getIdFromRef(any_t ref_t)
-{
-  ref *refS = (ref*) ref_t;
-  return refS->id;
-}
+//char* getIdFromRef(any_t ref_t)
+//{
+//  ref *refS = (ref*) ref_t;
+//  return refS->id;
+//}
 
 map_t ref_map;
 Group* gr;
@@ -53,14 +51,7 @@ int main(void)
   if (get != NULL)
   {
     printf("result is: %s and @: %p\n", get->id, get->whereToWrite);
-    (*(get->whereToWrite)) = dico;
-  }
-
-  if (get->whereToWrite != NULL)
-  {
-    Dictionary* d = *get->whereToWrite;
-    printf("get is correctly set\n");
-    printf("meta: %s\n", d->VT->metaClassName(d));
+    memcpy(get->whereToWrite, &dico, sizeof(char*));
   }
 
   if (gr->dictionary != NULL)

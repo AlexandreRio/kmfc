@@ -89,3 +89,24 @@ void parseObject(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr
 	}
 }
 
+ContainerRoot* init_deserial()
+{
+	ContainerRoot* ret = new_ContainerRoot();
+	ref_map = hashmap_new(getIdFromRef);
+
+	return ret;
+}
+
+void print_stored_ref()
+{
+	hashmap_map* m = (hashmap_map*) ref_map;
+	if (m != NULL)
+	{
+		for (int i=0; i<m->table_size; i++)
+		{
+			ref* r = (ref*) (m->data[i].data);
+			printf("[%d]: %s @: %p\n", i, r->id, r->whereToWrite);
+			free(r);
+		}
+	}
+}

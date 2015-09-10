@@ -26,3 +26,6 @@ fptrSetter getSetterFunc(struct ClassType ctype, char* name);
 
 void parseObject(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr_type);
 void parseArray(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr_type);
+ContainerRoot* init_deserial();
+char* getIdFromRef(any_t);
+void print_stored_ref();

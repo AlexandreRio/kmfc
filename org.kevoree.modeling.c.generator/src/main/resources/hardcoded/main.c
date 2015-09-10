@@ -42,6 +42,7 @@ int main(void)
   printf("-------------------\n");
   o->VT->fptrToJSON(o);
   printf("-------------------\n");
+  print_stored_ref();
 
   o->VT->delete(o);
   free(model);
