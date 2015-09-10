@@ -23,3 +23,6 @@
 - [ ] Implement a deserialization that instanciate only the current node
 - [ ] Implement comparison
 - [ ] Remove compilation warnings only for incompatible pointer type
+- [ ] Support Contiki file system, either with pre-processor or compiler option
+- [ ] Improve the command line mode, allow options like --no-test
+- [ ] Document the command line usage in the README
