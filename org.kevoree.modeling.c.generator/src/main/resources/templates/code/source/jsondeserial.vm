@@ -48,6 +48,9 @@ void parseArray(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr_
 			void* ptr = construct[ptr_type]();
 			parseObject(state, ptr, ptr_type, ptr_type);
 
+			//TODO problem is here, need to generate more code and to not only take care
+			// of the type but also of the name of the attribute.
+			// 2 attributes with the same type will result in ignoring one
 			if (obj_type == CONTAINERROOT_TYPE && ptr_type == GROUP_TYPE)
 			{
 				((ContainerRoot*)o)->VT->containerRootAddGroups(o, ptr);
@@ -69,7 +72,6 @@ void parseObject(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr
 {
 	char type = JSON_TYPE_PAIR_NAME;
 	struct ClassType ctype = getClass(obj_type);
-	//
 
 	while (type != '}')
 	{
@@ -77,7 +79,6 @@ void parseObject(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr
 		if (type == JSON_TYPE_PAIR_NAME)
 		{
 			printf("In object %d\n", obj_type);
-			//type = jsonparse_next(state);
 			jsonparse_copy_value(state, attr, sizeof attr);
 			struct at get = getAttr(ctype, attr);
 			//printf("In %d, need to parse: %s of type %c and ptr_type:%d struct name is %s\n", obj_type, attr, type, get.ptr_type, get.attr_name);

@@ -111,8 +111,9 @@ public class Deserializer {
                 } else if (v.getType().equals("char*")) {
                     ret += "\tchar* param = parseStr(state);\n";
                     if (!c.isAbstract()) {
-                        ret += "((" + c.getName() + "*)o)->" + v.getName() + " = malloc(strlen(param) * sizeof(char) +1);\n";
+//                        ret += "((" + c.getName() + "*)o)->" + v.getName() + " = malloc(strlen(param) * sizeof(char) +1);\n";
                         ret += "((" + c.getName() + "*)o)->" + v.getName() + " = param;\n";
+//                        ret += "printf(\"setted value is %s\\n\", ((" + c.getName() + "*)o)->" + v.getName() + ");\n";
                     }
                 } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
                     if (v.isContained()) {
