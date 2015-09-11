@@ -36,7 +36,7 @@ int main(void)
   jsonparse_setup(&state, model, size+1);
 
   //ContainerRoot *o = parse(&state, jsonparse_next(&state));
-  ContainerRoot* o = new_ContainerRoot();
+  ContainerRoot* o = init_deserial();
   parseObject(&state, o, CONTAINERROOT_TYPE, CONTAINERROOT_TYPE);
 
   printf("-------------------\n");

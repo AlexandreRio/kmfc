@@ -26,9 +26,7 @@ char* parseStr(struct jsonparse_state *state)
 {
 	char type;
 	while((type = jsonparse_next(state)) != JSON_TYPE_STRING)
-	{
-		printf("moving on\n");
-	}
+	{}
 	jsonparse_copy_value(state, attr, sizeof attr);
 	printf("found str %s\n", attr);
 	return attr;
@@ -48,13 +46,14 @@ void parseArray(struct jsonparse_state *state, void* o, TYPE obj_type, TYPE ptr_
 		{
 			//printf("In %d and need to create %d instance\n", obj_type, ptr_type);
 			void* ptr = construct[ptr_type]();
-			printf("new object is at %p\n", ptr);
 			parseObject(state, ptr, ptr_type, ptr_type);
 
 			if (obj_type == CONTAINERROOT_TYPE && ptr_type == GROUP_TYPE)
 			{
-				((ContainerRoot*)ptr)->VT->fptrToJSON(ptr);
 				((ContainerRoot*)o)->VT->containerRootAddGroups(o, ptr);
+			} else if (obj_type == CONTAINERROOT_TYPE && ptr_type == CONTAINERNODE_TYPE)
+			{
+				((ContainerRoot*)o)->VT->containerRootAddNodes(o, ptr);
 			}
 
 		}
@@ -106,6 +105,7 @@ void print_stored_ref()
 		{
 			ref* r = (ref*) (m->data[i].data);
 			printf("[%d]: %s @: %p\n", i, r->id, r->whereToWrite);
+			free(r->id);
 			free(r);
 		}
 	}

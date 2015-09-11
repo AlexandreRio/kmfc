@@ -65,7 +65,7 @@ public class Deserializer {
         ret += "\nchar attr[200];\n" +
                 "map_t ref_map;\n" +
                 "\n" +
-                "typedef struct _ref {\n" +
+                "typedef struct _ref {\n" + // TODO add another id because we may have duplicate object ID
                 "  char* id;\n" +
                 "  void** whereToWrite;\n" +
                 "} ref;\n" +
@@ -78,6 +78,17 @@ public class Deserializer {
                 "}\n\n" +
                 "void ContainerRootSetKMF_ID(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type);\n" +
                 "void doNothing(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type);\n";
+
+        // FIXME temp method, should it fact try to determine the actual type
+        for (Classifier c : Generator.classifiers.values())
+            if (c.isAbstract())
+                ret += "void* new_" + c.getName() + "()\n{}\n\n";
+
+        ret += "\n";
+        ret += "const fptrConstruct construct[NB_CLASSES] = {\n";
+        for (Classifier c : Generator.classifiers.values()) // see for abstract classes
+            ret += "\t[" + c.getName().toUpperCase() + "_TYPE] = new_" + c.getName() + ",\n";
+        ret += "};\n";
 
         // generate setter functions
         for (Classifier c : Generator.classifiers.values()) {
@@ -92,24 +103,37 @@ public class Deserializer {
                 ret += "{\n";
                 if (v.getType().equals("char")) {
                     ret += "\tchar* param = parseStr(state);\n";
-                    ret += "\tvoid* dest = ((" + c.getName() + "*)o)->" + v.getName() + ";\n";
-                    ret += "\tif (strlen(param) < 9)\n";
-                    ret += "\t\tstrcpy(dest, param);\n";
+                    if (!c.isAbstract()) {
+                        ret += "\tvoid* dest = ((" + c.getName() + "*)o)->" + v.getName() + ";\n";
+                        ret += "\tif (strlen(param) < 9)\n";
+                        ret += "\t\tstrcpy(dest, param);\n";
+                    }
                 } else if (v.getType().equals("char*")) {
                     ret += "\tchar* param = parseStr(state);\n";
-                    ret += "((" + c.getName() + "*)o)->" + v.getName() + " = param;\n";
+                    if (!c.isAbstract()) {
+                        ret += "((" + c.getName() + "*)o)->" + v.getName() + " = malloc(strlen(param) * sizeof(char) +1);\n";
+                        ret += "((" + c.getName() + "*)o)->" + v.getName() + " = param;\n";
+                    }
                 } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
-                    System.out.println("In " + c.getName() + " unaryLink of type " + v.getType());
-                    ret += "printf(\"storing ref: %s\\n\", parseStr(state));\n";
-                    ret += "printf(\"var: %p\\n\", &((" + c.getName() + "*)o)->" + v.getName() + ");\n";
-                    ret += "ref* r = malloc(sizeof(ref));\n";
-                    ret += "char* str = parseStr(state);\n";
-                    ret += "r->id = malloc(strlen(str));\n";
-                    ret += "r->id = str;\n";
-                    ret += "r->whereToWrite = &((" + c.getName() + "*)o)->" + v.getName() + ";\n";
-                    ret += "hashmap_put(ref_map, r->id, r);\n";
-                    //ret +=
-                    //store the reference
+                    if (v.isContained()) {
+                        ret += "char type;\n";
+                        ret += "while((type = jsonparse_next(state)) != '{') {}\n";
+                        ret += v.getType() + "* ptr = construct[ptr_type]();\n";
+                        if (!c.isAbstract()) {
+                            ret += "((" + c.getName() + "*)o)->" + v.getName() + " = ptr;\n";
+                            ret += "parseObject(state, ptr, ptr_type, ptr_type);\n";
+                        }
+                    } else {
+                        ret += "ref* r = malloc(sizeof(ref) + 1);\n";
+                        ret += "char* str = parseStr(state);\n";
+                        ret += "printf(\"storing: %s\\n\", str);\n";
+                        if (!c.isAbstract()) {
+                            ret += "r->id = malloc(strlen(str) * sizeof(char) + 1);\n";
+                            ret += "strcpy(r->id, str);\n";
+                            ret += "hashmap_put(ref_map, r->id, r);\n";
+                            ret += "r->whereToWrite = &((" + c.getName() + "*)o)->" + v.getName() + ";\n";
+                        }
+                    }
                 }
                 ret += "}\n\n";
             }
@@ -130,13 +154,8 @@ public class Deserializer {
                     parser = "parseArray";
                     type = v.getType().toUpperCase() + "_TYPE";
                 } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
-                    //parser = "parseRef";
                     type = v.getType().toUpperCase() + "_TYPE";
                 } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE) {
-                    //if (v.getType().contains("char"))
-                    //    parser = "parseStr";
-                    //else
-                    //    parser = "parseBool";
                     type = "PRIMITIVE_TYPE";
                 }
 
@@ -156,16 +175,6 @@ public class Deserializer {
         ret += "};\n";
         ret += "\n";
 
-        // FIXME temp method, should it fact try to determine the actual type
-        for (Classifier c : Generator.classifiers.values())
-            if (c.isAbstract())
-                ret += "void* new_" + c.getName() + "()\n{}\n\n";
-
-        ret += "\n";
-        ret += "const fptrConstruct construct[NB_CLASSES] = {\n";
-        for (Classifier c : Generator.classifiers.values()) // see for abstract classes
-            ret += "\t[" + c.getName().toUpperCase() + "_TYPE] = new_" + c.getName() + ",\n";
-        ret += "};\n";
 
         ret += TemplateManager.getInstance().getJsondeserial_source();
 
