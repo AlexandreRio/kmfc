@@ -47,6 +47,7 @@ public class Generator {
      */
     private void clean() {
         try {
+	    //TODO ask if it's ok to delete
             FileManager.delete(this.context.getGenerationDirectory());
         } catch (IOException e) {
             System.err.println("Error while cleaning output directory: " + e.getMessage());
