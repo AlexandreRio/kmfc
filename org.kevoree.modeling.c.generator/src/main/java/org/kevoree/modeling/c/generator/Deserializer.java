@@ -2,6 +2,7 @@ package org.kevoree.modeling.c.generator;
 
 import org.kevoree.modeling.c.generator.model.Classifier;
 import org.kevoree.modeling.c.generator.model.Variable;
+import org.kevoree.modeling.c.generator.model.Function;
 import org.kevoree.modeling.c.generator.utils.FileManager;
 import org.kevoree.modeling.c.generator.utils.HelperGenerator;
 
@@ -136,6 +137,12 @@ public class Deserializer {
 	    }
 	  }
 	} else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
+	  String fun = "";
+	  //TODO look into _all_ functions
+	  for (Function f : c.getFunctions())
+	    if (f.getSignature().contains("Add" + HelperGenerator.upperCaseFirstChar(v.getName())))
+	      fun = f.getSignature();
+	  System.out.println("Found function is " + fun);
 	  ret += 
 	    "char type = JSON_TYPE_ARRAY;\n" +
 	    "while((type = jsonparse_next(state)) != ']')\n" +
@@ -146,7 +153,7 @@ public class Deserializer {
 	    "parseObject(state, ptr, ptr_type, ptr_type);\n" +
 
 	    //TODO look into the Classifier for the correct name of the function because it may be inherited
-	    "((" + c.getName() + "*)o)->VT->" + HelperGenerator.lowerCaseFirstChar(c.getName()) + "Add" + HelperGenerator.upperCaseFirstChar(v.getName()) + "(o, ptr);\n" +
+	    "((" + c.getName() + "*)o)->VT->" + fun + "(o, ptr);\n" +
 	    "}\n" +
 	    "}\n";
 	  ret += "}\n\n";
