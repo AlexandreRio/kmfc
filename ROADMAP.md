@@ -19,6 +19,7 @@
 - [x] Add kevoree.h which include all structure headers
 - [x] Implement visitor design pattern
 - [x] Implement serialization
+- [ ] Implement a compact json serialization option
 - [ ] Implement deserialization
 - [ ] Implement a deserialization that instanciate only the current node
 - [ ] Implement comparison
