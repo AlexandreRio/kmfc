@@ -112,7 +112,7 @@ public class Classifier {
                 allVars.addAll(Generator.classifiers.get(parent).getVariables());
 
         String serialBody = "\tprintf(\"{\\n\");\n";
-        serialBody += "\tprintf(\"\\\"eClass\\\":\\\"org.kevoree.%s\\\",\\n\", this->VT->metaClassName(this));\n";
+        serialBody += "\tprintf(\"\\\"eClass\\\":\\\"org.kevoree.%s\\\"\", this->VT->metaClassName(this));\n";
         Iterator<Variable> it = allVars.iterator();
         while (it.hasNext()) {
             Variable v = it.next();

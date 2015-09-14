@@ -1,4 +1,4 @@
-	#[[printf("\"]]#$ref#[[\" : [\n"]]#);
+	#[[printf(",\n\"]]#$ref#[[\" : [\n"]]#);
 	#[[if (this->]]#$ref#[[ != NULL)]]#
 	{
 		#[[hashmap_map* m = (hashmap_map*) this->]]#$ref#[[;]]#
@@ -10,4 +10,4 @@
 				printf(",\n");
 		}
 	}
-	printf("]#if ($printComma),#end\n");
+	printf("]");

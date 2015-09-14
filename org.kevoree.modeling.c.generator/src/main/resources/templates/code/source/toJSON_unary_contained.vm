@@ -1,6 +1,6 @@
 	#[[if (this->]]#$ref#[[ != NULL)]]#
 	{
-		#[[printf("\"]]#$ref#[[\" : [\n");]]#
+		#[[printf(",\n\"]]#$ref#[[\" : [\n");]]#
 		#[[this->]]#$ref#[[->VT->fptrToJSON(this->]]#$ref#[[);]]#
-		printf("]#if ($printComma),#end\n");
+		printf("]");
 	}

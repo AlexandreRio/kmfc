@@ -1,2 +1,2 @@
 #[[if (this->]]#$ref#[[ != NULL)
-printf("\"]]#$ref#[[\" : \"%d\"]]##if($printComma),#end#[[\n", this->]]#$ref);
+printf(",\n\"]]#$ref#[[\" : \"%d\"]]##[[", this->]]#$ref);
