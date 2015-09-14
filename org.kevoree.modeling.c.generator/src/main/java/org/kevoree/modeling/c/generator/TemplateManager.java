@@ -26,6 +26,7 @@ public class TemplateManager {
 
     private Template gen_toJSON_multiple;
     private Template gen_toJSON_unary;
+    private Template gen_toJSON_unary_contained;
     private Template gen_toJSON_primitive_as_str;
     private Template gen_toJSON_primitive_bool;
 
@@ -54,27 +55,28 @@ public class TemplateManager {
     private String header_comment;
 
     private TemplateManager() {
-        String BASE_DIR = "templates/";
-        String CODE_DIR = "code/";
-        String TEST_DIR = "test/";
-        String COMMENTS_DIR = "comments/";
-        String SOURCE_DIR = "source/";
-        String HEADER_DIR = "header/";
-        ve.setProperty("file.resource.loader.class", ClasspathResourceLoader.class.getName());
-        ve.init();
+      String BASE_DIR = "templates/";
+      String CODE_DIR = "code/";
+      String TEST_DIR = "test/";
+      String COMMENTS_DIR = "comments/";
+      String SOURCE_DIR = "source/";
+      String HEADER_DIR = "header/";
+      ve.setProperty("file.resource.loader.class", ClasspathResourceLoader.class.getName());
+      ve.init();
 
-        gen_cmakelists = ve.getTemplate(BASE_DIR + "cmake.vm");
-        gen_add = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "add.vm");
-        gen_add_unary_containment = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "add_unary_containment.vm");
-        gen_remove = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "remove.vm");
-        gen_visitor = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "visitor.vm");
-        gen_visitor_ref = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "visitor_ref.vm");
-        gen_delete = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "delete.vm");
-        gen_new = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "new.vm");
-        gen_find_by_id = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "findById.vm");
+      gen_cmakelists = ve.getTemplate(BASE_DIR + "cmake.vm");
+      gen_add = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "add.vm");
+      gen_add_unary_containment = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "add_unary_containment.vm");
+      gen_remove = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "remove.vm");
+      gen_visitor = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "visitor.vm");
+      gen_visitor_ref = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "visitor_ref.vm");
+      gen_delete = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "delete.vm");
+      gen_new = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "new.vm");
+      gen_find_by_id = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "findById.vm");
 
-        gen_toJSON_multiple = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_multiple.vm");
-        gen_toJSON_unary = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_unary.vm");
+      gen_toJSON_multiple = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_multiple.vm");
+      gen_toJSON_unary = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_unary.vm");
+      gen_toJSON_unary_contained = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_unary_contained.vm");
         gen_toJSON_primitive_as_str = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_primitive_as_str.vm");
         gen_toJSON_primitive_bool = ve.getTemplate(BASE_DIR + CODE_DIR + SOURCE_DIR + "toJSON_primitive_bool.vm");
 
@@ -174,6 +176,10 @@ public class TemplateManager {
 
     public Template getGen_toJSON_unary() {
         return gen_toJSON_unary;
+    }
+
+    public Template getGen_toJSON_unary_contained() {
+        return gen_toJSON_unary_contained;
     }
 
     public Template getGen_toJSON_primitive_as_str() {

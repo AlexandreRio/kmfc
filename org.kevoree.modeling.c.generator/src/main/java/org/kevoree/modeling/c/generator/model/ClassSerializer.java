@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.kevoree.modeling.c.generator.utils.HelperGenerator.lowerCaseFirstChar;
 
+//TODO move to the upper package
 public abstract class ClassSerializer {
 
     private static String generateHeaderIncludes(Classifier cls) {

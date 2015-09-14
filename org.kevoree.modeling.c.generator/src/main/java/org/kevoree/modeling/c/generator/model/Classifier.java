@@ -88,7 +88,11 @@ public class Classifier {
         } else if (v.getLinkType() == Variable.LinkType.PRIMITIVE && !ConverterDataTypes.getInstance().isPrimitive(v.getType())) {
             TemplateManager.getInstance().getGen_toJSON_primitive_as_str().merge(context, result);
         } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
+          if (v.isContained())
+            TemplateManager.getInstance().getGen_toJSON_unary_contained().merge(context, result);
+          else
             TemplateManager.getInstance().getGen_toJSON_unary().merge(context, result);
+
         } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
             context.put("type", v.getType());
             TemplateManager.getInstance().getGen_toJSON_multiple().merge(context, result);
