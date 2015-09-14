@@ -28,8 +28,10 @@ char* parseStr(struct jsonparse_state *state)
 	while((type = jsonparse_next(state)) != JSON_TYPE_STRING)
 	{}
 	jsonparse_copy_value(state, attr, sizeof attr);
-	printf("found str %s\n", attr);
-	return attr;
+	char* toReturn = malloc(strlen(attr) + 1);
+	strcpy(toReturn, attr);
+	printf("found str %s copied is %s\n", attr, toReturn);
+	return toReturn;
 }
 
 void doNothing(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type)

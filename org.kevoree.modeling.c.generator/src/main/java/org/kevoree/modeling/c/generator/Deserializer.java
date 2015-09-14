@@ -10,7 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ArrayList;
 
+//TODO should be renamed to JSONDeserializer
 public class Deserializer {
 
   public static void generateDeserializer(GenerationContext context) throws IOException {
@@ -80,7 +82,7 @@ public class Deserializer {
       "void ContainerRootSetKMF_ID(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type);\n" +
       "void doNothing(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type);\n";
 
-    // FIXME temp method, should it fact try to determine the actual type
+    // FIXME temp method, should in fact try to determine the actual type
     for (Classifier c : Generator.classifiers.values())
       if (c.isAbstract())
 	ret += "void* new_" + c.getName() + "()\n{}\n\n";
@@ -138,11 +140,19 @@ public class Deserializer {
 	  }
 	} else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
 	  String fun = "";
+
+	  ArrayList<Function> allFunctions = new ArrayList<Function>(c.getFunctions());
+	  for (String cl : c.getAllSuperClass())
+	    if (!cl.equals("KMFContainer"))
+	      allFunctions.addAll(Generator.classifiers.get(cl).getFunctions());
+
 	  //TODO look into _all_ functions
-	  for (Function f : c.getFunctions())
+	  for (Function f : allFunctions)
 	    if (f.getSignature().contains("Add" + HelperGenerator.upperCaseFirstChar(v.getName())))
-	      fun = f.getSignature();
+	      fun = HelperGenerator.lowerCaseFirstChar(f.getSignature());
+
 	  System.out.println("Found function is " + fun);
+
 	  ret += 
 	    "char type = JSON_TYPE_ARRAY;\n" +
 	    "while((type = jsonparse_next(state)) != ']')\n" +
@@ -151,13 +161,13 @@ public class Deserializer {
 	    "{\n" +
 	    "void* ptr = construct[ptr_type]();\n" +
 	    "parseObject(state, ptr, ptr_type, ptr_type);\n" +
+	    "if (ptr != NULL)\n" +
 
-	    //TODO look into the Classifier for the correct name of the function because it may be inherited
-	    "((" + c.getName() + "*)o)->VT->" + fun + "(o, ptr);\n" +
+	    "\t((" + c.getName() + "*)o)->VT->" + fun + "(o, ptr);\n" +
 	    "}\n" +
 	    "}\n";
-	  ret += "}\n\n";
 	}
+        ret += "}\n\n";
       }
     }
     for (Classifier c : Generator.classifiers.values()) {
