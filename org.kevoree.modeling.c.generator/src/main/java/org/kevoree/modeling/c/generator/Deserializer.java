@@ -15,7 +15,29 @@ import java.util.ArrayList;
 //TODO should be renamed to JSONDeserializer
 public class Deserializer {
 
+  //TODO this should definitively not be here but eh ¯\_(ツ)_/¯
+  private static void constructAbstractHierarchy() {
+    //TODO rework: map all concrete class implementing an abstract class
+    // <eClass string> : <Abstract TYPE>
+    for (Classifier cl : Generator.classifiers.values()) {
+      if (cl.isAbstract()) {
+	for (Classifier child : Generator.classifiers.values()) {
+	  if (child.getSuperClass().equals(cl.getName())) {
+	    if (child.isAbstract()) {
+	      System.err.println("Seriously? Abstract inherited from another abstract, this isn't supported meh " + child.getName() + " parent " + cl.getName());
+	    }
+	    else {
+	      System.out.println(child.getName() + " inherit from " + cl.getName());
+	    }
+	  }
+	}
+      }
+    }
+
+  }
+
   public static void generateDeserializer(GenerationContext context) throws IOException {
+    constructAbstractHierarchy();
     generateHeader(context);
     generateSource(context);
   }
@@ -146,12 +168,9 @@ public class Deserializer {
 	    if (!cl.equals("KMFContainer"))
 	      allFunctions.addAll(Generator.classifiers.get(cl).getFunctions());
 
-	  //TODO look into _all_ functions
 	  for (Function f : allFunctions)
 	    if (f.getSignature().contains("Add" + HelperGenerator.upperCaseFirstChar(v.getName())))
 	      fun = HelperGenerator.lowerCaseFirstChar(f.getSignature());
-
-	  System.out.println("Found function is " + fun);
 
 	  ret += 
 	    "char type = JSON_TYPE_ARRAY;\n" +
