@@ -1,18 +1,23 @@
 # KMFC
 
 Rewrite of a cpp code generator from kevoree meta-model.
-Original write is by [Jean-Emile](https://github.com/Jean-Emile) and is located [here](https://github.com/kevoree/kmfcpp).
+Originally written by [Jean-Emile](https://github.com/Jean-Emile) and located [here](https://github.com/kevoree/kmfcpp).
+
+# Interest
+
+The goal of the kmfc is to provide a set of tools to dynamically deploy or reconfigure systems. Many other implementations exist
+in high-level language but this version aims the IoT world.
 
 ## Class generator
+You can also see the project [Roadmap](ROADMAP.md).
 
-See `org.kevoree.modeling.c.generator` for class generation and its [Readme](/org.kevoree.modeling.c.generator/README.md)
+See `org.kevoree.modeling.c.generator` to know how the classes generation is done and its [Readme](/org.kevoree.modeling.c.generator/README.md)
 for further reading.
 
 ### Progress
 
 We currently produce a full structure of classes to store instance of models.
-
-You can also see the project [Roadmap](ROADMAP.md).
+A set a unit tests is generated to check the behavior of every methods.
 
 ## Manipulation library
 
