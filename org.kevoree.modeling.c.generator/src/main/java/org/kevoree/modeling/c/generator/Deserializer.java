@@ -33,8 +33,7 @@ public class Deserializer {
     private static void constructAbstractHierarchy() {
         abstractClassifiers = new ArrayList<String>();
         concreteClassifiers = new ArrayList<String>();
-        //TODO rework: map all concrete class implementing an abstract class
-        // <eClass string> : <Abstract TYPE>
+
         for (Classifier cl : Generator.classifiers.values())
             if (cl.isAbstract())
                 abstractClassifiers.add(cl.getName());
@@ -50,13 +49,8 @@ public class Deserializer {
 
     }
 
-    private static void generateConstructorPointerFromeClass() {
-
-    }
-
     public static void generateDeserializer(GenerationContext context) throws IOException {
         constructAbstractHierarchy();
-        generateConstructorPointerFromeClass();
         generateHeader(context);
         generateSource(context);
     }
@@ -101,6 +95,32 @@ public class Deserializer {
                 "jsondeserializer.h", ret, false);
     }
 
+    private static void generateSource(GenerationContext context) throws IOException {
+        String ret = "";
+
+        ret += HelperGenerator.genIncludeLocal("jsondeserializer");
+
+        ret += generateDeclaration();
+
+        // FIXME temp method, should in fact try to determine the actual type
+        for (Classifier c : Generator.classifiers.values())
+            if (c.isAbstract())
+                ret += "void* new_" + c.getName() + "()\n{}\n\n";
+
+        ret += "\n";
+        ret += generateLookAheadFunction();
+        ret += generateConstructorTable();
+        ret += generateSetteFunctions();
+        ret += generateClassifierMaps();
+        ret += generateClassDescriptors();
+        ret += "\n";
+
+        ret += TemplateManager.getInstance().getJsondeserial_source();
+
+        FileManager.writeFile(context.getGenerationDirectory().getAbsolutePath() + File.separator +
+                "jsondeserializer.c", ret, false);
+    }
+
     private static String generateDeclaration() {
         String ret = "\nchar attr[200];\n" +
                 "map_t ref_map;\n" +
@@ -119,6 +139,16 @@ public class Deserializer {
                 "void ContainerRootSetKMF_ID(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type);\n" +
                 "void doNothing(struct jsonparse_state* state, void* o, TYPE obj_type, TYPE ptr_type);\n";
 
+        return ret;
+    }
+
+    private static String generateLookAheadFunction() {
+        String ret = "void* lookAheadNexeClass(struct jsonparse_state* state)\n";
+        ret += "{\n" +  // TODO need to copy the state, get the next eClass str,
+                // loop over the Java list concreteClass and compare
+                // and finally return the associated constructor fptr
+                "return NULL;\n" +
+                "}\n";
         return ret;
     }
 
@@ -180,31 +210,33 @@ public class Deserializer {
                 } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
                     String fun = "";
 
+                    // Determine the signature of the function to call on the object to add a new
+                    // element to the map
                     ArrayList<Function> allFunctions = new ArrayList<Function>(c.getFunctions());
                     for (String cl : c.getAllSuperClass())
                         if (!cl.equals("KMFContainer"))
                             allFunctions.addAll(Generator.classifiers.get(cl).getFunctions());
-
                     for (Function f : allFunctions)
                         if (f.getSignature().contains("Add" + HelperGenerator.upperCaseFirstChar(v.getName())))
                             fun = HelperGenerator.lowerCaseFirstChar(f.getSignature());
 
+                    ret += "char type = JSON_TYPE_ARRAY;\n" +
+                            "while((type = jsonparse_next(state)) != ']')\n" +
+                            "{\n" +
+                            "if (type == JSON_TYPE_OBJECT)\n" +
+                            "{\n";
 
-//	    ret += "//this is an abstract object\n";
+                    // Determine the constructor to call in order to create the new object
+                    if (abstractClassifiers.contains(v.getType()))
+                        ret += "void* ptr = lookAheadNexteClass(state);\n";
+                    else
+                        ret += "void* ptr = construct[ptr_type]();\n";
 
-                    ret +=
-                            "char type = JSON_TYPE_ARRAY;\n" +
-                                    "while((type = jsonparse_next(state)) != ']')\n" +
-                                    "{\n" +
-                                    "if (type == JSON_TYPE_OBJECT)\n" +
-                                    "{\n" +
-                                    "void* ptr = construct[ptr_type]();\n" +
-                                    "parseObject(state, ptr, ptr_type, ptr_type);\n" +
-                                    "if (ptr != NULL)\n" +
-
-                                    "\t((" + c.getName() + "*)o)->VT->" + fun + "(o, ptr);\n" +
-                                    "}\n" +
-                                    "}\n";
+                    ret += "parseObject(state, ptr, ptr_type, ptr_type);\n" +
+                            "if (ptr != NULL)\n" +
+                            "\t((" + c.getName() + "*)o)->VT->" + fun + "(o, ptr);\n" +
+                            "}\n" +
+                            "}\n";
                 }
                 ret += "}\n\n";
             }
@@ -254,28 +286,4 @@ public class Deserializer {
         return ret;
     }
 
-    private static void generateSource(GenerationContext context) throws IOException {
-        String ret = "";
-
-        ret += HelperGenerator.genIncludeLocal("jsondeserializer");
-
-        ret += generateDeclaration();
-
-        // FIXME temp method, should in fact try to determine the actual type
-        for (Classifier c : Generator.classifiers.values())
-            if (c.isAbstract())
-                ret += "void* new_" + c.getName() + "()\n{}\n\n";
-
-        ret += "\n";
-        ret += generateConstructorTable();
-        ret += generateSetteFunctions();
-        ret += generateClassifierMaps();
-        ret += generateClassDescriptors();
-        ret += "\n";
-
-        ret += TemplateManager.getInstance().getJsondeserial_source();
-
-        FileManager.writeFile(context.getGenerationDirectory().getAbsolutePath() + File.separator +
-                "jsondeserializer.c", ret, false);
-    }
 }
