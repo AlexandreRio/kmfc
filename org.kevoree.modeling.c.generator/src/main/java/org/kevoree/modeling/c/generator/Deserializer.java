@@ -143,13 +143,38 @@ public class Deserializer {
     }
 
     private static String generateLookAheadFunction() {
-        String ret = "void* lookAheadNexeClass(struct jsonparse_state* state)\n";
-        ret += "{\n" +  // TODO need to copy the state, get the next eClass str,
-                // loop over the Java list concreteClass and compare
-                // and finally return the associated constructor fptr
-                "return NULL;\n" +
-                "}\n";
-        return ret;
+        String fun = "\n" +
+                "char* readNexteClass(struct jsonparse_state* state)\n" +
+                "{\n" +
+                "  char type = JSON_TYPE_ARRAY;\n" +
+                "  while ((type = jsonparse_next(state)) != JSON_TYPE_PAIR_NAME)\n" +
+                "  { }\n" +
+                "  jsonparse_copy_value(state, attr, sizeof attr);\n" +
+                "  return parseStr(state);\n" +
+                "}\n" +
+                "\n" +
+                "void* lookAheadNexteClass(struct jsonparse_state* state)\n" +
+                "{\n" +
+                "  struct jsonparse_state copyState = *state;\n" +
+                "  char* eClass = readNexteClass(&copyState);\n" +
+                "  void* (*constructorFptr)();\n" +
+                "  if (strcmp(\"org.kevoree.NodeType\", eClass) == 0)\n" + // TODO should be generated
+                "    constructorFptr = new_NodeType;\n" +
+                "  else if (strcmp(\"org.kevoree.GroupType\", eClass) == 0)\n" +
+                "    constructorFptr = new_GroupType;\n" +
+                "  else if (strcmp(\"org.kevoree.ComponentType\", eClass) == 0)\n" +
+                "    constructorFptr = new_ComponentType;\n" +
+                "\n" +
+                "  return constructorFptr();\n" +
+                "}\n\n";
+        return fun;
+        //String ret = "void* lookAheadNexteClass(struct jsonparse_state* state)\n";
+        //ret += "{\n" +  // TODO need to copy the state, get the next eClass str,
+        //        // loop over the Java list concreteClass and compare
+        //        // and finally return the associated constructor fptr
+        //        "return NULL;\n" +
+        //        "}\n";
+        //return ret;
     }
 
     private static String generateConstructorTable() {
@@ -175,37 +200,27 @@ public class Deserializer {
                 ret += "{\n";
                 if (v.getType().equals("char")) {
                     ret += "\tchar* param = parseStr(state);\n";
-                    if (!c.isAbstract()) {
                         ret += "\tvoid* dest = ((" + c.getName() + "*)o)->" + v.getName() + ";\n";
                         ret += "\tif (strlen(param) < 9)\n";
                         ret += "\t\tstrcpy(dest, param);\n";
-                    }
                 } else if (v.getType().equals("char*")) {
                     ret += "\tchar* param = parseStr(state);\n";
-                    if (!c.isAbstract()) {
-                        //                        ret += "((" + c.getName() + "*)o)->" + v.getName() + " = malloc(strlen(param) * sizeof(char) +1);\n";
-                        ret += "((" + c.getName() + "*)o)->" + v.getName() + " = param;\n";
-                        //                        ret += "printf(\"setted value is %s\\n\", ((" + c.getName() + "*)o)->" + v.getName() + ");\n";
-                    }
+                    ret += "((" + c.getName() + "*)o)->" + v.getName() + " = param;\n";
                 } else if (v.getLinkType() == Variable.LinkType.UNARY_LINK) {
                     if (v.isContained()) {
                         ret += "char type;\n";
                         ret += "while((type = jsonparse_next(state)) != '{') {}\n";
                         ret += v.getType() + "* ptr = construct[ptr_type]();\n";
-                        if (!c.isAbstract()) {
-                            ret += "((" + c.getName() + "*)o)->" + v.getName() + " = ptr;\n";
-                            ret += "parseObject(state, ptr, ptr_type, ptr_type);\n";
-                        }
+                        ret += "((" + c.getName() + "*)o)->" + v.getName() + " = ptr;\n";
+                        ret += "parseObject(state, ptr, ptr_type, ptr_type);\n";
                     } else {
                         ret += "ref* r = malloc(sizeof(ref) + 1);\n";
                         ret += "char* str = parseStr(state);\n";
                         ret += "printf(\"storing: %s\\n\", str);\n";
-                        if (!c.isAbstract()) {
-                            ret += "r->id = malloc(strlen(str) * sizeof(char) + 1);\n";
-                            ret += "strcpy(r->id, str);\n";
-                            ret += "hashmap_put(ref_map, r->id, r);\n";
-                            ret += "r->whereToWrite = &((" + c.getName() + "*)o)->" + v.getName() + ";\n";
-                        }
+                        ret += "r->id = malloc(strlen(str) * sizeof(char) + 1);\n";
+                        ret += "strcpy(r->id, str);\n";
+                        ret += "hashmap_put(ref_map, r->id, r);\n";
+                        ret += "r->whereToWrite = &((" + c.getName() + "*)o)->" + v.getName() + ";\n";
                     }
                 } else if (v.getLinkType() == Variable.LinkType.MULTIPLE_LINK) {
                     String fun = "";
