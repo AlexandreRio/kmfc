@@ -142,6 +142,7 @@ public class Deserializer {
         return ret;
     }
 
+    //TODO produce pure abstact or full abstract table based on compiler option
     private static String generateLookAheadFunction() {
         String fun = "\n" +
                 "char* readNexteClass(struct jsonparse_state* state)\n" +

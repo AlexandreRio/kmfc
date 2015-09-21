@@ -9,15 +9,16 @@ The goal of the kmfc is to provide a set of tools to dynamically deploy or recon
 in high-level language but this version aims the IoT world.
 
 ## Class generator
-You can also see the project [Roadmap](ROADMAP.md).
 
 See `org.kevoree.modeling.c.generator` to know how the classes generation is done and its [Readme](/org.kevoree.modeling.c.generator/README.md)
 for further reading.
 
-### Progress
+# Progress
 
 We currently produce a full structure of classes to store instance of models.
 A set a unit tests is generated to check the behavior of every methods.
+
+You can also see the project [Roadmap](ROADMAP.md).
 
 ## Manipulation library
 
