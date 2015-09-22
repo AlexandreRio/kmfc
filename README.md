@@ -4,6 +4,25 @@ Rewrite of a cpp code generator from kevoree meta-model.
 Originally written by [Jean-Emile](https://github.com/Jean-Emile) and located [here](https://github.com/kevoree/kmfcpp) and
 based on the hand-crafted work of [kYc0o](https://github.com/kYc0o/kevoree-c-reloaded).
 
+# Quick usage
+
+Go the main folder
+
+`cd org.kevoree.modeling.c.generator`
+
+It contains a wrapper compiling KMF and generating a Kevoree version from a default metamodel, run it.
+
+`./wrapper`
+
+If everything goes well, and it should, your working version is under `kevoree/`, and can run some unit tests to check the generated code.
+
+```bash
+cd kevoree/build
+./test_runner
+```
+
+And voilà!
+
 # Interest: model@runtime
 
 The goal of kmfc is to provide a set of tools to dynamically deploy or reconfigure systems. Many other implementations exist
